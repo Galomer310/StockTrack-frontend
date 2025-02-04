@@ -1,0 +1,565 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+    
+  body {
+    font-family: 'Open Sans', sans-serif;
+    background: #f4f6f8;
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+  }
+  
+  /* Container for centralized content */
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  /* ---------- Navbar Styles ---------- */
+/* frontend/src/components/Navbar.css */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #007bff;
+  padding: 10px 20px;
+  color: #fff;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.navbar-links {
+  list-style: none;
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-links li {
+  margin-left: 20px;
+}
+
+.navbar-links li a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1rem;
+}
+
+.navbar-links li a:hover {
+  text-decoration: underline;
+}
+
+  /* ---------- Home Page ---------- */
+/* Ensure the container fills the entire viewport */
+.home-container {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  background-image: url('./images//backgrondImage.webp');
+}
+
+/* Hero section styling */
+.hero {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Full-screen background image */
+.hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.7); /* Darken the image slightly for better text contrast */
+}
+
+/* Dynamic color animation for text */
+@keyframes dynamic-color {
+  0% {
+      color: #d30000;
+  }
+  25% {
+      color: #007bff;
+  }
+  50% {
+      color: #28a745;
+  }
+  75% {
+      color: #ff9800;
+  }
+  100% {
+      color: #d30000;
+  }
+}
+
+/* Apply animation to hero overlay */
+.hero-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #d30000;
+  padding: 0 20px;
+  animation: dynamic-color 10s infinite;
+}
+
+/* Main heading style with dynamic color */
+.hero-overlay h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  font-family:cursive;
+  animation: dynamic-color 10s infinite;
+}
+
+/* Paragraph style with dynamic color */
+.hero-overlay p {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: left;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 900;
+  animation: dynamic-color 10s infinite;
+}
+
+
+/* Button container and individual button styling */
+.hero-buttons .btn {
+  background-color: #007bff;
+  padding: 0.75rem 1.5rem;
+  margin: 0 0.5rem;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+  font-size: 1rem;
+}
+
+.hero-buttons .btn:hover {
+  background-color: #0056b3;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hero-overlay h1 {
+    font-size: 2.5rem;
+  }
+  .hero-overlay p {
+    font-size: 1.2rem;
+  }
+  .hero-buttons .btn {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
+}
+
+
+  /* ---------- Authentication (Login & Register) ---------- */
+  .login-container,
+  .register-container {
+    background: #fff;
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .login-container form,
+  .register-container form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .login-container input,
+  .register-container input {
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .login-container button,
+  .register-container button {
+    padding: 10px;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.3s ease;
+  }
+  
+  .login-container button:hover,
+  .register-container button:hover {
+    background: #53d2a3;
+  }
+  
+  /* ---------- Stock Search Page ---------- */
+  .stock-search {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px auto;
+    max-width: 800px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .stock-search h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .stock-search input[type="text"],
+  .stock-search input[type="number"] {
+    padding: 10px;
+    margin: 10px 5px;
+    width: calc(50% - 20px);
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .stock-search button {
+    margin: 5px;
+    padding: 10px 20px;
+    background: #28a745;
+    border: none;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .stock-search button:hover {
+    background: #218838;
+  }
+  
+  .stock-search .market-status {
+    margin-top: 10px;
+    color: #ff0000;
+    font-weight: bold;
+  }
+  
+  .stock-search .error {
+    margin-top: 10px;
+    color: #dc3545;
+  }
+  
+  /* ---------- Company Info Section ---------- */
+  .company-info {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+  }
+  
+  .company-info img {
+    margin-right: 20px;
+    border-radius: 4px;
+    max-width: 100px;
+  }
+  
+  .company-info h3 {
+    margin-bottom: 5px;
+  }
+  
+  .company-info p {
+    margin: 2px 0;
+  }
+  
+  /* ---------- Stock Info Section ---------- */
+  .stock-info {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 4px;
+  }
+  
+  .stock-info h3 {
+    margin-bottom: 10px;
+  }
+  
+  .stock-info p {
+    margin-bottom: 5px;
+  }
+  
+  /* ---------- Additional Company Details ---------- */
+  .company-details {
+    background: #e9ecef;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+  }
+  
+  .company-details h4 {
+    margin-bottom: 10px;
+  }
+  
+  .company-details p {
+    margin-bottom: 5px;
+  }
+  
+  /* ---------- Company News Section ---------- */
+  .company-news {
+    margin: 20px 0;
+  }
+  
+  .company-news h4 {
+    margin-bottom: 10px;
+  }
+  
+  .company-news ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  .company-news li {
+    margin-bottom: 10px;
+  }
+  
+  .company-news a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .company-news a:hover {
+    text-decoration: underline;
+  }
+  
+  /* ---------- User Dashboard ---------- */
+  .user-page-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+  }
+  
+  /* ---------- Watchlist ---------- */
+  .watchlist {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px auto;
+    box-shadow: 0 7px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .watchlist h3 {
+    margin-bottom: 10px;
+  }
+  
+  .watchlist h4 {
+    margin-bottom: 15px;
+  }
+  
+  .watchlist ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .watchlist li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+  }
+  
+  .watchlist li:last-child {
+    border-bottom: none;
+  }
+  
+  /* ---------- Edit Mode for Watchlist Items ---------- */
+  .watchlist input[type="number"],
+  .watchlist input[type="datetime-local"] {
+    padding: 5px;
+    margin: 5px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 100%;
+  }
+  
+  .watchlist button {
+    background: #ffc107;
+    border: none;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 5px;
+    transition: background 0.3s ease;
+  }
+  
+  .watchlist button:hover {
+    background: #e78127;
+  }
+
+  /* Styles for each row in the watchlist */
+.watchlist-row {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #ffffff;
+  transition: background-color 0.3s ease;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  color: #202124;
+}
+
+/* Change background on hover */
+.watchlist-row:hover {
+  background-color: #f8f9fa;
+}
+
+/* Each child div inside the row */
+.watchlist-row div {
+  flex: 1;
+  padding: 0 8px;
+}
+
+/* Style for the ticker column; make it a bit narrower and bold */
+.watchlist-row .ticker {
+  flex: 0.5;
+  font-weight: 600;
+}
+
+/* Right-align numeric or date fields */
+.watchlist-row .price,
+.watchlist-row .quantity,
+.watchlist-row .added {
+  text-align: right;
+  color: #5f6368;
+}
+
+/* Actions column (buttons) styling */
+.watchlist-row .actions {
+  flex: 1;
+  text-align: right;
+}
+
+/* Optional: Style for editing mode */
+.watchlist-row.editing {
+  background-color: #fff7e6;
+}
+
+.watchlist-row.editing input[type="number"],
+.watchlist-row.editing input[type="datetime-local"] {
+  width: 100%;
+  padding: 4px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+  
+  /* ---------- Global Button Styles ---------- */
+  button {
+    padding: 10px 20px;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  /* ---------- Responsive Styles ---------- */
+  @media (max-width: 768px) {
+    .stock-search input[type="text"],
+    .stock-search input[type="number"] {
+      width: calc(100% - 20px);
+      margin: 10px 0;
+    }
+  }
+  
+
+
+  /* Example styles for the portfolio performance table */
+.portfolio-performance {
+  margin: 20px auto;
+  max-width: 800px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.portfolio-performance h3 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.portfolio-performance table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.portfolio-performance th,
+.portfolio-performance td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+.portfolio-performance th {
+  background-color: #f1f3f4;
+}
+
+/* Styles for the watchlist header row */
+.watchlist-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #f1f3f4;  /* light gray background for the header */
+  border-bottom: 2px solid #ccc; /* a slightly darker border to separate from data rows */
+  font-weight: bold;
+  font-size: 14px;
+}
+
+/* Each column in the header */
+.watchlist-header > div {
+  flex: 1;              /* default flex value for equal spacing */
+  text-align: center;   /* center text by default */
+  cursor: pointer;      /* indicates clickable sorting */
+}
+
+/* Ticker column: narrower and left-aligned */
+.watchlist-header .ticker {
+  flex: 0.7;
+  text-align: left;
+  padding-left: 8px;
+}
+
+/* Price column: right-aligned for numbers */
+.watchlist-header .price {
+  flex: 1;
+  text-align: right;
+  padding-right: 8px;
+}
+
+/* Quantity column: right-aligned */
+.watchlist-header .quantity {
+  flex: 1;
+  text-align: right;
+  padding-right: 8px;
+}
+
+/* Added column: slightly wider and right-aligned */
+.watchlist-header .added {
+  flex: 1.2;
+  text-align: right;
+  padding-right: 8px;
+}
+
+/* Actions column: center-aligned */
+.watchlist-header .actions {
+  flex: 1;
+  text-align: center;
+}

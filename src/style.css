@@ -26,21 +26,21 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #007bff;
+  background-color: #2f4a66;
   padding: 10px 20px;
   color: #fff;
 }
 
 .navbar-brand {
-  font-size: 1.5rem;
+  font-size: 1rem;
   font-weight: bold;
 }
 
 .navbar-links {
   list-style: none;
   display: flex;
-  margin: 0;
-  padding: 0;
+  margin: 2px;
+  padding: 2px;
 }
 
 .navbar-links li {
@@ -54,8 +54,32 @@
 }
 
 .navbar-links li a:hover {
-  text-decoration: underline;
+  text-decoration: none;
+  color: #ff0000;
 }
+
+/* Responsive Navbar */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .navbar-links {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .navbar-links li {
+    margin: 10px 0;
+  }
+
+  .navbar-brand {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+  }
+}
+
 
   /* ---------- Home Page ---------- */
 /* Ensure the container fills the entire viewport */
@@ -64,7 +88,9 @@
   height: 100vh;
   overflow: hidden;
   position: relative;
-  background-image: url('./images//backgrondImage.webp');
+  background-image: url('./images/backgrondImage.webp');
+  background-size: cover;
+  background-position: center;
 }
 
 /* Hero section styling */
@@ -82,24 +108,6 @@
   filter: brightness(0.7); /* Darken the image slightly for better text contrast */
 }
 
-/* Dynamic color animation for text */
-@keyframes dynamic-color {
-  0% {
-      color: #d30000;
-  }
-  25% {
-      color: #007bff;
-  }
-  50% {
-      color: #28a745;
-  }
-  75% {
-      color: #ff9800;
-  }
-  100% {
-      color: #d30000;
-  }
-}
 
 /* Apply animation to hero overlay */
 .hero-overlay {
@@ -148,14 +156,26 @@
   background-color: #0056b3;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
+/* Responsive Hero Section */
+@media (max-width: 1024px) {
   .hero-overlay h1 {
     font-size: 2.5rem;
   }
+
   .hero-overlay p {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
   }
+}
+
+@media (max-width: 768px) {
+  .hero-overlay h1 {
+    font-size: 2rem;
+  }
+
+  .hero-overlay p {
+    font-size: 1.1rem;
+  }
+
   .hero-buttons .btn {
     padding: 0.6rem 1.2rem;
     font-size: 0.9rem;
@@ -204,6 +224,26 @@
   .register-container button:hover {
     background: #53d2a3;
   }
+
+  /* Responsive Authentication Forms */
+@media (max-width: 576px) {
+  .login-container,
+  .register-container {
+    max-width: 90%;
+    padding: 20px;
+  }
+
+  .login-container input,
+  .register-container input {
+    font-size: 0.9rem;
+  }
+
+  .login-container button,
+  .register-container button {
+    font-size: 0.9rem;
+  }
+}
+
   
   /* ---------- Stock Search Page ---------- */
   .stock-search {
@@ -254,6 +294,8 @@
     margin-top: 10px;
     color: #dc3545;
   }
+
+  /* watchlist from here check what is needed !!!!!! */
   
   /* ---------- Company Info Section ---------- */
   .company-info {
@@ -562,4 +604,82 @@
 .watchlist-header .actions {
   flex: 1;
   text-align: center;
+}
+
+
+
+/* style for Manual add stock page */
+.manual-add-stock {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
+  font-family: Arial, sans-serif;
+
+}
+
+
+.manual-add-stock h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.manual-add-stock .error {
+  color: red;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.manual-add-stock form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.manual-add-stock input {
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.manual-add-stock input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
+}
+
+.manual-add-stock button {
+  padding: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  background-color: #007bff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.manual-add-stock button:hover {
+  background-color: #0056b3;
+}
+
+/* Image Section */
+.manual-add-stock-image {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.manual-add-stock-image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
 }

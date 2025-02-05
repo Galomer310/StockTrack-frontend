@@ -1,4 +1,3 @@
-// frontend/src/pages/ManualAddStock.tsx
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
@@ -20,7 +19,7 @@ const ManualAddStock = () => {
     e.preventDefault();
     try {
       await axios.post(
-        "http://localhost:3000/watchlist",
+        `${import.meta.env.VITE_BACKEND_API_URL}/watchlist`,
         {
           stock_symbol: stockSymbol.toUpperCase(),
           quantity,

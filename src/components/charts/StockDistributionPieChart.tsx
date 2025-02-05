@@ -1,11 +1,16 @@
-// StockDistributionPieChart.tsx
 import React, { useMemo } from "react";
 import { Pie } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import chroma from "chroma-js";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  Colors,
+} from "chart.js";
 
 // Register Chart.js components
-ChartJS.register(ArcElement, Tooltip, Legend);
-
+ChartJS.register(ArcElement, Tooltip, Legend, Colors);
 interface StockDistributionPieChartProps {
   watchlist: any[];
 }
@@ -29,29 +34,15 @@ const StockDistributionPieChart: React.FC<StockDistributionPieChartProps> = ({
   const labels = Object.keys(aggregatedData);
   const dataValues = labels.map((label) => aggregatedData[label]);
 
+  const generateDynamicColors = (count: number) =>
+    chroma.scale("Spectral").colors(count);
+
   const data = {
     labels,
     datasets: [
       {
         data: dataValues,
-        backgroundColor: [
-          "#FF6384",
-          "#36A2EB",
-          "#FFCE56",
-          "#4BC0C0",
-          "#9966FF",
-          "#FF9F40",
-          "#C9CBCF",
-        ],
-        hoverBackgroundColor: [
-          "#FF6384",
-          "#36A2EB",
-          "#FFCE56",
-          "#4BC0C0",
-          "#9966FF",
-          "#FF9F40",
-          "#C9CBCF",
-        ],
+        backgroundColor: generateDynamicColors(dataValues.length),
       },
     ],
   };

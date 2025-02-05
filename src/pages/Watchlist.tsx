@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 import { RootState } from "../store";
 import { useNavigate } from "react-router-dom";
 import StockDistributionPieChart from "../components/charts/StockDistributionPieChart";
-import PortfolioPerformance from "../components/performance/PortfolioPerformance";
 
 const Watchlist = () => {
   const [watchlist, setWatchlist] = useState<any[]>([]);
@@ -114,7 +113,7 @@ const Watchlist = () => {
   const handleSaveEdit = async (id: number) => {
     try {
       await axios.put(
-        `${import.meta.env.VITE_BACKEND_API_URL}/watchlist${id}`,
+        `${import.meta.env.VITE_BACKEND_API_URL}/watchlist/${id}`,
         editingItemData,
         {
           headers: { Authorization: `Bearer ${accessToken}` },
@@ -149,7 +148,6 @@ const Watchlist = () => {
       <h4>Total Portfolio Value: ${total.toFixed(2)}</h4>
 
       <StockDistributionPieChart watchlist={watchlist} />
-      <PortfolioPerformance watchlist={watchlist} />
 
       {/* Watchlist Table */}
       <div className="watchlist">

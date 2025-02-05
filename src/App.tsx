@@ -14,6 +14,7 @@ import UserPage from "./pages/UserPage";
 import StockSearch from "./pages/StockSearch";
 import ManualAddStock from "./pages/ManualAddStock";
 import Navbar from "./components/layout/Navbar";
+import PortfolioPerformancePage from "./pages/PortfolioPerformancePage";
 
 const App = () => {
   const user = useSelector((state: RootState) => state.auth.user);
@@ -35,6 +36,12 @@ const App = () => {
         <Route
           path="/manual-add"
           element={user ? <ManualAddStock /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/performance"
+          element={
+            user ? <PortfolioPerformancePage /> : <Navigate to="/login" />
+          }
         />
       </Routes>
     </Router>

@@ -5,13 +5,14 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 // Register Chart.js components (if using a pie chart)
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-interface WatchlistItem {
+export interface WatchlistItem {
   id: number;
   stock_symbol: string;
   price_at_time: string;
   quantity: number;
   added_at: string;
   industry?: string;
+  latestPrice?: number;
 }
 
 interface PortfolioPerformanceProps {
@@ -39,9 +40,9 @@ const PortfolioPerformance: React.FC<PortfolioPerformanceProps> = ({
         uniqueSymbols.map(async (symbol) => {
           try {
             const response = await axios.get(
-              `http://localhost:3000/stocks/${symbol}`
+              `${import.meta.env.VITE_BACKEND_API_URL}/stocks/${symbol}`
             );
-            // Assume the endpoint returns { last_price: "123.45", ... }
+
             prices[symbol] = parseFloat(response.data.last_price);
           } catch (err) {
             console.error(`Error fetching latest price for ${symbol}`, err);

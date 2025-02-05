@@ -15,6 +15,9 @@ const Navbar = () => {
         <li>
           <Link to="/search">Search Stocks</Link>
         </li>
+        <li>
+          <Link to="/performance">Performance</Link>
+        </li>
       </ul>
     </nav>
   );

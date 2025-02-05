@@ -88,7 +88,7 @@ const StockSearch: React.FC = () => {
     }
     try {
       await axios.post(
-        "http://localhost:3000/watchlist",
+        `${import.meta.env.VITE_BACKEND_API_URL}/watchlist`,
         { stock_symbol: query, quantity },
         { headers: { Authorization: `Bearer ${accessToken}` } }
       );

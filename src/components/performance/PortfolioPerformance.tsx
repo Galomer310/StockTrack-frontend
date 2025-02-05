@@ -1,4 +1,3 @@
-// frontend/src/components/PortfolioPerformance.tsx
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";

@@ -26,9 +26,12 @@ const Watchlist = () => {
     }
     const fetchWatchlist = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/watchlist", {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_API_URL}/watchlist`,
+          {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          }
+        );
         setWatchlist(response.data.watchlist);
         setTotal(response.data.total);
       } catch (err: any) {
@@ -43,9 +46,12 @@ const Watchlist = () => {
 
   const handleRemoveFromWatchlist = async (id: number) => {
     try {
-      await axios.delete(`http://localhost:3000/watchlist/${id}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
+      await axios.delete(
+        `${import.meta.env.VITE_BACKEND_API_URL}/watchlist/${id}`,
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      );
       const updatedWatchlist = watchlist.filter((stock) => stock.id !== id);
       setWatchlist(updatedWatchlist);
       const newTotal = updatedWatchlist.reduce((sum, item) => {
@@ -108,7 +114,7 @@ const Watchlist = () => {
   const handleSaveEdit = async (id: number) => {
     try {
       await axios.put(
-        `http://localhost:3000/watchlist/${id}`,
+        `${import.meta.env.VITE_BACKEND_API_URL}/watchlist${id}`,
         editingItemData,
         {
           headers: { Authorization: `Bearer ${accessToken}` },

@@ -15,11 +15,14 @@ const Login = () => {
     const userData = { email, password };
 
     try {
-      const response = await fetch("http://localhost:3000/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(userData),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_API_URL}/auth/login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(userData),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();

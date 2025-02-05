@@ -1,4 +1,3 @@
-// frontend/src/components/Navbar.tsx
 import { Link } from "react-router-dom";
 import "../../style.css";
 

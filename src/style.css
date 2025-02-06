@@ -1,685 +1,675 @@
 /* Reset and Base Styles */
+/* Apply to all elements: remove default margin and padding, and set box-sizing to border-box */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-    
-  body {
-    font-family: 'Open Sans', sans-serif;
-    background: #f4f6f8;
-    color: #333;
-    line-height: 1.6;
-    padding: 20px;
-  }
+  margin: 0;                           /* Remove default margin from all elements */
+  padding: 0;                          /* Remove default padding from all elements */
+  box-sizing: border-box;              /* Include padding and border in an element’s total width and height */
+}
   
-  /* Container for centralized content */
-  .container {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 20px;
-  }
+/* Styles for the <body> element */
+body {
+  font-family: 'Open Sans', sans-serif; /* Use "Open Sans" font with sans-serif fallback */
+  background: #f4f6f8;                    /* Set a light background color */
+  color: #333;                           /* Set default text color to a dark gray */
+  line-height: 1.6;                      /* Set line height for readability */
+  padding: 20px;                         /* Add some padding around the body content */
+}
 
-  /* ---------- Navbar Styles ---------- */
-/* frontend/src/components/Navbar.css */
+/* Container for centralized content */
+.container {
+  max-width: 960px;                      /* Limit the container width to 960px */
+  margin: 0 auto;                        /* Center the container horizontally */
+  padding: 20px;                         /* Add padding inside the container */
+}
+
+/* ---------- Navbar Styles ---------- */
+/* Styles for the navbar component (for example in frontend/src/components/Navbar.css) */
 .navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #2f4a66;
-  padding: 10px 20px;
-  color: #fff;
+  display: flex;                         /* Use flexbox layout for the navbar */
+  justify-content: space-between;        /* Distribute space between navbar items */
+  align-items: center;                   /* Vertically center the navbar items */
+  background-color: #2f4a66;               /* Set a dark blue-gray background color */
+  padding: 10px 20px;                    /* Add vertical and horizontal padding */
+  color: #fff;                           /* Set text color to white */
 }
 
 .navbar-brand {
-  font-size: 1rem;
-  font-weight: bold;
+  font-size: 1rem;                       /* Set font size for the brand/logo text */
+  font-weight: bold;                     /* Make the brand/logo text bold */
 }
 
 .navbar-links {
-  list-style: none;
-  display: flex;
-  margin: 2px;
-  padding: 2px;
+  list-style: none;                      /* Remove default bullet points from list */
+  display: flex;                         /* Display links in a row using flexbox */
+  margin: 2px;                           /* Small margin around the list (optional) */
+  padding: 2px;                          /* Small padding inside the list (optional) */
 }
 
 .navbar-links li {
-  margin-left: 20px;
+  margin-left: 20px;                     /* Space each list item from the left */
 }
 
 .navbar-links li a {
-  color: #fff;
-  text-decoration: none;
-  font-size: 1rem;
+  color: #fff;                           /* Set link text color to white */
+  text-decoration: none;                 /* Remove underline from links */
+  font-size: 1rem;                       /* Set font size for links */
 }
 
 .navbar-links li a:hover {
-  text-decoration: none;
-  color: #ff0000;
+  text-decoration: none;                 /* Ensure underline stays removed on hover */
+  color: #ff0000;                        /* Change link color to red when hovered */
 }
 
 /* Responsive Navbar */
+/* Apply these styles when the viewport width is 768px or less */
 @media (max-width: 768px) {
-  .navbar {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .navbar-links {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .navbar-links li {
-    margin: 10px 0;
-  }
-
-  .navbar-brand {
-    font-size: 1.2rem;
-    margin-bottom: 10px;
-  }
+.navbar {
+  flex-direction: column;              /* Stack navbar items vertically */
+  align-items: flex-start;             /* Align items to the start of the container */
 }
 
+.navbar-links {
+  flex-direction: column;              /* Stack links vertically */
+  width: 100%;                         /* Make links container full width */
+}
 
-  /* ---------- Home Page ---------- */
+.navbar-links li {
+  margin: 10px 0;                      /* Add vertical margin between links */
+}
+
+.navbar-brand {
+  font-size: 1.2rem;                   /* Increase brand font size slightly */
+  margin-bottom: 10px;                 /* Add space below the brand */
+}
+}
+
+/* ---------- Home Page ---------- */
 /* Ensure the container fills the entire viewport */
 .home-container {
-  width: 100%;
-  height: 100vh;
-  overflow: hidden;
-  position: relative;
-  background-image: url('./images/backgrondImage.webp');
-  background-size: cover;
-  background-position: center;
+width: 100%;                             /* Full width */
+height: 100vh;                           /* Full viewport height */
+overflow: hidden;                        /* Hide overflow content */
+position: relative;                      /* Establish positioning context for absolute children */
+background-image: url('./images/backgrondImage.webp');  /* Set background image */
+background-size: cover;                  /* Ensure the image covers the entire container */
+background-position: center;             /* Center the background image */
 }
 
 /* Hero section styling */
 .hero {
-  position: relative;
-  width: 100%;
-  height: 100%;
+position: relative;                      /* Allow positioning of inner elements */
+width: 100%;                             /* Full width */
+height: 100%;                            /* Full height of parent (.home-container) */
 }
 
 /* Full-screen background image */
 .hero-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: brightness(0.7); /* Darken the image slightly for better text contrast */
+width: 100%;                             /* Full width */
+height: 100%;                            /* Full height */
+object-fit: cover;                       /* Cover the container without distortion */
+filter: brightness(0.7);                 /* Darken image for better text contrast */
 }
-
 
 /* Apply animation to hero overlay */
 .hero-overlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  color: #d30000;
-  padding: 0 20px;
-  animation: dynamic-color 10s infinite;
+position: absolute;                      /* Position absolutely within .hero */
+top: 50%;                                /* Position at 50% from the top */
+left: 50%;                               /* Position at 50% from the left */
+transform: translate(-50%, -50%);        /* Center the overlay exactly */
+text-align: center;                      /* Center-align text inside the overlay */
+color: #d30000;                          /* Set text color to a red hue */
+padding: 0 20px;                         /* Horizontal padding inside the overlay */
+animation: dynamic-color 10s infinite;   /* Apply an infinite color-changing animation over 10 seconds */
 }
 
 /* Main heading style with dynamic color */
 .hero-overlay h1 {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  font-family:cursive;
-  animation: dynamic-color 10s infinite;
+font-size: 3rem;                         /* Large font size for the main heading */
+margin-bottom: 1rem;                     /* Space below the heading */
+font-family: cursive;                    /* Use a cursive font for a decorative look */
+animation: dynamic-color 10s infinite;   /* Apply dynamic color animation to the heading */
 }
 
 /* Paragraph style with dynamic color */
 .hero-overlay p {
-  font-size: 1.5rem;
-  margin-bottom: 2rem;
-  text-align: left;
-  font-family: 'Courier New', Courier, monospace;
-  font-weight: 900;
-  animation: dynamic-color 10s infinite;
+font-size: 1.5rem;                       /* Increase font size for readability */
+margin-bottom: 2rem;                     /* Space below the paragraph */
+text-align: left;                        /* Left-align the paragraph text */
+font-family: 'Courier New', Courier, monospace; /* Use a monospace font */
+font-weight: 900;                        /* Use a very bold weight */
+animation: dynamic-color 10s infinite;   /* Apply dynamic color animation */
 }
-
 
 /* Button container and individual button styling */
 .hero-buttons .btn {
-  background-color: #007bff;
-  padding: 0.75rem 1.5rem;
-  margin: 0 0.5rem;
-  color: #fff;
-  text-decoration: none;
-  border-radius: 4px;
-  transition: background-color 0.3s ease;
-  font-size: 1rem;
+background-color: #007bff;               /* Set button background color (blue) */
+padding: 0.75rem 1.5rem;                 /* Vertical and horizontal padding */
+margin: 0 0.5rem;                        /* Horizontal margin between buttons */
+color: #fff;                             /* White text color */
+text-decoration: none;                   /* Remove underline from button text */
+border-radius: 4px;                      /* Rounded corners */
+transition: background-color 0.3s ease;  /* Smooth transition for background color on hover */
+font-size: 1rem;                         /* Set font size for button text */
 }
 
 .hero-buttons .btn:hover {
-  background-color: #0056b3;
+background-color: #0056b3;               /* Darken button background on hover */
 }
 
 /* Responsive Hero Section */
 @media (max-width: 1024px) {
-  .hero-overlay h1 {
-    font-size: 2.5rem;
-  }
+.hero-overlay h1 {
+  font-size: 2.5rem;                     /* Slightly reduce heading font size for medium screens */
+}
 
-  .hero-overlay p {
-    font-size: 1.3rem;
-  }
+.hero-overlay p {
+  font-size: 1.3rem;                     /* Slightly reduce paragraph font size */
+}
 }
 
 @media (max-width: 768px) {
-  .hero-overlay h1 {
-    font-size: 2rem;
-  }
-
-  .hero-overlay p {
-    font-size: 1.1rem;
-  }
-
-  .hero-buttons .btn {
-    padding: 0.6rem 1.2rem;
-    font-size: 0.9rem;
-  }
+.hero-overlay h1 {
+  font-size: 2rem;                       /* Further reduce heading font size for smaller screens */
 }
 
+.hero-overlay p {
+  font-size: 1.1rem;                     /* Further reduce paragraph font size */
+}
 
-  /* ---------- Authentication (Login & Register) ---------- */
-  .login-container,
-  .register-container {
-    background: #fff;
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .login-container form,
-  .register-container form {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .login-container input,
-  .register-container input {
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-  }
-  
-  .login-container button,
-  .register-container button {
-    padding: 10px;
-    background: #007bff;
-    color: #fff;
-    border: none;
-    margin-top: 10px;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: background 0.3s ease;
-  }
-  
-  .login-container button:hover,
-  .register-container button:hover {
-    background: #53d2a3;
-  }
+.hero-buttons .btn {
+  padding: 0.6rem 1.2rem;                /* Reduce button padding */
+  font-size: 0.9rem;                     /* Reduce button font size */
+}
+}
 
-  /* Responsive Authentication Forms */
+/* ---------- Authentication (Login & Register) ---------- */
+.login-container,
+.register-container {
+  background: #fff;                      /* White background for forms */
+  max-width: 400px;                      /* Limit width to 400px */
+  margin: 50px auto;                     /* Center horizontally with top/bottom margin */
+  padding: 30px;                         /* Padding inside the container */
+  border-radius: 8px;                    /* Rounded corners */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);/* Subtle shadow for depth */
+}
+
+.login-container form,
+.register-container form {
+  display: flex;                         /* Use flexbox for form layout */
+  flex-direction: column;                /* Stack form elements vertically */
+}
+
+.login-container input,
+.register-container input {
+  padding: 10px;                         /* Padding inside input fields */
+  margin: 10px 0;                        /* Vertical margin between inputs */
+  border: 1px solid #ddd;                /* Light gray border */
+  border-radius: 4px;                    /* Rounded input corners */
+}
+
+.login-container button,
+.register-container button {
+  padding: 10px;                         /* Padding for buttons */
+  background: #007bff;                    /* Blue background color */
+  color: #fff;                           /* White text */
+  border: none;                          /* Remove border */
+  margin-top: 10px;                      /* Top margin */
+  cursor: pointer;                       /* Pointer cursor on hover */
+  border-radius: 4px;                    /* Rounded corners */
+  transition: background 0.3s ease;      /* Smooth background transition on hover */
+}
+
+.login-container button:hover,
+.register-container button:hover {
+  background: #53d2a3;                   /* Change button background on hover */
+}
+
+/* Responsive Authentication Forms */
 @media (max-width: 576px) {
-  .login-container,
-  .register-container {
-    max-width: 90%;
-    padding: 20px;
-  }
-
-  .login-container input,
-  .register-container input {
-    font-size: 0.9rem;
-  }
-
-  .login-container button,
-  .register-container button {
-    font-size: 0.9rem;
-  }
+.login-container,
+.register-container {
+  max-width: 90%;                        /* Make form width responsive (90% of viewport) */
+  padding: 20px;                         /* Reduce padding for smaller screens */
 }
 
-  
-  /* ---------- Stock Search Page ---------- */
-  .stock-search {
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    margin: 20px auto;
-    max-width: 800px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .stock-search h2 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .stock-search input[type="text"],
-  .stock-search input[type="number"] {
-    padding: 10px;
-    margin: 10px 5px;
-    width: calc(50% - 20px);
-    border: 1px solid #ddd;
-    border-radius: 4px;
-  }
-  
-  .stock-search button {
-    margin: 5px;
-    padding: 10px 20px;
-    background: #28a745;
-    border: none;
-    color: #fff;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-  
-  .stock-search button:hover {
-    background: #218838;
-  }
-  
-  .stock-search .market-status {
-    margin-top: 10px;
-    color: #ff0000;
-    font-weight: bold;
-  }
-  
-  .stock-search .error {
-    margin-top: 10px;
-    color: #dc3545;
-  }
+.login-container input,
+.register-container input {
+  font-size: 0.9rem;                     /* Slightly reduce input font size */
+}
 
-  /* watchlist from here check what is needed !!!!!! */
-  
-  /* ---------- Company Info Section ---------- */
-  .company-info {
-    display: flex;
-    align-items: center;
-    margin: 20px 0;
-  }
-  
-  .company-info img {
-    margin-right: 20px;
-    border-radius: 4px;
-    max-width: 100px;
-  }
-  
-  .company-info h3 {
-    margin-bottom: 5px;
-  }
-  
-  .company-info p {
-    margin: 2px 0;
-  }
-  
-  /* ---------- Stock Info Section ---------- */
-  .stock-info {
-    margin: 20px 0;
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 4px;
-  }
-  
-  .stock-info h3 {
-    margin-bottom: 10px;
-  }
-  
-  .stock-info p {
-    margin-bottom: 5px;
-  }
-  
-  /* ---------- Additional Company Details ---------- */
-  .company-details {
-    background: #e9ecef;
-    padding: 15px;
-    border-radius: 4px;
-    margin-bottom: 20px;
-  }
-  
-  .company-details h4 {
-    margin-bottom: 10px;
-  }
-  
-  .company-details p {
-    margin-bottom: 5px;
-  }
-  
-  /* ---------- Company News Section ---------- */
-  .company-news {
-    margin: 20px 0;
-  }
-  
-  .company-news h4 {
-    margin-bottom: 10px;
-  }
-  
-  .company-news ul {
-    list-style: none;
-    padding-left: 0;
-  }
-  
-  .company-news li {
-    margin-bottom: 10px;
-  }
-  
-  .company-news a {
-    color: #007bff;
-    text-decoration: none;
-  }
-  
-  .company-news a:hover {
-    text-decoration: underline;
-  }
-  
-  /* ---------- User Dashboard ---------- */
-  .user-page-container {
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-  }
-  
-  /* ---------- Watchlist ---------- */
-  .watchlist {
-    background: #fff;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px auto;
-    box-shadow: 0 7px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .watchlist h3 {
-    margin-bottom: 10px;
-  }
-  
-  .watchlist h4 {
-    margin-bottom: 15px;
-  }
-  
-  .watchlist ul {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .watchlist li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #ddd;
-    padding: 10px 0;
-  }
-  
-  .watchlist li:last-child {
-    border-bottom: none;
-  }
-  
-  /* ---------- Edit Mode for Watchlist Items ---------- */
-  .watchlist input[type="number"],
-  .watchlist input[type="datetime-local"] {
-    padding: 5px;
-    margin: 5px 0;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    width: 100%;
-  }
-  
-  .watchlist button {
-    background: #ffc107;
-    border: none;
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-left: 5px;
-    transition: background 0.3s ease;
-  }
-  
-  .watchlist button:hover {
-    background: #e78127;
-  }
+.login-container button,
+.register-container button {
+  font-size: 0.9rem;                     /* Slightly reduce button font size */
+}
+}
 
-  /* Styles for each row in the watchlist */
+/* ---------- Stock Search Page ---------- */
+.stock-search {
+  background: #fff;                      /* White background for stock search section */
+  padding: 20px;                         /* Padding inside the container */
+  border-radius: 8px;                    /* Rounded corners */
+  margin: 20px auto;                     /* Center with vertical margins */
+  max-width: 800px;                      /* Limit maximum width */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);/* Subtle shadow */
+}
+
+.stock-search h2 {
+  text-align: center;                    /* Center-align the heading */
+  margin-bottom: 20px;                   /* Space below the heading */
+}
+
+.stock-search input[type="text"],
+.stock-search input[type="number"] {
+  padding: 10px;                         /* Padding for input fields */
+  margin: 10px 5px;                      /* Margin around inputs */
+  width: calc(50% - 20px);                /* Set width to half minus extra spacing */
+  border: 1px solid #ddd;                /* Light border */
+  border-radius: 4px;                    /* Rounded corners */
+}
+
+.stock-search button {
+  margin: 5px;                          /* Margin around the button */
+  padding: 10px 20px;                    /* Padding inside the button */
+  background: #28a745;                   /* Green background color */
+  border: none;                         /* Remove border */
+  color: #fff;                          /* White text */
+  border-radius: 4px;                   /* Rounded corners */
+  cursor: pointer;                      /* Pointer cursor on hover */
+  transition: background 0.3s ease;     /* Smooth background transition */
+}
+
+.stock-search button:hover {
+  background: #218838;                   /* Darker green on hover */
+}
+
+.stock-search .market-status {
+  margin-top: 10px;                     /* Space above market status text */
+  color: #ff0000;                       /* Red color for emphasis */
+  font-weight: bold;                    /* Bold text */
+}
+
+.stock-search .error {
+  margin-top: 10px;                     /* Space above error message */
+  color: #dc3545;                       /* Red color for error */
+}
+
+/* ---------- Company Info Section ---------- */
+.company-info {
+  display: flex;                        /* Use flexbox for layout */
+  align-items: center;                  /* Vertically center items */
+  margin: 20px 0;                       /* Vertical margin */
+}
+
+.company-info img {
+  margin-right: 20px;                   /* Space to the right of the image */
+  border-radius: 4px;                   /* Rounded image corners */
+  max-width: 100px;                     /* Limit image width */
+}
+
+.company-info h3 {
+  margin-bottom: 5px;                   /* Space below the heading */
+}
+
+.company-info p {
+  margin: 2px 0;                        /* Small vertical margin for paragraphs */
+}
+
+/* ---------- Stock Info Section ---------- */
+.stock-info {
+  margin: 20px 0;                       /* Vertical margin */
+  padding: 15px;                        /* Padding inside the container */
+  background: #f8f9fa;                  /* Light background color */
+  border-radius: 4px;                   /* Rounded corners */
+}
+
+.stock-info h3 {
+  margin-bottom: 10px;                  /* Space below the heading */
+}
+
+.stock-info p {
+  margin-bottom: 5px;                   /* Space below paragraphs */
+}
+
+/* ---------- Additional Company Details ---------- */
+.company-details {
+  background: #e9ecef;                  /* Light gray background */
+  padding: 15px;                        /* Padding inside the container */
+  border-radius: 4px;                   /* Rounded corners */
+  margin-bottom: 20px;                  /* Space below the section */
+}
+
+.company-details h4 {
+  margin-bottom: 10px;                  /* Space below the heading */
+}
+
+.company-details p {
+  margin-bottom: 5px;                   /* Space below paragraphs */
+}
+
+/* ---------- Company News Section ---------- */
+.company-news {
+  margin: 20px 0;                       /* Vertical margin */
+}
+
+.company-news h4 {
+  margin-bottom: 10px;                  /* Space below the heading */
+}
+
+.company-news ul {
+  list-style: none;                     /* Remove bullet points */
+  padding-left: 0;                      /* Remove default padding */
+}
+
+.company-news li {
+  margin-bottom: 10px;                  /* Space between news items */
+}
+
+.company-news a {
+  color: #007bff;                       /* Blue color for links */
+  text-decoration: none;                /* Remove underline */
+}
+
+.company-news a:hover {
+  text-decoration: underline;           /* Underline links on hover */
+}
+
+/* ---------- User Dashboard ---------- */
+.user-page-container {
+  max-width: 800px;                     /* Limit container width */
+  margin: 20px auto;                    /* Center container with vertical margins */
+  padding: 20px;                        /* Padding inside the container */
+}
+
+/* ---------- Watchlist ---------- */
+.watchlist {
+  background: #fff;                     /* White background */
+  border-radius: 8px;                   /* Rounded corners */
+  padding: 20px;                        /* Padding inside the container */
+  margin: 20px auto;                    /* Center container with vertical margins */
+  box-shadow: 0 7px 6px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+}
+
+.watchlist h3 {
+  margin-bottom: 10px;                  /* Space below the heading */
+}
+
+.watchlist h4 {
+  margin-bottom: 15px;                  /* Space below subheadings */
+}
+
+.watchlist ul {
+  list-style: none;                     /* Remove bullet points */
+  padding: 0;                           /* Remove default padding */
+}
+
+.watchlist li {
+  display: flex;                        /* Use flexbox for row layout */
+  justify-content: space-between;       /* Distribute space between columns */
+  align-items: center;                  /* Vertically center items */
+  border-bottom: 1px solid #ddd;        /* Light bottom border for separation */
+  padding: 10px 0;                      /* Vertical padding for each list item */
+}
+
+.watchlist li:last-child {
+  border-bottom: none;                  /* Remove border from the last item */
+}
+
+/* ---------- Edit Mode for Watchlist Items ---------- */
+.watchlist input[type="number"],
+.watchlist input[type="datetime-local"] {
+  padding: 5px;                         /* Padding for input fields */
+  margin: 5px 0;                        /* Vertical margin */
+  border: 1px solid #ddd;               /* Light border */
+  border-radius: 4px;                   /* Rounded corners */
+  width: 100%;                          /* Full width */
+}
+
+.watchlist button {
+  background: #ffc107;                  /* Amber background for action buttons */
+  border: none;                         /* Remove border */
+  color: #fff;                          /* White text */
+  padding: 5px 10px;                    /* Padding for buttons */
+  border-radius: 4px;                   /* Rounded corners */
+  cursor: pointer;                      /* Pointer cursor on hover */
+  margin-left: 5px;                     /* Left margin for spacing */
+  transition: background 0.3s ease;     /* Smooth background transition */
+}
+
+.watchlist button:hover {
+  background: #e78127;                  /* Darken background on hover */
+}
+
+/* Styles for each row in the watchlist */
 .watchlist-row {
-  display: flex;
-  align-items: center;
-  padding: 12px 16px;
-  border-bottom: 1px solid #e0e0e0;
-  background-color: #ffffff;
-  transition: background-color 0.3s ease;
-  font-family: 'Open Sans', sans-serif;
-  font-size: 14px;
-  color: #202124;
+display: flex;                           /* Use flexbox for row layout */
+align-items: center;                     /* Vertically center items */
+padding: 12px 16px;                      /* Padding for each row */
+border-bottom: 1px solid #e0e0e0;         /* Light bottom border */
+background-color: #ffffff;               /* White background */
+transition: background-color 0.3s ease;  /* Smooth background change on hover */
+font-family: 'Open Sans', sans-serif;    /* Use Open Sans font */
+font-size: 14px;                         /* Set font size */
+color: #202124;                         /* Dark text color */
 }
 
-/* Change background on hover */
+/* Change background on hover for watchlist rows */
 .watchlist-row:hover {
-  background-color: #f8f9fa;
+background-color: #f8f9fa;               /* Light background when hovered */
 }
 
-/* Each child div inside the row */
+/* Each child div inside the watchlist row */
 .watchlist-row div {
-  flex: 1;
-  padding: 0 8px;
+flex: 1;                               /* Default flex value for equal spacing */
+padding: 0 8px;                        /* Horizontal padding */
 }
 
-/* Style for the ticker column; make it a bit narrower and bold */
+/* Style for the ticker column; narrower and bold */
 .watchlist-row .ticker {
-  flex: 0.5;
-  font-weight: 600;
+flex: 0.5;                             /* Narrower column */
+font-weight: 600;                      /* Bold text */
 }
 
 /* Right-align numeric or date fields */
 .watchlist-row .price,
 .watchlist-row .quantity,
 .watchlist-row .added {
-  text-align: right;
-  color: #5f6368;
+text-align: right;                     /* Align text to the right */
+color: #5f6368;                        /* Gray color for numeric text */
 }
 
 /* Actions column (buttons) styling */
 .watchlist-row .actions {
-  flex: 1;
-  text-align: right;
+flex: 1;                              /* Take equal space */
+text-align: right;                    /* Right-align content */
 }
 
-/* Optional: Style for editing mode */
+/* Optional: Style for editing mode in watchlist rows */
 .watchlist-row.editing {
-  background-color: #fff7e6;
+background-color: #fff7e6;             /* Light yellow background when editing */
 }
 
 .watchlist-row.editing input[type="number"],
 .watchlist-row.editing input[type="datetime-local"] {
-  width: 100%;
-  padding: 4px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+width: 100%;                          /* Full width for input fields */
+padding: 4px;                         /* Padding for inputs */
+font-size: 14px;                      /* Font size for inputs */
+border: 1px solid #ccc;               /* Border for inputs */
+border-radius: 4px;                   /* Rounded corners for inputs */
 }
 
-  
-  /* ---------- Global Button Styles ---------- */
-  button {
-    padding: 10px 20px;
-    background: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  /* ---------- Responsive Styles ---------- */
-  @media (max-width: 768px) {
-    .stock-search input[type="text"],
-    .stock-search input[type="number"] {
-      width: calc(100% - 20px);
-      margin: 10px 0;
-    }
-  }
-  
+/* ---------- Global Button Styles ---------- */
+button {
+  padding: 10px 20px;                   /* Padding for all buttons */
+  background: #007bff;                  /* Blue background for buttons */
+  color: #fff;                          /* White text */
+  border: none;                         /* Remove border */
+  border-radius: 4px;                   /* Rounded corners */
+  cursor: pointer;                      /* Pointer cursor on hover */
+}
 
+/* ---------- Responsive Styles ---------- */
+/* Adjust stock search input widths on smaller screens */
+@media (max-width: 768px) {
+  .stock-search input[type="text"],
+  .stock-search input[type="number"] {
+    width: calc(100% - 20px);           /* Full width minus margins */
+    margin: 10px 0;                    /* Vertical margin */
+  }
+}
 
-  /* Example styles for the portfolio performance table */
+/* Example styles for the portfolio performance table */
 .portfolio-performance {
-  margin: 20px auto;
-  max-width: 800px;
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+margin: 20px auto;                     /* Center with vertical margins */
+max-width: 800px;                      /* Limit width */
+background: #fff;                      /* White background */
+padding: 20px;                         /* Padding inside the container */
+border-radius: 8px;                    /* Rounded corners */
+box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
 .portfolio-performance h3 {
-  text-align: center;
-  margin-bottom: 20px;
+text-align: center;                    /* Center-align heading */
+margin-bottom: 20px;                   /* Space below heading */
 }
 
 .portfolio-performance table {
-  width: 100%;
-  border-collapse: collapse;
+width: 100%;                           /* Full width table */
+border-collapse: collapse;             /* Collapse borders */
 }
 
 .portfolio-performance th,
 .portfolio-performance td {
-  padding: 12px;
-  border: 1px solid #ddd;
-  text-align: center;
+padding: 12px;                         /* Padding for table cells */
+border: 1px solid #ddd;                /* Light border for cells */
+text-align: center;                    /* Center text in cells */
 }
 
 .portfolio-performance th {
-  background-color: #f1f3f4;
+background-color: #f1f3f4;             /* Light gray background for table header */
 }
 
 /* Styles for the watchlist header row */
 .watchlist-header {
-  display: flex;
-  align-items: center;
-  padding: 12px 16px;
-  background-color: #f1f3f4;  /* light gray background for the header */
-  border-bottom: 2px solid #ccc; /* a slightly darker border to separate from data rows */
-  font-weight: bold;
-  font-size: 14px;
+display: flex;                         /* Use flexbox for layout */
+align-items: center;                   /* Vertically center items */
+padding: 12px 16px;                    /* Padding for the header row */
+background-color: #f1f3f4;               /* Light gray background */
+border-bottom: 2px solid #ccc;         /* Darker bottom border for separation */
+font-weight: bold;                     /* Bold text */
+font-size: 14px;                       /* Font size */
 }
 
 /* Each column in the header */
 .watchlist-header > div {
-  flex: 1;              /* default flex value for equal spacing */
-  text-align: center;   /* center text by default */
-  cursor: pointer;      /* indicates clickable sorting */
+flex: 1;                               /* Equal spacing for each header column */
+text-align: center;                    /* Center text */
+cursor: pointer;                       /* Indicate that columns are clickable (for sorting) */
 }
 
 /* Ticker column: narrower and left-aligned */
 .watchlist-header .ticker {
-  flex: 0.7;
-  text-align: left;
-  padding-left: 8px;
+flex: 0.7;                             /* Narrower column */
+text-align: left;                      /* Left-align text */
+padding-left: 8px;                     /* Left padding */
 }
 
 /* Price column: right-aligned for numbers */
 .watchlist-header .price {
-  flex: 1;
-  text-align: right;
-  padding-right: 8px;
+flex: 1;                               /* Standard flex size */
+text-align: right;                     /* Right-align text */
+padding-right: 8px;                    /* Right padding */
 }
 
 /* Quantity column: right-aligned */
 .watchlist-header .quantity {
-  flex: 1;
-  text-align: right;
-  padding-right: 8px;
+flex: 1;                               /* Standard flex size */
+text-align: right;                     /* Right-align text */
+padding-right: 8px;                    /* Right padding */
 }
 
 /* Added column: slightly wider and right-aligned */
 .watchlist-header .added {
-  flex: 1.2;
-  text-align: right;
-  padding-right: 8px;
+flex: 1.2;                             /* Slightly more space */
+text-align: right;                     /* Right-align text */
+padding-right: 8px;                    /* Right padding */
 }
 
 /* Actions column: center-aligned */
 .watchlist-header .actions {
-  flex: 1;
-  text-align: center;
+flex: 1;                               /* Standard flex size */
+text-align: center;                    /* Center text */
 }
 
-
-
-/* style for Manual add stock page */
+/* Style for Manual add stock page */
 .manual-add-stock {
-  max-width: 600px;
-  margin: 40px auto;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  background-color: #f9f9f9;
-  font-family: Arial, sans-serif;
-
+max-width: 600px;                      /* Limit width */
+margin: 40px auto;                     /* Center with vertical margins */
+padding: 20px;                         /* Padding inside container */
+border-radius: 10px;                   /* Rounded corners */
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+background-color: #f9f9f9;             /* Light gray background */
+font-family: Arial, sans-serif;        /* Use Arial font */
 }
-
 
 .manual-add-stock h2 {
-  text-align: center;
-  color: #333;
-  margin-bottom: 20px;
-  font-size: 24px;
-  font-weight: bold;
+text-align: center;                    /* Center-align heading */
+color: #333;                           /* Dark text color */
+margin-bottom: 20px;                   /* Space below heading */
+font-size: 24px;                       /* Font size */
+font-weight: bold;                     /* Bold text */
 }
 
 .manual-add-stock .error {
-  color: red;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 10px;
+color: red;                            /* Red text for errors */
+font-weight: bold;                     /* Bold error text */
+text-align: center;                    /* Center-align error message */
+margin-bottom: 10px;                   /* Space below error message */
 }
 
 .manual-add-stock form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+display: flex;                         /* Use flexbox for form layout */
+flex-direction: column;                /* Stack form elements vertically */
+gap: 15px;                             /* Gap between form elements */
 }
 
 .manual-add-stock input {
-  padding: 12px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  outline: none;
-  transition: border-color 0.3s;
+padding: 12px;                         /* Padding for input fields */
+font-size: 16px;                       /* Font size for input text */
+border: 1px solid #ccc;                /* Light border for inputs */
+border-radius: 6px;                    /* Rounded corners for inputs */
+outline: none;                         /* Remove default outline */
+transition: border-color 0.3s;         /* Smooth transition for border-color on focus */
 }
 
 .manual-add-stock input:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
+border-color: #007bff;                 /* Change border color when input is focused */
+box-shadow: 0 0 4px rgba(0, 123, 255, 0.5); /* Add a subtle blue glow on focus */
 }
 
 .manual-add-stock button {
-  padding: 12px;
-  font-size: 16px;
-  font-weight: bold;
-  color: white;
-  background-color: #007bff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+padding: 12px;                         /* Padding for button */
+font-size: 16px;                       /* Font size for button text */
+font-weight: bold;                     /* Bold text */
+color: white;                          /* White text color */
+background-color: #007bff;             /* Blue background color */
+border: none;                         /* Remove border */
+border-radius: 6px;                    /* Rounded corners */
+cursor: pointer;                       /* Pointer cursor on hover */
+transition: background-color 0.3s;     /* Smooth background transition on hover */
 }
 
 .manual-add-stock button:hover {
-  background-color: #0056b3;
+background-color: #0056b3;             /* Darken background on hover */
 }
 
-/* Image Section */
+/* Image Section for Manual Add Stock Page */
 .manual-add-stock-image {
-  text-align: center;
-  margin-bottom: 20px;
+text-align: center;                    /* Center-align image container */
+margin-bottom: 20px;                   /* Space below the image */
 }
 
 .manual-add-stock-image img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 8px;
+max-width: 100%;                       /* Image should not exceed container width */
+height: auto;                          /* Maintain image aspect ratio */
+border-radius: 8px;                    /* Rounded image corners */
 }

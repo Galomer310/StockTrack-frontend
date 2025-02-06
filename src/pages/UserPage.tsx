@@ -1,33 +1,37 @@
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { RootState } from "../store"; // Import RootState to access Redux state
-import Watchlist from "./Watchlist";
+import { useSelector } from "react-redux"; // Import useSelector to access Redux state
+import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { RootState } from "../store"; // Import RootState for type definitions
+import Watchlist from "./Watchlist"; // Import the Watchlist component
 
+// Define the UserPage functional component
 const UserPage = () => {
-  const user = useSelector((state: RootState) => state.auth.user); // Get user from Redux store
-  const navigate = useNavigate();
+  const user = useSelector((state: RootState) => state.auth.user); // Get the current user from Redux state
+  const navigate = useNavigate(); // Initialize navigate for redirection
 
-  // If there is no user (meaning the user is not logged in), redirect to the login page
+  // If no user is present, navigate to the login page
   if (!user) {
-    navigate("/login");
+    navigate("/login"); // Redirect to login if user is not logged in
   }
 
+  // Return the user dashboard UI
   return (
     <div className="user-page-container">
-      {user ? (
+      {" "}
+      {/* Container with CSS class for the user page */}
+      {user ? ( // If user exists, render the dashboard
         <div>
-          {/* Descriptive Text for the User Dashboard */}
           <section className="dashboard-info">
-            <h1>My Investment Dashboard</h1>
+            {" "}
+            {/* Section for dashboard descriptive text */}
+            <h1>My Investment Dashboard</h1> {/* Dashboard heading */}
           </section>
-
-          <Watchlist />
+          <Watchlist /> {/* Render the Watchlist component */}
         </div>
       ) : (
-        <p>Loading...</p>
+        <p>Loading...</p> // Show loading text if user data is not yet available
       )}
     </div>
   );
 };
 
-export default UserPage;
+export default UserPage; // Export component as default

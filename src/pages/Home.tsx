@@ -16,9 +16,11 @@ const Home = () => {
           </p>
           <div className="hero-buttons">
             <Link to="/login" className="btn">
+              {/* Link styled as a button for login */}
               Login
             </Link>
             <Link to="/register" className="btn">
+              {/* Link styled as a button for registration */}
               Register
             </Link>
           </div>

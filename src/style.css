@@ -90,7 +90,7 @@ width: 100%;                             /* Full width */
 height: 100vh;                           /* Full viewport height */
 overflow: hidden;                        /* Hide overflow content */
 position: relative;                      /* Establish positioning context for absolute children */
-background-image: url('./images/backgrondImage.webp');  /* Set background image */
+background-image: url('./images/homepage.webp');  /* Set background image */
 background-size: cover;                  /* Ensure the image covers the entire container */
 background-position: center;             /* Center the background image */
 }
@@ -191,6 +191,7 @@ background-color: #0056b3;               /* Darken button background on hover */
   padding: 30px;                         /* Padding inside the container */
   border-radius: 8px;                    /* Rounded corners */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);/* Subtle shadow for depth */
+  
 }
 
 .login-container form,

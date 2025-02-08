@@ -37,33 +37,37 @@ const Register = () => {
 
   // Return the registration form UI
   return (
-    <div className="register-container">
-      {" "}
-      {/* Container with CSS class for registration */}
-      <form onSubmit={handleRegister}>
-        {" "}
-        {/* Form submission triggers handleRegister */}
-        <input
-          type="email" // Input field for email
-          placeholder="Email" // Placeholder text
-          value={email} // Bind value to email state
-          onChange={(e) => setEmail(e.target.value)} // Update email state on change
-          required // Mark input as required
-        />
-        <input
-          type="password" // Input field for password
-          placeholder="Password" // Placeholder text
-          value={password} // Bind value to password state
-          onChange={(e) => setPassword(e.target.value)} // Update password state on change
-          required // Mark input as required
-        />
-        <button type="submit">Register</button> {/* Submit button */}
-      </form>
-      <button onClick={() => navigate("/login")}>
-        Already have an account? Login
-      </button>{" "}
-      {/* Button to navigate to Login page */}
-    </div>
+    <>
+      <div className="register-page">
+        <div className="register-container">
+          {" "}
+          {/* Container with CSS class for registration */}
+          <form onSubmit={handleRegister}>
+            {" "}
+            {/* Form submission triggers handleRegister */}
+            <input
+              type="email" // Input field for email
+              placeholder="Email" // Placeholder text
+              value={email} // Bind value to email state
+              onChange={(e) => setEmail(e.target.value)} // Update email state on change
+              required // Mark input as required
+            />
+            <input
+              type="password" // Input field for password
+              placeholder="Password" // Placeholder text
+              value={password} // Bind value to password state
+              onChange={(e) => setPassword(e.target.value)} // Update password state on change
+              required // Mark input as required
+            />
+            <button type="submit">Register</button> {/* Submit button */}
+          </form>
+          <button onClick={() => navigate("/login")}>
+            Already have an account? Login
+          </button>{" "}
+          {/* Button to navigate to Login page */}
+        </div>
+      </div>
+    </>
   );
 };
 

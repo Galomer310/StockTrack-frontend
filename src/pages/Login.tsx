@@ -53,32 +53,34 @@ const Login = () => {
   // Return the login form UI
   return (
     <>
-      <div className="login-container">
-        {" "}
-        {/* Container with CSS class for login */}
-        <form onSubmit={handleLogin}>
+      <div className="login-page">
+        <div className="login-container">
           {" "}
-          {/* Form submission triggers handleLogin */}
-          <input
-            type="email" // Input field for email
-            placeholder="Email" // Placeholder text
-            value={email} // Bind value to email state
-            onChange={(e) => setEmail(e.target.value)} // Update email state on change
-            required // Mark input as required
-          />
-          <input
-            type="password" // Input field for password
-            placeholder="Password" // Placeholder text
-            value={password} // Bind value to password state
-            onChange={(e) => setPassword(e.target.value)} // Update password state on change
-            required // Mark input as required
-          />
-          <button type="submit">Login</button> {/* Submit button */}
-        </form>
-        <button onClick={() => navigate("/")}>Back to Home</button>{" "}
-        {/* Button to navigate back to Home */}
+          {/* Container with CSS class for login */}
+          <form onSubmit={handleLogin}>
+            {" "}
+            {/* Form submission triggers handleLogin */}
+            <input
+              type="email" // Input field for email
+              placeholder="Email" // Placeholder text
+              value={email} // Bind value to email state
+              onChange={(e) => setEmail(e.target.value)} // Update email state on change
+              required // Mark input as required
+            />
+            <input
+              type="password" // Input field for password
+              placeholder="Password" // Placeholder text
+              value={password} // Bind value to password state
+              onChange={(e) => setPassword(e.target.value)} // Update password state on change
+              required // Mark input as required
+            />
+            <button type="submit">Login</button> {/* Submit button */}
+          </form>
+          <button onClick={() => navigate("/")}>Back to Home</button>{" "}
+          {/* Button to navigate back to Home */}
+        </div>
+        <div></div> {/* An empty div (can be removed if not used) */}
       </div>
-      <div></div> {/* An empty div (can be removed if not used) */}
     </>
   );
 };

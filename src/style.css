@@ -184,6 +184,42 @@ background-color: #0056b3;               /* Darken button background on hover */
 }
 
 /* ---------- Authentication (Login & Register) ---------- */
+/* Full-page background for Login */
+.login-page {
+  background-image: url('./images/loginPage.webp'); /* Change to your login image path */
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  min-height: 100vh;       /* Ensure it fills the viewport height */
+  display: flex;
+  align-items: center;     /* Center the form vertically */
+  justify-content: center; /* Center the form horizontally */
+}
+
+/* Full-page background for Register */
+.register-page {
+  background-image: url('./images/RegisterImage.webp'); /* Change to your register image path */
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Optional: Adjust the container styles if needed */
+.login-container,
+.register-container {
+  background: rgba(255, 255, 255, 0.9); /* Semi-transparent white to help the form stand out */
+  max-width: 400px;
+  margin: 20px;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+
 .login-container,
 .register-container {
   background: #fff;                      /* White background for forms */

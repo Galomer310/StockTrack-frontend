@@ -90,9 +90,10 @@ width: 100%;                             /* Full width */
 height: 100vh;                           /* Full viewport height */
 overflow: hidden;                        /* Hide overflow content */
 position: relative;                      /* Establish positioning context for absolute children */
-background-image: url('./images/homepage.webp');  /* Set background image */
-background-size: cover;                  /* Ensure the image covers the entire container */
-background-position: center;             /* Center the background image */
+background-image: url('./images/DiscoverNewWaysToInvest.webp');  /* Set background image */
+background-size:contain;                  /* Ensure the image covers the entire container */
+background-position:center;             /* Center the background image */
+background-repeat: no-repeat;            /* Prevent repeating the background image */
 }
 
 /* Hero section styling */

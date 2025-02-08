@@ -245,53 +245,81 @@ background-color: #0056b3;               /* Darken button background on hover */
 }
 
 /* ---------- Stock Search Page ---------- */
+/* ---------- Stock Search Page ---------- */
 .stock-search {
-  background: #fff;                      /* White background for stock search section */
-  padding: 20px;                         /* Padding inside the container */
-  border-radius: 8px;                    /* Rounded corners */
-  margin: 20px auto;                     /* Center with vertical margins */
-  max-width: 800px;                      /* Limit maximum width */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);/* Subtle shadow */
+  /* Use a soft gradient background and increased padding */
+  background: rgb(255, 255, 255); 
+  padding: 30px;
+  border-radius: 10px;
+  margin: 20px auto;
+  max-width: 800px;
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+  /* Use a modern font for the stock search section */
+  font-family: 'Roboto', sans-serif;
 }
 
 .stock-search h2 {
-  text-align: center;                    /* Center-align the heading */
-  margin-bottom: 20px;                   /* Space below the heading */
+  text-align: center;
+  margin-bottom: 20px;
+  /* Use a different font for headings and a dark blue color */
+  font-family: 'Montserrat', sans-serif;
+  color: #2f4a66;
 }
 
 .stock-search input[type="text"],
 .stock-search input[type="number"] {
-  padding: 10px;                         /* Padding for input fields */
-  margin: 10px 5px;                      /* Margin around inputs */
-  width: calc(50% - 20px);                /* Set width to half minus extra spacing */
-  border: 1px solid #ddd;                /* Light border */
-  border-radius: 4px;                    /* Rounded corners */
+  padding: 12px;
+  margin: 10px 5px;
+  width: calc(50% - 20px);
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: 'Roboto', sans-serif;
+  /* Optional: add a subtle inner shadow for a modern feel */
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .stock-search button {
-  margin: 5px;                          /* Margin around the button */
-  padding: 10px 20px;                    /* Padding inside the button */
-  background: #28a745;                   /* Green background color */
-  border: none;                         /* Remove border */
-  color: #fff;                          /* White text */
-  border-radius: 4px;                   /* Rounded corners */
-  cursor: pointer;                      /* Pointer cursor on hover */
-  transition: background 0.3s ease;     /* Smooth background transition */
+  margin: 5px;
+  padding: 12px 24px;
+  background: #007bff;  /* Blue primary button */
+  border: none;
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
 }
 
 .stock-search button:hover {
-  background: #218838;                   /* Darker green on hover */
+  background: #0056b3;
 }
 
 .stock-search .market-status {
-  margin-top: 10px;                     /* Space above market status text */
-  color: #ff0000;                       /* Red color for emphasis */
-  font-weight: bold;                    /* Bold text */
+  margin-top: 10px;
+  color: #d9534f; /* Bootstrap's danger red */
+  font-weight: bold;
 }
 
 .stock-search .error {
-  margin-top: 10px;                     /* Space above error message */
-  color: #dc3545;                       /* Red color for error */
+  margin-top: 10px;
+  color: #dc3545;
+  font-weight: bold;
+}
+
+/* ---------- Company Info Section ---------- */
+/* Ensure the company image is nicely styled;
+   if its src is empty, hide it */
+.company-info img {
+  margin-right: 20px;
+  border-radius: 4px;
+  max-width: 100px;
+  display: block;
+}
+
+.company-info img[src=""] {
+  display: none;
 }
 
 /* ---------- Company Info Section ---------- */

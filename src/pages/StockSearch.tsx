@@ -15,9 +15,10 @@ import {
   Title,
   Tooltip,
   Legend,
+  Filler, // Import Filler plugin
 } from "chart.js";
 
-// Register Chart.js components
+// Register Chart.js components including Filler
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -25,7 +26,8 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 );
 
 const POLYGON_API_KEY = import.meta.env.VITE_POLYGON_API_KEY;
@@ -102,7 +104,7 @@ const rangeOptions = [
 ];
 
 const StockSearch: React.FC = () => {
-  // Basic states for stock, company, and news data
+  // Basic states for stock, company, news and aggregated data
   const [query, setQuery] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [stockData, setStockData] = useState<any>(null);
@@ -113,7 +115,7 @@ const StockSearch: React.FC = () => {
   const [marketStatus, setMarketStatus] = useState<string | null>(null);
   const [error, setError] = useState("");
 
-  // New states for time range selection and toggling aggregated data display
+  // States for time range selection and toggling aggregated data display
   const [selectedRange, setSelectedRange] = useState("30d");
   const [showAggregatedData, setShowAggregatedData] = useState(false);
 
@@ -196,7 +198,6 @@ const StockSearch: React.FC = () => {
     if (query) {
       fetchAggregatedData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedRange]);
 
   // Function to search for a stock and fetch its various data
@@ -411,7 +412,6 @@ const StockSearch: React.FC = () => {
               <div className="chart-container" style={{ marginTop: "20px" }}>
                 <Line data={chartData} options={chartOptions} />
               </div>
-
               {/* Aggregated Data Table */}
               <table style={tableStyle}>
                 <thead>

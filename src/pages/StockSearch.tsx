@@ -1,242 +1,304 @@
-import React, { useState, useEffect } from "react"; // Import React and necessary hooks
-import { useSelector } from "react-redux"; // Import useSelector to access Redux state
-import axios from "axios"; // Import axios for HTTP requests
-import { RootState } from "../store"; // Import RootState for type definitions
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import axios from "axios";
+import { RootState } from "../store";
+import { useNavigate } from "react-router-dom";
 
-const POLYGON_API_KEY = import.meta.env.VITE_POLYGON_API_KEY; // Get the Polygon API key from environment variables
+const POLYGON_API_KEY = import.meta.env.VITE_POLYGON_API_KEY;
 
-// Define the StockSearch functional component
 const StockSearch: React.FC = () => {
-  const [query, setQuery] = useState(""); // State for storing the search query
-  const [quantity, setQuantity] = useState(1); // State for storing the quantity (default is 1)
-  const [stockData, setStockData] = useState<any>(null); // State for storing basic stock data
-  const [companyInfo, setCompanyInfo] = useState<any>(null); // State for storing company info
-  const [companyDetails, setCompanyDetails] = useState<any>(null); // State for storing additional company details
-  const [news, setNews] = useState<any[]>([]); // State for storing news articles
-  const [marketStatus, setMarketStatus] = useState<string | null>(null); // State for storing market status information
-  const [error, setError] = useState(""); // State for storing error messages
-  const navigate = useNavigate(); // Initialize navigate for redirection
-  const user = useSelector((state: RootState) => state.auth.user); // Get the current user from Redux state
-  const accessToken = useSelector((state: RootState) => state.auth.accessToken); // Get the access token from Redux state
+  const [query, setQuery] = useState("");
+  const [quantity, setQuantity] = useState(1);
+  const [stockData, setStockData] = useState<any>(null);
+  const [companyInfo, setCompanyInfo] = useState<any>(null);
+  const [companyDetails, setCompanyDetails] = useState<any>(null);
+  const [news, setNews] = useState<any[]>([]);
+  const [aggregatedData, setAggregatedData] = useState<any[]>([]);
+  const [marketStatus, setMarketStatus] = useState<string | null>(null);
+  const [error, setError] = useState("");
+  const [showAggregatedData, setShowAggregatedData] = useState(false);
+  const navigate = useNavigate();
+  const user = useSelector((state: RootState) => state.auth.user);
+  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
 
-  // useEffect hook to check market status on component mount
+  // Inline styling objects for the table
+  const tableStyle: React.CSSProperties = {
+    width: "100%",
+    borderCollapse: "collapse",
+    marginTop: "20px",
+    fontFamily: "Arial, sans-serif",
+  };
+
+  const thStyle: React.CSSProperties = {
+    borderBottom: "2px solid #009879",
+    backgroundColor: "#009879",
+    color: "#ffffff",
+    textAlign: "left",
+    padding: "12px",
+  };
+
+  const tdStyle: React.CSSProperties = {
+    borderBottom: "1px solid #dddddd",
+    textAlign: "left",
+    padding: "12px",
+  };
+
+  // Check market status on mount
   useEffect(() => {
     const checkMarketStatus = async () => {
       try {
-        // Make a GET request to check current market status via Polygon API
         const res = await axios.get(
           `https://api.polygon.io/v1/marketstatus/now?apiKey=${POLYGON_API_KEY}`
         );
         if (res.data.market === "closed") {
-          // If market is closed
           setMarketStatus(
             "🚫 The market is closed, stock prices won’t update in real time."
           );
         } else {
-          setMarketStatus(null); // Clear market status if market is open
+          setMarketStatus(null);
         }
       } catch (err) {
-        console.error("Error checking market status", err); // Log error if request fails
+        console.error("Error checking market status", err);
       }
     };
-    checkMarketStatus(); // Invoke the function to check market status
-  }, []); // Empty dependency array: run only on mount
+    checkMarketStatus();
+  }, []);
 
-  // Function to search for a stock by its symbol
+  // Function to search for a stock and fetch its data
   const searchStock = async () => {
     try {
-      setError(""); // Clear any previous error messages
-      // Fetch basic stock data (previous close information) from Polygon API
+      setError("");
+
+      // 1. Fetch previous close aggregated data
       const stockRes = await axios.get(
         `https://api.polygon.io/v2/aggs/ticker/${query}/prev?adjusted=true&apiKey=${POLYGON_API_KEY}`
       );
       if (stockRes.data.results && stockRes.data.results.length > 0) {
-        setStockData(stockRes.data.results[0]); // Use the first result if available
+        setStockData(stockRes.data.results[0]);
       } else {
-        setError("No stock data available."); // Set error message if no data is returned
-        setStockData(null); // Clear stockData state
+        setError("No stock data available.");
+        setStockData(null);
       }
-      // Fetch basic company info from Polygon API
+
+      // 2. Fetch basic company info
       const companyRes = await axios.get(
         `https://api.polygon.io/v3/reference/tickers/${query}?apiKey=${POLYGON_API_KEY}`
       );
-      setCompanyInfo(companyRes.data.results); // Update companyInfo state with fetched data
-      // Fetch additional company details using the /company endpoint
+      setCompanyInfo(companyRes.data.results);
+
+      // 3. Fetch additional company details
       const companyDetailsRes = await axios.get(
         `https://api.polygon.io/v1/meta/symbols/${query}/company?apiKey=${POLYGON_API_KEY}`
       );
-      setCompanyDetails(companyDetailsRes.data); // Update companyDetails state with fetched data
-      // Fetch latest news articles about the company
+      setCompanyDetails(companyDetailsRes.data);
+
+      // 4. Fetch latest news articles
       const newsRes = await axios.get(
         `https://api.polygon.io/v2/reference/news?ticker=${query}&apiKey=${POLYGON_API_KEY}`
       );
-      setNews(newsRes.data.results); // Update news state with fetched articles
+      setNews(newsRes.data.results);
+
+      // 5. Fetch aggregated historical data (last 30 days)
+      const today = new Date();
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(today.getDate() - 30);
+      const fromDate = thirtyDaysAgo.toISOString().split("T")[0];
+      const toDate = today.toISOString().split("T")[0];
+
+      const aggRes = await axios.get(
+        `https://api.polygon.io/v2/aggs/ticker/${query}/range/1/day/${fromDate}/${toDate}?adjusted=true&apiKey=${POLYGON_API_KEY}`
+      );
+      if (aggRes.data.results && aggRes.data.results.length > 0) {
+        setAggregatedData(aggRes.data.results);
+      } else {
+        setAggregatedData([]);
+      }
     } catch (err) {
-      setError("Stock not found or API error."); // Set error message if request fails
-      setStockData(null); // Clear stockData state
-      setCompanyInfo(null); // Clear companyInfo state
-      setCompanyDetails(null); // Clear companyDetails state
-      setNews([]); // Clear news state
+      setError("Stock not found or API error.");
+      setStockData(null);
+      setCompanyInfo(null);
+      setCompanyDetails(null);
+      setNews([]);
+      setAggregatedData([]);
     }
   };
 
-  // Function to add the searched stock to the watchlist
+  // Function to add stock to the watchlist
   const addToWatchlist = async () => {
     if (!user) {
-      // Check if user is logged in
-      setError("You must be logged in to add to watchlist"); // Set error message if not logged in
-      return; // Exit the function
+      setError("You must be logged in to add to watchlist");
+      return;
     }
     try {
-      // Make a POST request to add the stock to the watchlist
       await axios.post(
         `${import.meta.env.VITE_BACKEND_API_URL}/watchlist`,
-        { stock_symbol: query, quantity }, // Send stock symbol and quantity in the request body
-        { headers: { Authorization: `Bearer ${accessToken}` } } // Include access token in headers
+        { stock_symbol: query, quantity },
+        { headers: { Authorization: `Bearer ${accessToken}` } }
       );
-      alert(`${query} added to watchlist with quantity ${quantity}`); // Alert success message
+      alert(`${query} added to watchlist with quantity ${quantity}`);
     } catch (err) {
-      setError("Failed to add to watchlist"); // Set error message if request fails
+      setError("Failed to add to watchlist");
     }
   };
 
-  // Return the StockSearch UI
   return (
     <div className="stock-search">
-      {" "}
-      {/* Container with CSS class */}
-      <h2>Search Stocks</h2> {/* Page heading */}
+      <h2>Search Stocks</h2>
       <input
-        type="text" // Input field for stock symbol query
-        placeholder="Enter stock symbol" // Placeholder text
-        value={query} // Bind value to query state
-        onChange={(e) => setQuery(e.target.value.toUpperCase())} // Update query state (convert input to uppercase)
+        type="text"
+        placeholder="Enter stock symbol"
+        value={query}
+        onChange={(e) => setQuery(e.target.value.toUpperCase())}
       />
-      <button onClick={searchStock}>Search</button>{" "}
-      {/* Button triggers searchStock function */}
-      {marketStatus && <p className="market-status">{marketStatus}</p>}{" "}
-      {/* Display market status if available */}
-      {error && <p className="error">{error}</p>}{" "}
-      {/* Display error message if any */}
-      {/* Display basic company info if available */}
+      <button onClick={searchStock}>Search</button>
+      {marketStatus && <p className="market-status">{marketStatus}</p>}
+      {error && <p className="error">{error}</p>}
+
+      {/* Company Info */}
       {companyInfo && (
         <div className="company-info">
-          {" "}
-          {/* Container for company info */}
           {companyInfo.branding?.logo_url && (
             <img
-              src={`${companyInfo.branding.logo_url}?format=png`} // Display company logo if available
-              alt={`${companyInfo.name} Logo`} // Alt text for image
-              style={{ width: "100px", height: "100px", objectFit: "contain" }} // Inline styles for image
+              src={`${companyInfo.branding.logo_url}?format=png`}
+              alt={`${companyInfo.name} Logo`}
+              style={{ width: "100px", height: "100px", objectFit: "contain" }}
             />
           )}
-          <h3>{companyInfo.name}</h3> {/* Display company name */}
-          <p>Industry: {companyInfo.sic_description}</p>{" "}
-          {/* Display company industry */}
+          <h3>{companyInfo.name}</h3>
+          <p>Industry: {companyInfo.sic_description}</p>
         </div>
       )}
-      {/* Display additional company details if available */}
+
+      {/* Company Details */}
       {companyDetails && (
         <div className="company-details">
-          {" "}
-          {/* Container for additional details */}
-          <h4>About {companyDetails.name}</h4> {/* Heading with company name */}
-          {companyDetails.description && (
-            <p>{companyDetails.description}</p>
-          )}{" "}
-          {/* Display description if available */}
+          <h4>About {companyDetails.name}</h4>
+          {companyDetails.description && <p>{companyDetails.description}</p>}
           {companyDetails.ceo && (
             <p>
-              <strong>CEO:</strong> {companyDetails.ceo}{" "}
-              {/* Display CEO information */}
+              <strong>CEO:</strong> {companyDetails.ceo}
             </p>
           )}
           {companyDetails.industry && (
             <p>
-              <strong>Industry:</strong> {companyDetails.industry}{" "}
-              {/* Display industry */}
+              <strong>Industry:</strong> {companyDetails.industry}
             </p>
           )}
           {companyDetails.employees && (
             <p>
-              <strong>Employees:</strong> {companyDetails.employees}{" "}
-              {/* Display number of employees */}
+              <strong>Employees:</strong> {companyDetails.employees}
             </p>
           )}
           {companyDetails.website && (
             <p>
               <strong>Website:</strong>{" "}
               <a
-                href={companyDetails.website} // Link to company website
-                target="_blank" // Open link in a new tab
-                rel="noopener noreferrer" // Security attributes
+                href={companyDetails.website}
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                {companyDetails.website} {/* Display website URL */}
+                {companyDetails.website}
               </a>
             </p>
           )}
         </div>
       )}
-      {/* Display basic stock data if available */}
+
+      {/* Basic Stock Info */}
       {stockData && (
         <div className="stock-info">
-          {" "}
-          {/* Container for stock information */}
           <h3>
-            {query} - Closing Price: ${stockData.c}{" "}
-            {/* Display stock symbol and closing price */}
+            {query} - Closing Price: ${stockData.c}
           </h3>
-          <p>Volume: {stockData.v}</p> {/* Display stock volume */}
+          <p>Volume: {stockData.v}</p>
           <button onClick={addToWatchlist} disabled={!user}>
-            {" "}
-            {/* Button to add to watchlist; disabled if no user */}
             Add to Watchlist
           </button>
           <input
-            type="number" // Input field for quantity selection
-            min="1" // Minimum value is 1
-            placeholder="choose quantity" // Placeholder text
-            value={quantity} // Bind value to quantity state
-            onChange={(e) => setQuantity(Number(e.target.value))} // Update quantity state on change
+            type="number"
+            min="1"
+            placeholder="Choose quantity"
+            value={quantity}
+            onChange={(e) => setQuantity(Number(e.target.value))}
           />
         </div>
       )}
-      {/* Display recent news articles if any exist */}
+
+      {/* Aggregated Historical Data Dropdown */}
+      {aggregatedData && aggregatedData.length > 0 && (
+        <div className="aggregated-data">
+          <button
+            onClick={() => setShowAggregatedData(!showAggregatedData)}
+            style={{
+              marginTop: "20px",
+              padding: "10px 20px",
+              backgroundColor: "#009879",
+              color: "#fff",
+              border: "none",
+              cursor: "pointer",
+              borderRadius: "5px",
+            }}
+          >
+            {showAggregatedData
+              ? "Hide Aggregated Data"
+              : "Show Aggregated Data"}
+          </button>
+          {showAggregatedData && (
+            <table style={tableStyle}>
+              <thead>
+                <tr>
+                  <th style={thStyle}>Date</th>
+                  <th style={thStyle}>Open</th>
+                  <th style={thStyle}>High</th>
+                  <th style={thStyle}>Low</th>
+                  <th style={thStyle}>Close</th>
+                  <th style={thStyle}>Volume</th>
+                </tr>
+              </thead>
+              <tbody>
+                {aggregatedData.map((agg: any) => (
+                  <tr key={agg.t}>
+                    <td style={tdStyle}>
+                      {new Date(agg.t).toLocaleDateString()}
+                    </td>
+                    <td style={tdStyle}>{agg.o}</td>
+                    <td style={tdStyle}>{agg.h}</td>
+                    <td style={tdStyle}>{agg.l}</td>
+                    <td style={tdStyle}>{agg.c}</td>
+                    <td style={tdStyle}>{agg.v}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      )}
+
+      {/* News Articles */}
       {news.length > 0 && (
         <div className="company-news">
-          {" "}
-          {/* Container for news articles */}
-          <h4>Latest News</h4> {/* Heading for news section */}
+          <h4>Latest News</h4>
           <ul>
-            {news.map(
-              (
-                article // Map over each news article
-              ) => (
-                <li key={article.id}>
-                  {" "}
-                  {/* Unique key for each article */}
-                  <a
-                    href={article.article_url} // Link to full article
-                    target="_blank" // Open link in a new tab
-                    rel="noopener noreferrer" // Security attributes
-                  >
-                    {article.title} {/* Display article title */}
-                  </a>
-                  <p>{new Date(article.published_utc).toLocaleString()}</p>{" "}
-                  {/* Display formatted publication date */}
-                </li>
-              )
-            )}
+            {news.map((article) => (
+              <li key={article.id}>
+                <a
+                  href={article.article_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {article.title}
+                </a>
+                <p>{new Date(article.published_utc).toLocaleString()}</p>
+              </li>
+            ))}
           </ul>
         </div>
       )}
-      <button onClick={() => navigate("/")}>Log Out</button>{" "}
-      {/* Button to navigate back to Home (logout) */}
-      <button onClick={() => navigate("/user")}>User Dashboard</button>{" "}
-      {/* Button to navigate to user dashboard */}
+
+      <button onClick={() => navigate("/")}>Log Out</button>
+      <button onClick={() => navigate("/user")}>User Dashboard</button>
     </div>
   );
 };
 
-export default StockSearch; // Export component as default
+export default StockSearch;

@@ -4,9 +4,105 @@ import axios from "axios";
 import { RootState } from "../store";
 import { useNavigate } from "react-router-dom";
 
+// Import Chart.js and react-chartjs-2 components
+import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
 const POLYGON_API_KEY = import.meta.env.VITE_POLYGON_API_KEY;
 
+// Define the available time range options. Each option specifies:
+// - value: A unique key for the option.
+// - label: What the user sees.
+// - days: How many days back to go.
+// - multiplier and timespan: How to aggregate the data.
+const rangeOptions = [
+  {
+    value: "1d",
+    label: "Last 1 Day",
+    days: 1,
+    multiplier: 5,
+    timespan: "minute",
+  },
+  {
+    value: "5d",
+    label: "Last 5 Days",
+    days: 5,
+    multiplier: 1,
+    timespan: "day",
+  },
+  {
+    value: "30d",
+    label: "Last 30 Days",
+    days: 30,
+    multiplier: 1,
+    timespan: "day",
+  },
+  {
+    value: "3m",
+    label: "Last 3 Months",
+    days: 90,
+    multiplier: 1,
+    timespan: "week",
+  },
+  {
+    value: "6m",
+    label: "Last 6 Months",
+    days: 180,
+    multiplier: 1,
+    timespan: "week",
+  },
+  {
+    value: "1y",
+    label: "Last Year",
+    days: 365,
+    multiplier: 1,
+    timespan: "month",
+  },
+  {
+    value: "2y",
+    label: "Last 2 Years",
+    days: 730,
+    multiplier: 1,
+    timespan: "month",
+  },
+  {
+    value: "5y",
+    label: "Last 5 Years",
+    days: 1825,
+    multiplier: 1,
+    timespan: "year",
+  },
+  {
+    value: "10y",
+    label: "Last 10 Years",
+    days: 3650,
+    multiplier: 1,
+    timespan: "year",
+  },
+];
+
 const StockSearch: React.FC = () => {
+  // Basic states for stock, company, and news data
   const [query, setQuery] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [stockData, setStockData] = useState<any>(null);
@@ -16,12 +112,16 @@ const StockSearch: React.FC = () => {
   const [aggregatedData, setAggregatedData] = useState<any[]>([]);
   const [marketStatus, setMarketStatus] = useState<string | null>(null);
   const [error, setError] = useState("");
+
+  // New states for time range selection and toggling aggregated data display
+  const [selectedRange, setSelectedRange] = useState("30d");
   const [showAggregatedData, setShowAggregatedData] = useState(false);
+
   const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.auth.user);
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
 
-  // Inline styling objects for the table
+  // Inline styling for the table
   const tableStyle: React.CSSProperties = {
     width: "100%",
     borderCollapse: "collapse",
@@ -64,12 +164,47 @@ const StockSearch: React.FC = () => {
     checkMarketStatus();
   }, []);
 
-  // Function to search for a stock and fetch its data
+  // Function to fetch aggregated data based on the selected range and current query
+  const fetchAggregatedData = async () => {
+    if (!query) return;
+    try {
+      const rangeOption = rangeOptions.find((r) => r.value === selectedRange);
+      if (!rangeOption) return;
+      const { days, multiplier, timespan } = rangeOption;
+      const today = new Date();
+      const pastDate = new Date();
+      pastDate.setDate(today.getDate() - days);
+      const fromDate = pastDate.toISOString().split("T")[0];
+      const toDate = today.toISOString().split("T")[0];
+
+      const aggRes = await axios.get(
+        `https://api.polygon.io/v2/aggs/ticker/${query}/range/${multiplier}/${timespan}/${fromDate}/${toDate}?adjusted=true&apiKey=${POLYGON_API_KEY}`
+      );
+      if (aggRes.data.results && aggRes.data.results.length > 0) {
+        setAggregatedData(aggRes.data.results);
+      } else {
+        setAggregatedData([]);
+      }
+    } catch (err) {
+      console.error("Error fetching aggregated data", err);
+      setAggregatedData([]);
+    }
+  };
+
+  // Refetch aggregated data when the selected range changes (if a query is present)
+  useEffect(() => {
+    if (query) {
+      fetchAggregatedData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedRange]);
+
+  // Function to search for a stock and fetch its various data
   const searchStock = async () => {
     try {
       setError("");
 
-      // 1. Fetch previous close aggregated data
+      // 1. Fetch previous close aggregated data (basic stock info)
       const stockRes = await axios.get(
         `https://api.polygon.io/v2/aggs/ticker/${query}/prev?adjusted=true&apiKey=${POLYGON_API_KEY}`
       );
@@ -98,21 +233,8 @@ const StockSearch: React.FC = () => {
       );
       setNews(newsRes.data.results);
 
-      // 5. Fetch aggregated historical data (last 30 days)
-      const today = new Date();
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(today.getDate() - 30);
-      const fromDate = thirtyDaysAgo.toISOString().split("T")[0];
-      const toDate = today.toISOString().split("T")[0];
-
-      const aggRes = await axios.get(
-        `https://api.polygon.io/v2/aggs/ticker/${query}/range/1/day/${fromDate}/${toDate}?adjusted=true&apiKey=${POLYGON_API_KEY}`
-      );
-      if (aggRes.data.results && aggRes.data.results.length > 0) {
-        setAggregatedData(aggRes.data.results);
-      } else {
-        setAggregatedData([]);
-      }
+      // 5. Fetch aggregated historical data for the selected range
+      await fetchAggregatedData();
     } catch (err) {
       setError("Stock not found or API error.");
       setStockData(null);
@@ -123,7 +245,7 @@ const StockSearch: React.FC = () => {
     }
   };
 
-  // Function to add stock to the watchlist
+  // Function to add the searched stock to the watchlist
   const addToWatchlist = async () => {
     if (!user) {
       setError("You must be logged in to add to watchlist");
@@ -139,6 +261,28 @@ const StockSearch: React.FC = () => {
     } catch (err) {
       setError("Failed to add to watchlist");
     }
+  };
+
+  // Prepare the chart data from the aggregated data
+  const chartData = {
+    labels: aggregatedData.map((item) => new Date(item.t).toLocaleDateString()),
+    datasets: [
+      {
+        label: `${query} Closing Price`,
+        data: aggregatedData.map((item) => item.c),
+        borderColor: "rgba(75,192,192,1)",
+        backgroundColor: "rgba(75,192,192,0.2)",
+        fill: true,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: { position: "top" as const },
+      title: { display: true, text: `${query} Closing Prices` },
+    },
   };
 
   return (
@@ -224,7 +368,25 @@ const StockSearch: React.FC = () => {
         </div>
       )}
 
-      {/* Aggregated Historical Data Dropdown */}
+      {/* Range Selection Dropdown */}
+      {aggregatedData && aggregatedData.length > 0 && (
+        <div className="range-selection" style={{ marginTop: "20px" }}>
+          <label htmlFor="range-select">Select Time Range: </label>
+          <select
+            id="range-select"
+            value={selectedRange}
+            onChange={(e) => setSelectedRange(e.target.value)}
+          >
+            {rangeOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* Aggregated Data Section with Dropdown Toggle */}
       {aggregatedData && aggregatedData.length > 0 && (
         <div className="aggregated-data">
           <button
@@ -244,37 +406,45 @@ const StockSearch: React.FC = () => {
               : "Show Aggregated Data"}
           </button>
           {showAggregatedData && (
-            <table style={tableStyle}>
-              <thead>
-                <tr>
-                  <th style={thStyle}>Date</th>
-                  <th style={thStyle}>Open</th>
-                  <th style={thStyle}>High</th>
-                  <th style={thStyle}>Low</th>
-                  <th style={thStyle}>Close</th>
-                  <th style={thStyle}>Volume</th>
-                </tr>
-              </thead>
-              <tbody>
-                {aggregatedData.map((agg: any) => (
-                  <tr key={agg.t}>
-                    <td style={tdStyle}>
-                      {new Date(agg.t).toLocaleDateString()}
-                    </td>
-                    <td style={tdStyle}>{agg.o}</td>
-                    <td style={tdStyle}>{agg.h}</td>
-                    <td style={tdStyle}>{agg.l}</td>
-                    <td style={tdStyle}>{agg.c}</td>
-                    <td style={tdStyle}>{agg.v}</td>
+            <>
+              {/* Chart Display */}
+              <div className="chart-container" style={{ marginTop: "20px" }}>
+                <Line data={chartData} options={chartOptions} />
+              </div>
+
+              {/* Aggregated Data Table */}
+              <table style={tableStyle}>
+                <thead>
+                  <tr>
+                    <th style={thStyle}>Date</th>
+                    <th style={thStyle}>Open</th>
+                    <th style={thStyle}>High</th>
+                    <th style={thStyle}>Low</th>
+                    <th style={thStyle}>Close</th>
+                    <th style={thStyle}>Volume</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {aggregatedData.map((agg: any) => (
+                    <tr key={agg.t}>
+                      <td style={tdStyle}>
+                        {new Date(agg.t).toLocaleDateString()}
+                      </td>
+                      <td style={tdStyle}>{agg.o}</td>
+                      <td style={tdStyle}>{agg.h}</td>
+                      <td style={tdStyle}>{agg.l}</td>
+                      <td style={tdStyle}>{agg.c}</td>
+                      <td style={tdStyle}>{agg.v}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
           )}
         </div>
       )}
 
-      {/* News Articles */}
+      {/* Latest News */}
       {news.length > 0 && (
         <div className="company-news">
           <h4>Latest News</h4>

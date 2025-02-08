@@ -91,7 +91,7 @@ height: 100vh;                           /* Full viewport height */
 overflow: hidden;                        /* Hide overflow content */
 position: relative;                      /* Establish positioning context for absolute children */
 background-image: url('./images/DiscoverNewWaysToInvest.webp');  /* Set background image */
-background-size:contain;                  /* Ensure the image covers the entire container */
+background-size:cover;                  /* Ensure the image covers the entire container */
 background-position:center;             /* Center the background image */
 background-repeat: no-repeat;            /* Prevent repeating the background image */
 }

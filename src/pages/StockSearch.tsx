@@ -464,9 +464,6 @@ const StockSearch: React.FC = () => {
           </ul>
         </div>
       )}
-
-      <button onClick={() => navigate("/")}>Log Out</button>
-      <button onClick={() => navigate("/user")}>User Dashboard</button>
     </div>
   );
 };

@@ -29,8 +29,10 @@ body {
   justify-content: space-between;        /* Distribute space between navbar items */
   align-items: center;                   /* Vertically center the navbar items */
   background-color: #2f4a66;               /* Set a dark blue-gray background color */
-  padding: 10px 20px;                    /* Add vertical and horizontal padding */
-  color: #fff;                           /* Set text color to white */
+  padding: 20px 20px;                    /* Add vertical and horizontal padding */
+  color: #fff;                   
+  border-radius: 5px;
+  /* width: 100%;         */
 }
 
 .navbar-brand {
@@ -41,8 +43,10 @@ body {
 .navbar-links {
   list-style: none;                      /* Remove default bullet points from list */
   display: flex;                         /* Display links in a row using flexbox */
-  margin: 2px;                           /* Small margin around the list (optional) */
-  padding: 2px;                          /* Small padding inside the list (optional) */
+  margin: 3px;                          
+  padding: 3px;                          
+  font-size: 1rem;
+  font-weight: bold;
 }
 
 .navbar-links li {
@@ -56,8 +60,9 @@ body {
 }
 
 .navbar-links li a:hover {
-  text-decoration: none;                 /* Ensure underline stays removed on hover */
-  color: #ff0000;                        /* Change link color to red when hovered */
+  text-decoration: none;              
+  color: rgb(152, 82, 123);
+  text-shadow: purple 2px 2px 2px;
 }
 
 /* Responsive Navbar */
@@ -444,8 +449,14 @@ background-color: #0056b3;               /* Darken button background on hover */
   max-width: 800px;                     /* Limit container width */
   margin: 20px auto;                    /* Center container with vertical margins */
   padding: 20px;                        /* Padding inside the container */
+  text-align: center;
+  color:#2f4a66;
+  font-family:Arial, Helvetica, sans-serif;
 }
 
+.dashboard-info {
+  margin-bottom: 20px;                  /* Space below the dashboard info */
+}
 /* ---------- Watchlist ---------- */
 .watchlist {
   background: #fff;                     /* White background */
@@ -727,7 +738,15 @@ transition: background-color 0.3s;     /* Smooth background transition on hover 
 .manual-add-stock button:hover {
 background-color: #0056b3;             /* Darken background on hover */
 }
+.manual-add-btn {
+  background-color: rgb(164, 64, 97);
+}
 
+.manual-add-btn:hover {
+  transform: scale(1.1);
+  transition: 0.5s ease;
+  background-color: purple;
+}
 /* Image Section for Manual Add Stock Page */
 .manual-add-stock-image {
 text-align: center;                    /* Center-align image container */

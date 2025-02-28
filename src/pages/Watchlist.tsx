@@ -475,7 +475,10 @@ const Watchlist = () => {
           }
         })}
       </div>
-      <button onClick={() => navigate("/manual-add")}>
+      <button
+        className="manual-add-btn"
+        onClick={() => navigate("/manual-add")}
+      >
         Add Stock Manually
       </button>{" "}
       {/* Button to navigate to the manual add stock page */}

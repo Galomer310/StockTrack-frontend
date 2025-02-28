@@ -81,8 +81,8 @@ const PortfolioPerformanceChart: FC<PortfolioPerformanceChartProps> = ({
           label: "Current Value", // Label for the current value line
           data: currentData, // Data points for current portfolio value
           borderColor: "green", // Line color for current value
-          backgroundColor: "rgba(0, 128, 0, 0.1)", // Background color under the line
-          fill: false, // Do not fill the area under the line
+          backgroundColor: "rgba(17, 0, 128, 0.1)", // Background color under the line
+          fill: true, // Do not fill the area under the line
         },
       ],
     };

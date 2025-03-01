@@ -32,7 +32,7 @@ body {
   padding: 20px 20px;                    /* Add vertical and horizontal padding */
   color: #fff;                   
   border-radius: 5px;
-  /* width: 100%;         */
+  width: 100%;        
 }
 
 .navbar-brand {
@@ -59,11 +59,7 @@ body {
   font-size: 1rem;                       /* Set font size for links */
 }
 
-.navbar-links li a:hover {
-  text-decoration: none;              
-  color: rgb(152, 82, 123);
-  text-shadow: purple 2px 2px 2px;
-}
+
 
 /* Responsive Navbar */
 /* Apply these styles when the viewport width is 768px or less */
@@ -302,18 +298,27 @@ background-color: #0056b3;               /* Darken button background on hover */
 
 .stock-search h2 {
   text-align: center;
-  margin-bottom: 20px;
-  /* Use a different font for headings and a dark blue color */
-  font-family: 'Montserrat', sans-serif;
-  color: #2f4a66;
+  margin: 20px;
+  font-family:'Times New Roman', Times, serif ;
+  font-size: 2rem;
+  background-color: #008000b3;
+  color: white;
+  border-radius: 4px;
+}
+
+.stock-search p {
+  margin: 20px;
+  font-size: 1.1rem;;
+  color: #333;
 }
 
 .stock-search input[type="text"],
 .stock-search input[type="number"] {
+
+  display: block;
   padding: 12px;
   margin: 10px 5px;
-  width: calc(50% - 20px);
-  border: 1px solid #ccc;
+  width: calc(30% - 10px);
   border-radius: 6px;
   font-size: 1rem;
   font-family: 'Roboto', sans-serif;
@@ -350,39 +355,48 @@ background-color: #0056b3;               /* Darken button background on hover */
   font-weight: bold;
 }
 
-/* ---------- Company Info Section ---------- */
-/* Ensure the company image is nicely styled;
-   if its src is empty, hide it */
-.company-info img {
-  margin-right: 20px;
-  border-radius: 4px;
-  max-width: 100px;
-  display: block;
-}
-
-.company-info img[src=""] {
-  display: none;
-}
 
 /* ---------- Company Info Section ---------- */
 .company-info {
-  display: flex;                        /* Use flexbox for layout */
-  align-items: center;                  /* Vertically center items */
-  margin: 20px 0;                       /* Vertical margin */
+  display: flex;                        
+  align-items:start;                  
+  margin: 20px 0;                      
+  padding: 15px;                        
+  background-color: #008000b3;
+  border-radius: 4px;                   /* Rounded corners */
+  font-family:'Times New Roman', Times, serif ;
+  font-size: 1.5rem;
+  color: white;
+  font-weight: bold;
+  justify-content: center;
 }
 
-.company-info img {
-  margin-right: 20px;                   /* Space to the right of the image */
-  border-radius: 4px;                   /* Rounded image corners */
-  max-width: 100px;                     /* Limit image width */
-}
-
+/* company name header search stock */
 .company-info h3 {
-  margin-bottom: 5px;                   /* Space below the heading */
+ padding: 10px;                       
 }
-
+.company-info h3:hover {
+  background-color: rgba(255, 255, 255);
+  transform: scale(1.1);
+  transition: 0.25s ease;
+  border-radius: 5px;
+  color: #008000b3;
+  padding: 15px;
+}
+/* company industry header search stock */
 .company-info p {
-  margin: 2px 0;                        /* Small vertical margin for paragraphs */
+  display: flex;
+  flex-wrap: wrap;
+  color: white;                   
+}
+.company-info p:hover {
+  background-color: rgba(255, 255, 255);
+  transform: scale(1.10);
+  transition: 0.25s ease;
+  border-radius: 5px;
+  color: #008000b3;
+  padding: 15px;
+
 }
 
 /* ---------- Stock Info Section ---------- */
@@ -394,16 +408,33 @@ background-color: #0056b3;               /* Darken button background on hover */
 }
 
 .stock-info h3 {
-  margin-bottom: 10px;                  /* Space below the heading */
+  margin-bottom: 10px;   
+  color: #008000b3; 
 }
 
 .stock-info p {
   margin-bottom: 5px;                   /* Space below paragraphs */
 }
+.range-selection {
+  padding: 10px;
+  background-color: #008000b3;
+  color: white;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.5rem;
+  font-family:'Times New Roman', Times, serif ;
+  border-radius: 4px;
+}
+
+#range-select {
+  font-size: 1rem;
+  padding: 5px;
+  margin: 5px;
+  border-radius: 4px;
+}
 
 /* ---------- Additional Company Details ---------- */
 .company-details {
-  background: #e9ecef;                  /* Light gray background */
   padding: 15px;                        /* Padding inside the container */
   border-radius: 4px;                   /* Rounded corners */
   margin-bottom: 20px;                  /* Space below the section */
@@ -411,7 +442,10 @@ background-color: #0056b3;               /* Darken button background on hover */
 
 .company-details h4 {
   margin-bottom: 10px;                  /* Space below the heading */
+  color: #008000b3;
+  font-weight: bold;
 }
+
 
 .company-details p {
   margin-bottom: 5px;                   /* Space below paragraphs */
@@ -420,10 +454,20 @@ background-color: #0056b3;               /* Darken button background on hover */
 /* ---------- Company News Section ---------- */
 .company-news {
   margin: 20px 0;                       /* Vertical margin */
+  border-radius: 4px;                   /* Rounded corners */
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+  padding: 5px;
 }
 
 .company-news h4 {
   margin-bottom: 10px;                  /* Space below the heading */
+  text-align: center;
+  font-size: 1.5rem;
+  background-color: rgb(0, 128, 0, 0.7);
+  border-radius: 4px;
+  color: white;
+  font-family:'Times New Roman', Times, serif ;
+
 }
 
 .company-news ul {
@@ -433,6 +477,15 @@ background-color: #0056b3;               /* Darken button background on hover */
 
 .company-news li {
   margin-bottom: 10px;                  /* Space between news items */
+  border-bottom: 1px solid #f3f3f3;        /* Light bottom border */
+  font-weight: bold;
+  padding: 2px;
+}
+.company-news li:hover {
+  background-color: hsl(120, 73%, 75%, 0.1);
+  transform: scale(0.987);
+  transition: 0.1s ease;
+  border-radius: 5px;
 }
 
 .company-news a {
@@ -444,6 +497,21 @@ background-color: #0056b3;               /* Darken button background on hover */
   text-decoration: underline;           /* Underline links on hover */
 }
 
+.aggregated-data {
+  padding: 15px;                       
+}
+/* the  Aggregated chart  */
+.chart-container :hover{
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: scale(1.10);
+  border: 1px solid rgb(190, 190, 190);
+  transition: 0.25s ease;
+  border-radius: 5px;
+}
+
+
+
+
 /* ---------- User Dashboard ---------- */
 .user-page-container {
   max-width: 800px;                     /* Limit container width */
@@ -451,11 +519,13 @@ background-color: #0056b3;               /* Darken button background on hover */
   padding: 20px;                        /* Padding inside the container */
   text-align: center;
   color:#2f4a66;
+  
   font-family:Arial, Helvetica, sans-serif;
 }
 
 .dashboard-info {
-  margin-bottom: 20px;                  /* Space below the dashboard info */
+  margin-bottom: 20px;                  
+  font-size: 1.5rem;
 }
 /* ---------- Watchlist ---------- */
 .watchlist {
@@ -516,7 +586,9 @@ background-color: #0056b3;               /* Darken button background on hover */
   background: #e78127;                  /* Darken background on hover */
 }
 
-/* Styles for each row in the watchlist */
+/* ---------- Watchlist Table Styles ---------- */
+/* Watchlist table container */
+
 .watchlist-row {
 display: flex;                           /* Use flexbox for row layout */
 align-items: center;                     /* Vertically center items */
@@ -524,9 +596,10 @@ padding: 12px 16px;                      /* Padding for each row */
 border-bottom: 1px solid #e0e0e0;         /* Light bottom border */
 background-color: #ffffff;               /* White background */
 transition: background-color 0.3s ease;  /* Smooth background change on hover */
-font-family: 'Open Sans', sans-serif;    /* Use Open Sans font */
-font-size: 14px;                         /* Set font size */
-color: #202124;                         /* Dark text color */
+font-family:Arial, Helvetica, sans-serif;    
+font-size: 14px;                         
+color: rgb(0, 128, 0, 0.7);                        
+border: 2px solid #ccc;
 }
 
 /* Change background on hover for watchlist rows */
@@ -550,8 +623,8 @@ font-weight: 600;                      /* Bold text */
 .watchlist-row .price,
 .watchlist-row .quantity,
 .watchlist-row .added {
-text-align: right;                     /* Align text to the right */
-color: #5f6368;                        /* Gray color for numeric text */
+text-align: right;                     
+color: #5f6368;                        
 }
 
 /* Actions column (buttons) styling */
@@ -627,13 +700,15 @@ background-color: #f1f3f4;             /* Light gray background for table header
 
 /* Styles for the watchlist header row */
 .watchlist-header {
-display: flex;                         /* Use flexbox for layout */
+display: flex;                     
 align-items: center;                   /* Vertically center items */
 padding: 12px 16px;                    /* Padding for the header row */
 background-color: #f1f3f4;               /* Light gray background */
 border-bottom: 2px solid #ccc;         /* Darker bottom border for separation */
 font-weight: bold;                     /* Bold text */
 font-size: 14px;                       /* Font size */
+border: 2px solid #ccc;
+border-radius: 4px;
 }
 
 /* Each column in the header */
@@ -641,6 +716,7 @@ font-size: 14px;                       /* Font size */
 flex: 1;                               /* Equal spacing for each header column */
 text-align: center;                    /* Center text */
 cursor: pointer;                       /* Indicate that columns are clickable (for sorting) */
+
 }
 
 /* Ticker column: narrower and left-aligned */
@@ -675,7 +751,28 @@ padding-right: 8px;                    /* Right padding */
 .watchlist-header .actions {
 flex: 1;                               /* Standard flex size */
 text-align: center;                    /* Center text */
+
 }
+.watchlist-group {
+  cursor: pointer;
+  padding: 0.5rem;
+  background-color: white;
+  text-align: left;
+  font-family:sans-serif;
+  font-weight: bold;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+}
+
+.group-header {
+  cursor: pointer;
+  padding: 0.5rem;
+  background-color: white;
+  text-align: left;
+  font-family:sans-serif;
+  font-weight: bold;
+}
+
 
 /* Style for Manual add stock page */
 .manual-add-stock {
@@ -745,7 +842,7 @@ background-color: #0056b3;             /* Darken background on hover */
 .manual-add-btn:hover {
   transform: scale(1.1);
   transition: 0.5s ease;
-  background-color: purple;
+  background-color: #e78127;
 }
 /* Image Section for Manual Add Stock Page */
 .manual-add-stock-image {

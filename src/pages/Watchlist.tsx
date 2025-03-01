@@ -374,12 +374,6 @@ const Watchlist = () => {
                 <div
                   className="group-header"
                   onClick={() => toggleGroup(symbol)} // Toggle group expansion on click
-                  style={{
-                    cursor: "pointer",
-                    backgroundColor: "#f0f0f0",
-                    padding: "0.5rem",
-                    borderBottom: "1px solid #ccc",
-                  }}
                 >
                   <span>{symbol}</span>{" "}
                   {/* Display the stock symbol for the group */}

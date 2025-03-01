@@ -289,6 +289,11 @@ const StockSearch: React.FC = () => {
   return (
     <div className="stock-search">
       <h2>Search Stocks</h2>
+      <p>Get stock data, company info, news, and historical prices.</p>
+      <p>Search for a stock symbol to get started.</p>
+      <p>Example: AAPL, TSLA, MSFT, AMZN, GOOGL</p>
+      <p>Market data provided by Polygon.io</p>
+
       <input
         type="text"
         placeholder="Enter stock symbol"
@@ -302,13 +307,6 @@ const StockSearch: React.FC = () => {
       {/* Company Info */}
       {companyInfo && (
         <div className="company-info">
-          {companyInfo.branding?.logo_url && (
-            <img
-              src={`${companyInfo.branding.logo_url}?format=png`}
-              alt={`${companyInfo.name} Logo`}
-              style={{ width: "100px", height: "100px", objectFit: "contain" }}
-            />
-          )}
           <h3>{companyInfo.name}</h3>
           <p>Industry: {companyInfo.sic_description}</p>
         </div>
@@ -333,19 +331,10 @@ const StockSearch: React.FC = () => {
             <p>
               <strong>Employees:</strong> {companyDetails.employees}
             </p>
-          )}
-          {companyDetails.website && (
-            <p>
-              <strong>Website:</strong>{" "}
-              <a
-                href={companyDetails.website}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {companyDetails.website}
-              </a>
-            </p>
-          )}
+          )}{" "}
+          <p>
+            <strong>Volume:</strong> {stockData.v}
+          </p>
         </div>
       )}
 
@@ -355,7 +344,7 @@ const StockSearch: React.FC = () => {
           <h3>
             {query} - Closing Price: ${stockData.c}
           </h3>
-          <p>Volume: {stockData.v}</p>
+
           <button onClick={addToWatchlist} disabled={!user}>
             Add to Watchlist
           </button>
@@ -395,7 +384,7 @@ const StockSearch: React.FC = () => {
             style={{
               marginTop: "20px",
               padding: "10px 20px",
-              backgroundColor: "#009879",
+              backgroundColor: "#008000b3",
               color: "#fff",
               border: "none",
               cursor: "pointer",

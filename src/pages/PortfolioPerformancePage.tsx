@@ -143,8 +143,14 @@ const PortfolioPerformancePage: React.FC = () => {
       {/* Display total invested */}
       <h2>Current Portfolio Value: ${totalCurrentValue.toFixed(2)}</h2>{" "}
       {/* Display current portfolio value */}
-      <h2>Total Gain: ${totalGain.toFixed(2)}</h2> {/* Display total gain */}
-      <h2>Total Lost: ${Math.abs(totalLost).toFixed(2)}</h2>{" "}
+      <h2>
+        Total Gain: <span id="h2Gain">${totalGain.toFixed(2)}</span>
+      </h2>{" "}
+      {/* Display total gain */}
+      <h2>
+        Total Lost:<span id="h2Lost">${Math.abs(totalLost).toFixed(2)}</span>{" "}
+      </h2>{" "}
+      <p>Click On: Ticker / Quantity / Profit/Loss </p>
       {/* Display total lost (absolute value) */}
       {/* Render the PortfolioPerformance component passing the watchlist */}
       <PortfolioPerformance watchlist={watchlist} />

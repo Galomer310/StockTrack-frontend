@@ -88,13 +88,13 @@ body {
 /* Ensure the container fills the entire viewport */
 .home-container {
 width: 100%;                             /* Full width */
-height: 100vh;                           /* Full viewport height */
-overflow: hidden;                        /* Hide overflow content */
+height: 120vh;                           /* Full viewport height */
 position: relative;                      /* Establish positioning context for absolute children */
 background-image: url('./images/DiscoverNewWaysToInvest.webp');  /* Set background image */
-background-size:contain;                  /* Ensure the image covers the entire container */
-background-position:center;             /* Center the background image */
-background-repeat: no-repeat;            /* Prevent repeating the background image */
+background-size:cover;                  /* Ensure the image covers the entire container */
+background-position:top;             /* Center the background image */
+border-radius: 5px;
+
 }
 
 /* Hero section styling */
@@ -195,6 +195,7 @@ background-color: #0056b3;               /* Darken button background on hover */
   display: flex;
   align-items: center;     /* Center the form vertically */
   justify-content: center; /* Center the form horizontally */
+  border-radius: 5px;
 }
 
 /* Full-page background for Register */
@@ -207,6 +208,7 @@ background-color: #0056b3;               /* Darken button background on hover */
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 5px;
 }
 
 /* Optional: Adjust the container styles if needed */
@@ -675,6 +677,7 @@ background: #fff;                      /* White background */
 padding: 20px;                         /* Padding inside the container */
 border-radius: 8px;                    /* Rounded corners */
 box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+
 }
 
 .portfolio-performance h3 {
@@ -689,15 +692,36 @@ border-collapse: collapse;             /* Collapse borders */
 
 .portfolio-performance th,
 .portfolio-performance td {
-padding: 12px;                         /* Padding for table cells */
-border: 1px solid #ddd;                /* Light border for cells */
-text-align: center;                    /* Center text in cells */
+padding: 10px;                         /* Padding for table cells */
+text-align: center;                    
+box-shadow: 1px 1px 1px #2f4a66; /* Subtle shadow */
 }
 
 .portfolio-performance th {
 background-color: #f1f3f4;             /* Light gray background for table header */
 }
 
+
+.portfolio-performance-page h2{
+  text-align: center;
+  padding: 5px;
+  margin: 10px;
+}
+
+.portfolio-performance-page p {
+  text-align: center;
+  padding: 5px;
+  margin: 10px;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+#h2Gain{
+  color: green;
+}
+#h2Lost{
+  color: red;
+}
 /* Styles for the watchlist header row */
 .watchlist-header {
 display: flex;                     

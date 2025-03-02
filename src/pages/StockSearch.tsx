@@ -40,7 +40,7 @@ const rangeOptions = [
     label: "Last 5 Days",
     days: 5,
     multiplier: 1,
-    timespan: "day",
+    timespan: "hour",
   },
   {
     value: "30d",
@@ -68,7 +68,7 @@ const rangeOptions = [
     label: "Last Year",
     days: 365,
     multiplier: 1,
-    timespan: "month",
+    timespan: "week",
   },
   {
     value: "2y",
@@ -76,20 +76,6 @@ const rangeOptions = [
     days: 730,
     multiplier: 1,
     timespan: "month",
-  },
-  {
-    value: "5y",
-    label: "Last 5 Years",
-    days: 1825,
-    multiplier: 1,
-    timespan: "year",
-  },
-  {
-    value: "10y",
-    label: "Last 10 Years",
-    days: 3650,
-    multiplier: 1,
-    timespan: "year",
   },
 ];
 

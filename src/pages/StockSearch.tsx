@@ -33,19 +33,8 @@ ChartJS.register(
 
 const POLYGON_API_KEY = import.meta.env.VITE_POLYGON_API_KEY;
 
-// Define the available time range options. Each option specifies:
-// - value: A unique key for the option.
-// - label: What the user sees.
-// - days: How many days back to go.
-// - multiplier and timespan: How to aggregate the data.
+// Define the available time range options.
 const rangeOptions = [
-  {
-    value: "1d",
-    label: "Last 1 Day",
-    days: 1,
-    multiplier: 5,
-    timespan: "minute",
-  },
   {
     value: "5d",
     label: "Last 5 Days",
@@ -105,7 +94,7 @@ const rangeOptions = [
 ];
 
 const StockSearch: React.FC = () => {
-  // Basic states for stock, company, news and aggregated data
+  // Basic states for stock, company, news, and aggregated data
   const [query, setQuery] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [stockData, setStockData] = useState<any>(null);
@@ -116,17 +105,21 @@ const StockSearch: React.FC = () => {
   const [marketStatus, setMarketStatus] = useState<string | null>(null);
   const [error, setError] = useState("");
 
-  // New state to store the timestamp of the last market status fetch
+  // Timestamp state for market status caching
   const [lastMarketStatusFetched, setLastMarketStatusFetched] =
     useState<number>(0);
 
-  // --- New states for Search Button Disable Feature ---
+  // --- Search Button Disable Feature (for overall search) ---
   const [searchDisabled, setSearchDisabled] = useState(false);
   const [searchCountdown, setSearchCountdown] = useState(30);
-  // -------------------------------------------------------
+  // -------------------------------------------------------------
 
-  // States for time range selection and toggling aggregated data display
+  // --- New States for Range Selection Cooldown Feature ---
   const [selectedRange, setSelectedRange] = useState("30d");
+  const [rangeDisabled, setRangeDisabled] = useState(false);
+  const [rangeCountdown, setRangeCountdown] = useState(30);
+  // ---------------------------------------------------------
+
   const [showAggregatedData, setShowAggregatedData] = useState(false);
 
   const navigate = useNavigate();
@@ -155,11 +148,10 @@ const StockSearch: React.FC = () => {
     padding: "12px",
   };
 
-  // useEffect to check market status with caching to avoid too many requests
+  // useEffect to check market status with caching
   useEffect(() => {
     const checkMarketStatus = async () => {
       const now = Date.now();
-      // If market status was fetched within the last 60 seconds, skip re-fetching
       if (now - lastMarketStatusFetched < 60000 && marketStatus !== null) {
         return;
       }
@@ -180,24 +172,21 @@ const StockSearch: React.FC = () => {
       }
     };
 
-    // Call checkMarketStatus on mount
     checkMarketStatus();
-    // Set an interval to check market status every minute
     const interval = setInterval(checkMarketStatus, 60000);
     return () => clearInterval(interval);
   }, [lastMarketStatusFetched, marketStatus]);
 
-  // --- New useEffect to handle search button countdown ---
-  // useEffect to handle search button countdown
+  // useEffect for search button cooldown (30s)
   useEffect(() => {
-    let timer: number; // use number instead of NodeJS.Timeout in browser
+    let timer: number;
     if (searchDisabled) {
       timer = window.setInterval(() => {
         setSearchCountdown((prev) => {
           if (prev <= 1) {
             clearInterval(timer);
             setSearchDisabled(false);
-            return 30; // Reset countdown for next search
+            return 30;
           }
           return prev - 1;
         });
@@ -206,7 +195,34 @@ const StockSearch: React.FC = () => {
     return () => clearInterval(timer);
   }, [searchDisabled]);
 
-  // ----------------------------------------------------------
+  // useEffect for range selection cooldown (30s)
+  useEffect(() => {
+    let timer: number;
+    if (rangeDisabled) {
+      timer = window.setInterval(() => {
+        setRangeCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            setRangeDisabled(false);
+            return 20;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [rangeDisabled]);
+
+  // Function to handle range selection change
+  const handleRangeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    // Only process change if range selection is not disabled
+    if (!rangeDisabled) {
+      setSelectedRange(e.target.value);
+      // Disable the dropdown for 20 seconds after a change
+      setRangeDisabled(true);
+      setRangeCountdown(20);
+    }
+  };
 
   // Function to fetch aggregated data based on the selected range and current query
   const fetchAggregatedData = async () => {
@@ -244,11 +260,10 @@ const StockSearch: React.FC = () => {
 
   // Function to search for a stock and fetch its various data
   const searchStock = async () => {
-    // --- Disable search button for 30 seconds when search is initiated ---
-    if (searchDisabled) return; // Prevent multiple clicks during cooldown
+    // Disable search button for 30 seconds when search is initiated
+    if (searchDisabled) return;
     setSearchDisabled(true);
     setSearchCountdown(30);
-    // --------------------------------------------------------
 
     try {
       setError("");
@@ -395,7 +410,6 @@ const StockSearch: React.FC = () => {
           <h3>
             {query} - Closing Price: ${stockData.c}
           </h3>
-
           <button onClick={addToWatchlist} disabled={!user}>
             Add to Watchlist
           </button>
@@ -409,14 +423,15 @@ const StockSearch: React.FC = () => {
         </div>
       )}
 
-      {/* Range Selection Dropdown */}
+      {/* Range Selection Dropdown with cooldown */}
       {aggregatedData && aggregatedData.length > 0 && (
         <div className="range-selection" style={{ marginTop: "20px" }}>
           <label htmlFor="range-select">Select Time Range: </label>
           <select
             id="range-select"
             value={selectedRange}
-            onChange={(e) => setSelectedRange(e.target.value)}
+            onChange={handleRangeChange}
+            disabled={rangeDisabled} // Disable dropdown when cooldown is active
           >
             {rangeOptions.map((option) => (
               <option key={option.value} value={option.value}>
@@ -424,6 +439,11 @@ const StockSearch: React.FC = () => {
               </option>
             ))}
           </select>
+          {rangeDisabled && (
+            <span style={{ marginLeft: "10px", color: "gray" }}>
+              (Change disabled for {rangeCountdown} s)
+            </span>
+          )}
         </div>
       )}
 

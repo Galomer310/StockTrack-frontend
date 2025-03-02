@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react"; // Import React and necessary hooks
-import axios from "axios"; // Import axios for HTTP requests
+import axiosInstance from "../api/axiosInstance";
 import PortfolioPerformance from "../components/performance/PortfolioPerformance"; // Import the PortfolioPerformance component
 import { WatchlistItem } from "../components/performance/PortfolioPerformance"; // Import WatchlistItem type
 import { useSelector } from "react-redux"; // Import useSelector to access Redux state
@@ -22,7 +22,7 @@ const PortfolioPerformancePage: React.FC = () => {
     const fetchWatchlist = async () => {
       try {
         // Make a GET request to fetch the watchlist for the user
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `${import.meta.env.VITE_BACKEND_API_URL}/watchlist`,
           {
             headers: { Authorization: `Bearer ${accessToken}` }, // Include access token in headers
@@ -51,7 +51,7 @@ const PortfolioPerformancePage: React.FC = () => {
           // For each unique symbol
           try {
             // Make a GET request to fetch the latest price for the symbol
-            const response = await axios.get(
+            const response = await axiosInstance.get(
               `${import.meta.env.VITE_BACKEND_API_URL}/stocks/${symbol}`
             );
             // Store the parsed latest price in the prices object
@@ -137,7 +137,6 @@ const PortfolioPerformancePage: React.FC = () => {
   // Return the performance page UI
   return (
     <div className="portfolio-performance-page" style={{ padding: "1rem" }}>
-      {" "}
       {/* Container with inline padding */}
       <h2>Total financial contribution: ${totalInvested.toFixed(2)}</h2>{" "}
       {/* Display total invested */}
@@ -145,11 +144,11 @@ const PortfolioPerformancePage: React.FC = () => {
       {/* Display current portfolio value */}
       <h2>
         Total Gain: <span id="h2Gain">${totalGain.toFixed(2)}</span>
-      </h2>{" "}
+      </h2>
       {/* Display total gain */}
       <h2>
         Total Lost:<span id="h2Lost">${Math.abs(totalLost).toFixed(2)}</span>{" "}
-      </h2>{" "}
+      </h2>
       <p>Click On: Ticker / Quantity / Profit/Loss </p>
       {/* Display total lost (absolute value) */}
       {/* Render the PortfolioPerformance component passing the watchlist */}

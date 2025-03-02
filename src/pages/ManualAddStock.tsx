@@ -1,7 +1,7 @@
 import { useState } from "react"; // Import useState hook from React
 import { useSelector } from "react-redux"; // Import useSelector to access Redux state
 import { RootState } from "../store"; // Import RootState for type definitions
-import axios from "axios"; // Import axios for HTTP requests
+import axiosInstance from "../api/axiosInstance";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 
 // Define the ManualAddStock functional component
@@ -21,7 +21,7 @@ const ManualAddStock = () => {
     e.preventDefault(); // Prevent default form submission behavior
     try {
       // Make a POST request to add the stock manually
-      await axios.post(
+      await axiosInstance.post(
         `${import.meta.env.VITE_BACKEND_API_URL}/watchlist`,
         {
           stock_symbol: stockSymbol.toUpperCase(), // Convert symbol to uppercase

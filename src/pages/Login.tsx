@@ -39,6 +39,7 @@ const Login = () => {
           setUser({
             user: { id: data.user.id, email: data.user.email },
             accessToken: data.accessToken,
+            refreshToken: data.refreshToken,
           })
         );
         navigate("/user"); // Redirect to the user dashboard

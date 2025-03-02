@@ -285,7 +285,6 @@ background-color: #0056b3;               /* Darken button background on hover */
 }
 
 /* ---------- Stock Search Page ---------- */
-/* ---------- Stock Search Page ---------- */
 .stock-search {
   /* Use a soft gradient background and increased padding */
   background: rgb(255, 255, 255); 
@@ -324,14 +323,13 @@ background-color: #0056b3;               /* Darken button background on hover */
   border-radius: 6px;
   font-size: 1rem;
   font-family: 'Roboto', sans-serif;
-  /* Optional: add a subtle inner shadow for a modern feel */
   box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .stock-search button {
   margin: 5px;
   padding: 12px 24px;
-  background: #007bff;  /* Blue primary button */
+  background: #007bff;  
   border: none;
   color: #fff;
   border-radius: 6px;
@@ -536,6 +534,7 @@ background-color: #0056b3;               /* Darken button background on hover */
   padding: 20px;                        /* Padding inside the container */
   margin: 20px auto;                    /* Center container with vertical margins */
   box-shadow: 0 7px 6px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+  border: 1px solid #ccc;               
 }
 
 .watchlist h3 {
@@ -555,8 +554,8 @@ background-color: #0056b3;               /* Darken button background on hover */
   display: flex;                        /* Use flexbox for row layout */
   justify-content: space-between;       /* Distribute space between columns */
   align-items: center;                  /* Vertically center items */
-  border-bottom: 1px solid #ddd;        /* Light bottom border for separation */
-  padding: 10px 0;                      /* Vertical padding for each list item */
+  border-bottom: 1px solid #ddd;        
+  padding: 10px 0;                     
 }
 
 .watchlist li:last-child {

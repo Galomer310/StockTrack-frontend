@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react"; // Import React hooks
-import axios from "axios"; // Import axios for HTTP requests
+import axiosInstance from "../api/axiosInstance";
 import { useSelector } from "react-redux"; // Import useSelector to access Redux state
 import { RootState } from "../store"; // Import RootState for type definitions
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
@@ -35,7 +35,7 @@ const Watchlist = () => {
     const fetchWatchlist = async () => {
       try {
         // Make a GET request to fetch the watchlist
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `${import.meta.env.VITE_BACKEND_API_URL}/watchlist`,
           {
             headers: { Authorization: `Bearer ${accessToken}` }, // Include access token in headers
@@ -64,7 +64,7 @@ const Watchlist = () => {
         symbols.map(async (symbol) => {
           // For each symbol, fetch its latest price
           try {
-            const response = await axios.get(
+            const response = await axiosInstance.get(
               `${import.meta.env.VITE_BACKEND_API_URL}/stocks/${symbol}`
             );
             prices[symbol] = parseFloat(response.data.last_price); // Parse and store the price
@@ -162,7 +162,7 @@ const Watchlist = () => {
   const handleSaveEdit = async (id: number) => {
     try {
       // Make a PUT request to update the watchlist item
-      await axios.put(
+      await axiosInstance.put(
         `${import.meta.env.VITE_BACKEND_API_URL}/watchlist/${id}`,
         editingItemData, // Send the updated data
         {
@@ -200,7 +200,7 @@ const Watchlist = () => {
   const handleRemoveFromWatchlist = async (id: number) => {
     try {
       // Make a DELETE request to remove the item
-      await axios.delete(
+      await axiosInstance.delete(
         `${import.meta.env.VITE_BACKEND_API_URL}/watchlist/${id}`,
         {
           headers: { Authorization: `Bearer ${accessToken}` }, // Include access token in headers
@@ -226,7 +226,6 @@ const Watchlist = () => {
   // Return the Watchlist UI
   return (
     <div style={{ padding: "1rem" }}>
-      {" "}
       {/* Container with inline padding */}
       <h4>Total Portfolio Value: ${total.toFixed(2)}</h4>{" "}
       {/* Display total portfolio value */}
@@ -270,7 +269,7 @@ const Watchlist = () => {
             // Define an inline handler for removing this stock from the watchlist
             const handleRemoveFromWatchlist = async (id: number) => {
               try {
-                await axios.delete(
+                await axiosInstance.delete(
                   `${import.meta.env.VITE_BACKEND_API_URL}/watchlist/${id}`,
                   {
                     headers: { Authorization: `Bearer ${accessToken}` },
@@ -474,7 +473,7 @@ const Watchlist = () => {
         onClick={() => navigate("/manual-add")}
       >
         Add Stock Manually
-      </button>{" "}
+      </button>
       {/* Button to navigate to the manual add stock page */}
     </div>
   );

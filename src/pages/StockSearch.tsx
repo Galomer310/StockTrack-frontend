@@ -1,6 +1,7 @@
+// frontend/src/components/StockSearch.tsx
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import axios from "axios";
+import axiosInstance from "../api/axiosInstance";
 import { RootState } from "../store";
 import { useNavigate } from "react-router-dom";
 
@@ -115,6 +116,15 @@ const StockSearch: React.FC = () => {
   const [marketStatus, setMarketStatus] = useState<string | null>(null);
   const [error, setError] = useState("");
 
+  // New state to store the timestamp of the last market status fetch
+  const [lastMarketStatusFetched, setLastMarketStatusFetched] =
+    useState<number>(0);
+
+  // --- New states for Search Button Disable Feature ---
+  const [searchDisabled, setSearchDisabled] = useState(false);
+  const [searchCountdown, setSearchCountdown] = useState(30);
+  // -------------------------------------------------------
+
   // States for time range selection and toggling aggregated data display
   const [selectedRange, setSelectedRange] = useState("30d");
   const [showAggregatedData, setShowAggregatedData] = useState(false);
@@ -145,11 +155,16 @@ const StockSearch: React.FC = () => {
     padding: "12px",
   };
 
-  // Check market status on mount
+  // useEffect to check market status with caching to avoid too many requests
   useEffect(() => {
     const checkMarketStatus = async () => {
+      const now = Date.now();
+      // If market status was fetched within the last 60 seconds, skip re-fetching
+      if (now - lastMarketStatusFetched < 60000 && marketStatus !== null) {
+        return;
+      }
       try {
-        const res = await axios.get(
+        const res = await axiosInstance.get(
           `https://api.polygon.io/v1/marketstatus/now?apiKey=${POLYGON_API_KEY}`
         );
         if (res.data.market === "closed") {
@@ -159,12 +174,39 @@ const StockSearch: React.FC = () => {
         } else {
           setMarketStatus(null);
         }
+        setLastMarketStatusFetched(now);
       } catch (err) {
         console.error("Error checking market status", err);
       }
     };
+
+    // Call checkMarketStatus on mount
     checkMarketStatus();
-  }, []);
+    // Set an interval to check market status every minute
+    const interval = setInterval(checkMarketStatus, 60000);
+    return () => clearInterval(interval);
+  }, [lastMarketStatusFetched, marketStatus]);
+
+  // --- New useEffect to handle search button countdown ---
+  // useEffect to handle search button countdown
+  useEffect(() => {
+    let timer: number; // use number instead of NodeJS.Timeout in browser
+    if (searchDisabled) {
+      timer = window.setInterval(() => {
+        setSearchCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            setSearchDisabled(false);
+            return 30; // Reset countdown for next search
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [searchDisabled]);
+
+  // ----------------------------------------------------------
 
   // Function to fetch aggregated data based on the selected range and current query
   const fetchAggregatedData = async () => {
@@ -179,7 +221,7 @@ const StockSearch: React.FC = () => {
       const fromDate = pastDate.toISOString().split("T")[0];
       const toDate = today.toISOString().split("T")[0];
 
-      const aggRes = await axios.get(
+      const aggRes = await axiosInstance.get(
         `https://api.polygon.io/v2/aggs/ticker/${query}/range/${multiplier}/${timespan}/${fromDate}/${toDate}?adjusted=true&apiKey=${POLYGON_API_KEY}`
       );
       if (aggRes.data.results && aggRes.data.results.length > 0) {
@@ -202,11 +244,17 @@ const StockSearch: React.FC = () => {
 
   // Function to search for a stock and fetch its various data
   const searchStock = async () => {
+    // --- Disable search button for 30 seconds when search is initiated ---
+    if (searchDisabled) return; // Prevent multiple clicks during cooldown
+    setSearchDisabled(true);
+    setSearchCountdown(30);
+    // --------------------------------------------------------
+
     try {
       setError("");
 
       // 1. Fetch previous close aggregated data (basic stock info)
-      const stockRes = await axios.get(
+      const stockRes = await axiosInstance.get(
         `https://api.polygon.io/v2/aggs/ticker/${query}/prev?adjusted=true&apiKey=${POLYGON_API_KEY}`
       );
       if (stockRes.data.results && stockRes.data.results.length > 0) {
@@ -217,19 +265,19 @@ const StockSearch: React.FC = () => {
       }
 
       // 2. Fetch basic company info
-      const companyRes = await axios.get(
+      const companyRes = await axiosInstance.get(
         `https://api.polygon.io/v3/reference/tickers/${query}?apiKey=${POLYGON_API_KEY}`
       );
       setCompanyInfo(companyRes.data.results);
 
       // 3. Fetch additional company details
-      const companyDetailsRes = await axios.get(
+      const companyDetailsRes = await axiosInstance.get(
         `https://api.polygon.io/v1/meta/symbols/${query}/company?apiKey=${POLYGON_API_KEY}`
       );
       setCompanyDetails(companyDetailsRes.data);
 
       // 4. Fetch latest news articles
-      const newsRes = await axios.get(
+      const newsRes = await axiosInstance.get(
         `https://api.polygon.io/v2/reference/news?ticker=${query}&apiKey=${POLYGON_API_KEY}`
       );
       setNews(newsRes.data.results);
@@ -253,7 +301,7 @@ const StockSearch: React.FC = () => {
       return;
     }
     try {
-      await axios.post(
+      await axiosInstance.post(
         `${import.meta.env.VITE_BACKEND_API_URL}/watchlist`,
         { stock_symbol: query, quantity },
         { headers: { Authorization: `Bearer ${accessToken}` } }
@@ -300,7 +348,10 @@ const StockSearch: React.FC = () => {
         value={query}
         onChange={(e) => setQuery(e.target.value.toUpperCase())}
       />
-      <button onClick={searchStock}>Search</button>
+      {/* Disable the search button for 30s after click and show countdown */}
+      <button onClick={searchStock} disabled={searchDisabled}>
+        {searchDisabled ? `Search disabled (${searchCountdown})` : "Search"}
+      </button>
       {marketStatus && <p className="market-status">{marketStatus}</p>}
       {error && <p className="error">{error}</p>}
 
@@ -331,7 +382,7 @@ const StockSearch: React.FC = () => {
             <p>
               <strong>Employees:</strong> {companyDetails.employees}
             </p>
-          )}{" "}
+          )}
           <p>
             <strong>Volume:</strong> {stockData.v}
           </p>

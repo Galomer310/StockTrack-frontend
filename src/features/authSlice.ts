@@ -4,12 +4,14 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'; // Import createS
 interface AuthState {
   user: { id: number; email: string } | null; // User object or null if not logged in
   accessToken: string | null; // Access token for authenticated requests or null if not available
+  refreshToken: string | null; // Refresh token for renewing access tokens
 }
 
 // Set the initial state for authentication
 const initialState: AuthState = {
   user: null,         // No user initially
   accessToken: null,  // No access token initially
+  refreshToken: null, // No refresh token initially
 };
 
 // Create the auth slice using createSlice
@@ -17,9 +19,10 @@ const authSlice = createSlice({
   name: 'auth',         // Name of the slice
   initialState,         // Initial state defined above
   reducers: {           // Reducers to modify the state
-    setUser: (state, action: PayloadAction<{ user: { id: number; email: string }; accessToken: string }>) => {
+    setUser: (state, action: PayloadAction<{ user: { id: number; email: string }; accessToken: string; refreshToken: string }>) => {
       state.user = action.payload.user;          // Set the user data from the action payload
       state.accessToken = action.payload.accessToken;  // Set the access token from the action payload
+      state.refreshToken = action.payload.refreshToken; // Set the refresh token from the action payload
     },
     clearUser: (state) => {
       state.user = null;        // Clear the user data

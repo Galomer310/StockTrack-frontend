@@ -28,7 +28,7 @@ body {
   display: flex;                         /* Use flexbox layout for the navbar */
   justify-content: space-between;        /* Distribute space between navbar items */
   align-items: center;                   /* Vertically center the navbar items */
-  background-color: #2f4a66;               /* Set a dark blue-gray background color */
+  background-color: #5C7285;               /* Set a dark blue-gray background color */
   padding: 20px 20px;                    /* Add vertical and horizontal padding */
   color: #fff;                   
   border-radius: 5px;
@@ -59,7 +59,17 @@ body {
   font-size: 1rem;                       /* Set font size for links */
 }
 
-
+.toggle-dark-mode {
+  background-color: #5a8cc3;
+  color: #fff;                          
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 10px;                      
+  border: none;                         
+  border-radius: 5px;                   
+  cursor: pointer;                       
+  transition: background-color 0.3s;     
+}
 
 /* Responsive Navbar */
 /* Apply these styles when the viewport width is 768px or less */
@@ -302,7 +312,7 @@ background-color: #0056b3;               /* Darken button background on hover */
   margin: 20px;
   font-family:'Times New Roman', Times, serif ;
   font-size: 2rem;
-  background-color: #008000b3;
+  background-color: #A7B49E;
   color: white;
   border-radius: 4px;
 }
@@ -311,6 +321,9 @@ background-color: #0056b3;               /* Darken button background on hover */
   margin: 20px;
   font-size: 1.1rem;;
   color: #333;
+}
+body.dark-mode .stock-search p{
+  color: white;
 }
 
 .stock-search input[type="text"],
@@ -362,7 +375,7 @@ background-color: #0056b3;               /* Darken button background on hover */
   align-items:start;                  
   margin: 20px 0;                      
   padding: 15px;                        
-  background-color: #008000b3;
+  background-color: #A7B49E;
   border-radius: 4px;                   /* Rounded corners */
   font-family:'Times New Roman', Times, serif ;
   font-size: 1.5rem;
@@ -390,11 +403,11 @@ background-color: #0056b3;               /* Darken button background on hover */
   color: white;                   
 }
 .company-info p:hover {
-  background-color: rgba(255, 255, 255);
   transform: scale(1.10);
   transition: 0.25s ease;
   border-radius: 5px;
-  color: #008000b3;
+  color: white;
+  background-color: skyblue;
   padding: 15px;
 
 }
@@ -405,6 +418,14 @@ background-color: #0056b3;               /* Darken button background on hover */
   padding: 15px;                        /* Padding inside the container */
   background: #f8f9fa;                  /* Light background color */
   border-radius: 4px;                   /* Rounded corners */
+}
+body.dark-mode .stock-info {
+  background-color: #3f3f3f;
+  border: 1px solid black;
+}
+body.dark-mode .stock-info h3 {
+  color: white;
+  padding: 10px;
 }
 
 .stock-info h3 {
@@ -482,10 +503,11 @@ background-color: #0056b3;               /* Darken button background on hover */
   padding: 2px;
 }
 .company-news li:hover {
-  background-color: hsl(120, 73%, 75%, 0.1);
-  transform: scale(0.987);
+  background-color: hsla(228, 73%, 75%, 0.2);
+  transform: scale(0.99);
   transition: 0.1s ease;
-  border-radius: 5px;
+  padding: 5px;
+  border-radius: 10px;
 }
 
 .company-news a {
@@ -721,6 +743,13 @@ background-color: #f1f3f4;             /* Light gray background for table header
 #h2Lost{
   color: red;
 }
+.watchlist {
+  background-color: rgb(255, 255, 255);
+}
+body.dark-mode .watchlist {
+  background-color: #3f3f3f;
+  border: 1px solid black;
+}
 /* Styles for the watchlist header row */
 .watchlist-header {
 display: flex;                     
@@ -732,6 +761,7 @@ font-weight: bold;                     /* Bold text */
 font-size: 14px;                       /* Font size */
 border: 2px solid #ccc;
 border-radius: 4px;
+
 }
 
 /* Each column in the header */
@@ -739,7 +769,6 @@ border-radius: 4px;
 flex: 1;                               /* Equal spacing for each header column */
 text-align: center;                    /* Center text */
 cursor: pointer;                       /* Indicate that columns are clickable (for sorting) */
-
 }
 
 /* Ticker column: narrower and left-aligned */
@@ -747,6 +776,8 @@ cursor: pointer;                       /* Indicate that columns are clickable (f
 flex: 0.7;                             /* Narrower column */
 text-align: left;                      /* Left-align text */
 padding-left: 8px;                     /* Left padding */
+color: black;
+
 }
 
 /* Price column: right-aligned for numbers */
@@ -754,6 +785,8 @@ padding-left: 8px;                     /* Left padding */
 flex: 1;                               /* Standard flex size */
 text-align: right;                     /* Right-align text */
 padding-right: 8px;                    /* Right padding */
+color: black;
+
 }
 
 /* Quantity column: right-aligned */
@@ -761,6 +794,8 @@ padding-right: 8px;                    /* Right padding */
 flex: 1;                               /* Standard flex size */
 text-align: right;                     /* Right-align text */
 padding-right: 8px;                    /* Right padding */
+color: black;
+
 }
 
 /* Added column: slightly wider and right-aligned */
@@ -768,12 +803,15 @@ padding-right: 8px;                    /* Right padding */
 flex: 1.2;                             /* Slightly more space */
 text-align: right;                     /* Right-align text */
 padding-right: 8px;                    /* Right padding */
+color: black;
+
 }
 
 /* Actions column: center-aligned */
 .watchlist-header .actions {
 flex: 1;                               /* Standard flex size */
 text-align: center;                    /* Center text */
+color: black;
 
 }
 .watchlist-group {
@@ -785,6 +823,7 @@ text-align: center;                    /* Center text */
   font-weight: bold;
   border: 2px solid #ccc;
   border-radius: 4px;
+  color: black;
 }
 
 .group-header {
@@ -877,4 +916,38 @@ margin-bottom: 20px;                   /* Space below the image */
 max-width: 100%;                       /* Image should not exceed container width */
 height: auto;                          /* Maintain image aspect ratio */
 border-radius: 8px;                    /* Rounded image corners */
+}
+
+
+
+/* Dark Mode Styles */
+body.dark-mode {
+  background-color: #121212 ;
+  color: #ffffff ;
+}
+
+/* Dark mode adjustments for common elements */
+body.dark-mode .navbar {
+  background-color: #1f1f1f ;
+}
+
+body.dark-mode .navbar-links li a {
+  color: #e0e0e0 ;
+}
+
+body.dark-mode .stock-search,
+body.dark-mode .portfolio-performance,
+body.dark-mode .user-page-container {
+  background-color: #1e1e1e ;
+  color: #e0e0e0 ;
+}
+
+/* Optional: adjust buttons and table headers for dark mode */
+body.dark-mode button {
+  background-color: #58a375 ;
+  color: #e0e0e0 ;
+}
+
+body.dark-mode th {
+  background-color: #333 ;
 }

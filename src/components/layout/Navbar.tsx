@@ -8,41 +8,53 @@ const Navbar = () => {
 
   // State to track if the Search Stocks link is disabled
   const [searchDisabled, setSearchDisabled] = useState(false);
-  // State to store the countdown (in seconds)
+  // State to store the countdown (in seconds) for the Search Stocks button
   const [countdown, setCountdown] = useState(60);
 
+  // State to track Dark Mode; false means light mode, true means dark mode
+  const [darkMode, setDarkMode] = useState(false);
+
+  // Update the document's body class based on darkMode state
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add("dark-mode");
+    } else {
+      document.body.classList.remove("dark-mode");
+    }
+  }, [darkMode]);
+
+  // useEffect to handle Search Stocks button countdown
   useEffect(() => {
     let timer: ReturnType<typeof setInterval>;
-    // If the search link is disabled, start a countdown timer
     if (searchDisabled) {
       timer = setInterval(() => {
         setCountdown((prev) => {
-          // When countdown reaches 1, clear the interval and re-enable the link
           if (prev <= 1) {
             clearInterval(timer);
             setSearchDisabled(false);
-            return 30; // Reset countdown for next time
+            return 60; // Reset countdown for next use
           }
           return prev - 1;
         });
       }, 1000);
     }
-    // Clean up the timer when component unmounts or searchDisabled changes
     return () => {
       if (timer) clearInterval(timer);
     };
   }, [searchDisabled]);
 
-  // Handler for when the user clicks the "Search Stocks" link
+  // Handler for the Search Stocks link click
   const handleSearchClick = () => {
-    // Only process if the link is not disabled
     if (!searchDisabled) {
-      // Navigate to the search page
       navigate("/search");
-      // Disable the search link and start the countdown
       setSearchDisabled(true);
       setCountdown(30);
     }
+  };
+
+  // Handler for toggling dark mode
+  const toggleDarkMode = () => {
+    setDarkMode((prev) => !prev);
   };
 
   return (
@@ -57,12 +69,10 @@ const Navbar = () => {
         </li>
         <li>
           {searchDisabled ? (
-            // When disabled, display a span with a countdown and disabled styling
             <span style={{ cursor: "not-allowed", color: "gray" }}>
               Search Stocks ({countdown})
             </span>
           ) : (
-            // When enabled, display a clickable span that triggers the search click handler
             <span onClick={handleSearchClick} style={{ cursor: "pointer" }}>
               Search Stocks
             </span>
@@ -70,6 +80,12 @@ const Navbar = () => {
         </li>
         <li>
           <Link to="/performance">Performance</Link>
+        </li>
+        <li>
+          {/* Dark Mode toggle button */}
+          <button onClick={toggleDarkMode} className="toggle-dark-mode">
+            {darkMode ? "Light Mode" : "Dark Mode"}
+          </button>
         </li>
       </ul>
     </nav>

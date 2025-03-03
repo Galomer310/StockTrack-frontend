@@ -17,10 +17,10 @@ const UserPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Set timer for 14 minutes (14 * 60 * 1000 ms)
+    // Set timer for 60 minutes (60 * 60 * 1000 ms)
     const timer = setTimeout(() => {
       setShowRefreshAlert(true);
-    }, 14 * 60 * 1000);
+    }, 60 * 60 * 1000);
 
     return () => clearTimeout(timer);
   }, [accessToken]);

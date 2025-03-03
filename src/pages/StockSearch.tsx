@@ -116,20 +116,21 @@ const StockSearch: React.FC = () => {
   const tableStyle: React.CSSProperties = {
     width: "100%",
     borderCollapse: "collapse",
-    marginTop: "20px",
+    marginTop: "30px",
     fontFamily: "Arial, sans-serif",
   };
 
   const thStyle: React.CSSProperties = {
-    borderBottom: "2px solid #009879",
-    backgroundColor: "#009879",
+    backgroundColor: "#A7B49E",
     color: "#ffffff",
     textAlign: "left",
-    padding: "12px",
+    padding: "15px",
   };
 
   const tdStyle: React.CSSProperties = {
-    borderBottom: "1px solid #dddddd",
+    borderBottom: "1px solid #A7B49E",
+    borderLeft: "1px solid #A7B49E",
+    borderRight: "1px solid #A7B49E",
     textAlign: "left",
     padding: "12px",
   };
@@ -172,7 +173,7 @@ const StockSearch: React.FC = () => {
           if (prev <= 1) {
             clearInterval(timer);
             setSearchDisabled(false);
-            return 30;
+            return 13;
           }
           return prev - 1;
         });
@@ -190,7 +191,7 @@ const StockSearch: React.FC = () => {
           if (prev <= 1) {
             clearInterval(timer);
             setRangeDisabled(false);
-            return 20;
+            return 13;
           }
           return prev - 1;
         });
@@ -206,7 +207,7 @@ const StockSearch: React.FC = () => {
       setSelectedRange(e.target.value);
       // Disable the dropdown for 20 seconds after a change
       setRangeDisabled(true);
-      setRangeCountdown(20);
+      setRangeCountdown(13);
     }
   };
 
@@ -249,7 +250,7 @@ const StockSearch: React.FC = () => {
     // Disable search button for 30 seconds when search is initiated
     if (searchDisabled) return;
     setSearchDisabled(true);
-    setSearchCountdown(30);
+    setSearchCountdown(12);
 
     try {
       setError("");
@@ -320,8 +321,8 @@ const StockSearch: React.FC = () => {
       {
         label: `${query} Closing Price`,
         data: aggregatedData.map((item) => item.c),
-        borderColor: "rgba(75,192,192,1)",
-        backgroundColor: "rgba(75,192,192,0.2)",
+        borderColor: "rgb(75, 192, 97)",
+        backgroundColor: "rgba(75, 192, 118, 0.2)",
         fill: true,
       },
     ],
@@ -426,7 +427,7 @@ const StockSearch: React.FC = () => {
             ))}
           </select>
           {rangeDisabled && (
-            <span style={{ marginLeft: "10px", color: "gray" }}>
+            <span style={{ marginLeft: "10px", color: "white" }}>
               (Change disabled for {rangeCountdown} s)
             </span>
           )}
@@ -441,7 +442,7 @@ const StockSearch: React.FC = () => {
             style={{
               marginTop: "20px",
               padding: "10px 20px",
-              backgroundColor: "#008000b3",
+              backgroundColor: "#A7B49E",
               color: "#fff",
               border: "none",
               cursor: "pointer",

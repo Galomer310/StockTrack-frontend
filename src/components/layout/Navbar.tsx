@@ -32,7 +32,7 @@ const Navbar = () => {
           if (prev <= 1) {
             clearInterval(timer);
             setSearchDisabled(false);
-            return 60; // Reset countdown for next use
+            return 10; // Reset countdown for next use
           }
           return prev - 1;
         });
@@ -48,7 +48,7 @@ const Navbar = () => {
     if (!searchDisabled) {
       navigate("/search");
       setSearchDisabled(true);
-      setCountdown(30);
+      setCountdown(11);
     }
   };
 

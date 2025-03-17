@@ -148,7 +148,7 @@ The frontend will be available at `http://localhost:5173`, and the backend at `h
 
 This project is licensed under the [MIT License](LICENSE).
 
-Video Link YouTube : https://youtu.be/XTYVHmeUiLY
+Illustrative video : https://youtu.be/XTYVHmeUiLY
 ---
 
 ## Contact

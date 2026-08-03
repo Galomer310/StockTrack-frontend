@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate for naviga
 import { RootState } from "../store"; // Import RootState for type definitions
 import Watchlist from "./Watchlist"; // Import the Watchlist component
 import TokenRefreshAlert from "../components/alerts/TokenRefreshAlert";
+import TradeJournal from "../components/trades/TradeJournal";
 
 // Define the UserPage functional component
 
@@ -82,6 +83,10 @@ const UserPage = () => {
             <h1>My Investment Dashboard</h1> {/* Dashboard heading */}
           </section>
           <Watchlist /> {/* Render the Watchlist component */}
+          <section className="dashboard-journal">
+            <h3>Your trade journal</h3>
+            <TradeJournal userId={user.id} />
+          </section>
         </div>
       ) : (
         <p>Loading...</p> // Show loading text if user data is not yet available

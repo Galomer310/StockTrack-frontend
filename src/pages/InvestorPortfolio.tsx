@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import TradeJournal from "../components/trades/TradeJournal";
 import {
   fetchPortfolio,
   PortfolioResponse,
@@ -85,6 +86,12 @@ const InvestorPortfolio = () => {
           Compare with my portfolio
         </button>
       )}
+
+      <h3>Trade journal</h3>
+      <p className="compare-note">
+        Every buy and sell {is_self ? "you have" : `${user.display_name} has`} recorded, with the reasoning at the time.
+      </p>
+      <TradeJournal userId={user.id} />
 
       <h3>Holdings</h3>
       {holdings.length === 0 ? (

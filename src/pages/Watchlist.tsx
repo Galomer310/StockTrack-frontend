@@ -6,6 +6,7 @@ import { useNavigate, Link } from "react-router-dom"; // Import useNavigate for 
 import StockDistributionPieChart from "../components/charts/StockDistributionPieChart"; // Import StockDistributionPieChart component
 import PortfolioPerformanceChart from "../components/charts/PortfolioPerformanceChart"; // Import PortfolioPerformanceChart component
 import { useToast } from "../components/ui/ToastProvider";
+import TradeNoteModal, { TradeSubmission } from "../components/trades/TradeNoteModal";
 
 // Define the Watchlist functional component
 const Watchlist = () => {
@@ -18,6 +19,7 @@ const Watchlist = () => {
   const [expandedSymbols, setExpandedSymbols] = useState<{
     [key: string]: boolean;
   }>({}); // State to track expanded groups by stock symbol
+  const [reloadKey, setReloadKey] = useState(0); // bumped after a sale to refetch
   const [latestPrices, setLatestPrices] = useState<{
     [symbol: string]: number;
   }>({}); // State for storing the latest prices for each stock
@@ -25,6 +27,8 @@ const Watchlist = () => {
   const accessToken = useSelector((state: RootState) => state.auth.accessToken); // Get access token from Redux state
   const navigate = useNavigate(); // Initialize navigate for redirection
   const toast = useToast();
+  // The holding currently being sold, if the note window is open
+  const [selling, setSelling] = useState<any | null>(null);
 
   // useEffect hook to fetch the watchlist when the component mounts or when user changes
   useEffect(() => {
@@ -53,7 +57,7 @@ const Watchlist = () => {
       }
     };
     fetchWatchlist(); // Call the fetch function
-  }, [user, navigate, accessToken]); // Dependency array: refetch if user, navigate, or accessToken changes
+  }, [user, navigate, accessToken, reloadKey]); // Dependency array: refetch if user, navigate, or accessToken changes
 
   // useEffect hook to fetch the latest prices for each unique stock symbol in the watchlist
   useEffect(() => {
@@ -198,6 +202,21 @@ const Watchlist = () => {
     setEditingItemData({}); // Clear editing data state
   };
 
+  // Selling opens the note window; the backend records the trade and its
+  // thesis in one transaction, then we refresh from the server rather than
+  // guessing at the new quantity locally.
+  const handleSell = async ({ note, quantity, price }: TradeSubmission) => {
+    if (!selling) return;
+    await axiosInstance.post(
+      `${import.meta.env.VITE_BACKEND_API_URL}/watchlist/${selling.id}/sell`,
+      { quantity, price, note }
+    );
+    const symbol = selling.stock_symbol;
+    setSelling(null);
+    setReloadKey((k) => k + 1);
+    toast.success(`Sold ${quantity} ${symbol} at $${price.toFixed(2)}, with your note.`, "Sale recorded");
+  };
+
   // Handler to remove an item from the watchlist
   const handleRemoveFromWatchlist = async (id: number) => {
     try {
@@ -228,6 +247,21 @@ const Watchlist = () => {
   // Return the Watchlist UI
   return (
     <div style={{ padding: "1rem" }}>
+      {selling && (
+        <TradeNoteModal
+          open
+          mode="sell"
+          symbol={selling.stock_symbol}
+          maxQuantity={Number(selling.quantity)}
+          defaultQuantity={Number(selling.quantity)}
+          defaultPrice={
+            latestPrices[selling.stock_symbol] ||
+            parseFloat(selling.price_at_time)
+          }
+          onClose={() => setSelling(null)}
+          onSubmit={handleSell}
+        />
+      )}
       {/* Container with inline padding */}
       <h4>Total Portfolio Value: ${total.toFixed(2)}</h4>{" "}
       {/* Display total portfolio value */}
@@ -361,6 +395,7 @@ const Watchlist = () => {
                   ) : (
                     // Otherwise, show Edit and Remove buttons
                     <>
+                      <button onClick={() => setSelling(stock)}>Sell…</button>
                       <button onClick={() => handleEdit(stock)}>Edit</button>
                       <button
                         onClick={() => handleRemoveFromWatchlist(stock.id)}
@@ -457,6 +492,9 @@ const Watchlist = () => {
                             </>
                           ) : (
                             <>
+                              <button onClick={() => setSelling(stock)}>
+                                Sell…
+                              </button>
                               <button onClick={() => handleEdit(stock)}>
                                 Edit
                               </button>

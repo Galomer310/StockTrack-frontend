@@ -16,6 +16,7 @@ import axiosInstance from "../../api/axiosInstance";
 import { RootState } from "../../store";
 import { SERIES } from "../../charts/chartTheme";
 import { useToast } from "../ui/ToastProvider";
+import TradeNoteModal, { TradeSubmission } from "../trades/TradeNoteModal";
 
 ChartJS.register(
   CategoryScale,
@@ -135,6 +136,7 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [quantity, setQuantity] = useState(1);
+  const [noteOpen, setNoteOpen] = useState(false);
 
   const user = useSelector((state: RootState) => state.auth.user);
   const toast = useToast();
@@ -237,20 +239,20 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
     };
   }, [symbol, range]);
 
-  const addToWatchlist = async () => {
-    if (!user || !quote) return;
-    try {
-      await axiosInstance.post(`${API}/watchlist`, {
-        stock_symbol: quote.symbol,
-        quantity,
-      });
-      toast.success(
-        `${quote.symbol} × ${quantity} at ${money(quote.price)} added to your portfolio.`,
-        "Holding added"
-      );
-    } catch (err: any) {
-      toast.error(describeError(err, "Could not add this holding."));
-    }
+  // Buying opens the note window first: the trade and its thesis are recorded
+  // together, so the journal can never contain a trade with no reasoning.
+  const recordPurchase = async ({ note }: TradeSubmission) => {
+    if (!quote) return;
+    await axiosInstance.post(`${API}/watchlist`, {
+      stock_symbol: quote.symbol,
+      quantity,
+      note,
+    });
+    setNoteOpen(false);
+    toast.success(
+      `${quote.symbol} × ${quantity} at ${money(quote.price)} added, with your note.`,
+      "Purchase recorded"
+    );
   };
 
   const positive = bars.length > 1 ? bars[bars.length - 1].c >= bars[0].c : true;
@@ -300,6 +302,18 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
 
   return (
     <div className="stock-panel">
+      {quote && (
+        <TradeNoteModal
+          open={noteOpen}
+          mode="buy"
+          symbol={quote.symbol}
+          defaultQuantity={quantity}
+          defaultPrice={quote.price}
+          onClose={() => setNoteOpen(false)}
+          onSubmit={recordPurchase}
+        />
+      )}
+
       {notice && <p className="market-status">{notice}</p>}
 
       {/* Headline */}
@@ -331,8 +345,8 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
                 onChange={(e) => setQuantity(Number(e.target.value))}
                 aria-label="Quantity"
               />
-              <button className="compare-btn" onClick={addToWatchlist}>
-                Add to portfolio
+              <button className="compare-btn" onClick={() => setNoteOpen(true)}>
+                Buy…
               </button>
             </div>
           )}

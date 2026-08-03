@@ -1,9 +1,8 @@
 import { useState } from "react"; // Import useState hook from React
-import { useSelector } from "react-redux"; // Import useSelector to access Redux state
-import { RootState } from "../store"; // Import RootState for type definitions
 import axiosInstance from "../api/axiosInstance";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import { useToast } from "../components/ui/ToastProvider";
+import TradeNoteModal, { TradeSubmission } from "../components/trades/TradeNoteModal";
 
 // Define the ManualAddStock functional component
 const ManualAddStock = () => {
@@ -13,37 +12,38 @@ const ManualAddStock = () => {
   const [date, setDate] = useState(""); // State for date input
   const [industry, setIndustry] = useState(""); // State for industry input (optional)
   const [error, setError] = useState(""); // State for error messages
-  // Get the access token from Redux state
-  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
   const navigate = useNavigate(); // Initialize navigate for redirection
   const toast = useToast();
+  const [noteOpen, setNoteOpen] = useState(false); // note window for the entry
 
-  // Handler function for the form submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); // Prevent default form submission behavior
-    try {
-      // Make a POST request to add the stock manually
-      await axiosInstance.post(
-        `${import.meta.env.VITE_BACKEND_API_URL}/watchlist`,
-        {
-          stock_symbol: stockSymbol.toUpperCase(), // Convert symbol to uppercase
-          quantity, // Quantity from state
-          price_at_time: price, // Price at time from state
-          added_at: date, // Date added from state
-          industry, // Industry from state (optional)
-          manual: true, // Flag indicating manual addition
-        },
-        { headers: { Authorization: `Bearer ${accessToken}` } } // Include access token in headers
-      );
-      toast.success(
-        `${stockSymbol.toUpperCase()} × ${quantity} at $${price} added to your portfolio.`,
-        "Holding added"
-      );
-      navigate("/user"); // Redirect to user dashboard
-    } catch (err: any) {
-      // Update error state with error message from response if available
-      setError(err.response?.data.error || "Failed to add stock");
-    }
+  // The form only collects the trade details; submitting opens the note
+  // window, and the entry is recorded once the thesis is written.
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setNoteOpen(true);
+  };
+
+  // Records the backdated purchase together with its note.
+  const recordPurchase = async ({ note }: TradeSubmission) => {
+    await axiosInstance.post(
+      `${import.meta.env.VITE_BACKEND_API_URL}/watchlist`,
+      {
+        stock_symbol: stockSymbol.toUpperCase(),
+        quantity,
+        price_at_time: price,
+        added_at: date,
+        industry,
+        manual: true,
+        note,
+      }
+    );
+    setNoteOpen(false);
+    toast.success(
+      `${stockSymbol.toUpperCase()} × ${quantity} at $${price} added, with your note.`,
+      "Purchase recorded"
+    );
+    navigate("/user");
   };
 
   // Return the manual add stock form UI
@@ -52,6 +52,15 @@ const ManualAddStock = () => {
       {" "}
       {/* Container with CSS class */}
       <h2>Add Stock Manually</h2> {/* Form heading */}
+      <TradeNoteModal
+        open={noteOpen}
+        mode="buy"
+        symbol={stockSymbol.toUpperCase() || "—"}
+        defaultQuantity={quantity}
+        defaultPrice={parseFloat(price) || 0}
+        onClose={() => setNoteOpen(false)}
+        onSubmit={recordPurchase}
+      />
       {error && <p className="error">{error}</p>}{" "}
       {/* Display error message if any */}
       <form onSubmit={handleSubmit}>
@@ -93,7 +102,7 @@ const ManualAddStock = () => {
           value={industry} // Bind value to industry state
           onChange={(e) => setIndustry(e.target.value)} // Update state on change
         />
-        <button type="submit">Add Stock Manually</button> {/* Submit button */}
+        <button type="submit">Continue to notes…</button> {/* Submit button */}
       </form>
     </div>
   );

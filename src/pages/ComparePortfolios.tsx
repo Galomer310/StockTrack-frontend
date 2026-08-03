@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
 import {
@@ -8,6 +8,8 @@ import {
   money,
   percent,
 } from "../api/social";
+import { buildInsights } from "../api/comparison";
+import PortfolioComparisonChart from "../components/charts/PortfolioComparisonChart";
 
 // Side-by-side comparison of your portfolio against another investor's.
 // Both sides come from the same endpoint so the two columns are always
@@ -76,6 +78,7 @@ const ComparePortfolios = () => {
 
   // Positive means you are ahead on that measure.
   const diffPct = mine.summary.return_pct - theirs.summary.return_pct;
+  const insights = buildInsights(mine, theirs);
 
   const rows: { label: string; a: string; b: string; winner: "a" | "b" | null }[] = [
     {
@@ -135,6 +138,22 @@ const ComparePortfolios = () => {
           : `You are behind by ${Math.abs(diffPct).toFixed(2)} percentage points.`}
       </p>
 
+      {/* Both books on one axis */}
+      <h3>Growth side by side</h3>
+      <PortfolioComparisonChart mine={mine} theirs={theirs} />
+
+      {/* What the numbers actually mean */}
+      <h3>What the difference comes down to</h3>
+      <div className="insight-list">
+        {insights.map((insight) => (
+          <div key={insight.label} className={`insight insight-${insight.tone}`}>
+            <span className="insight-label">{insight.label}</span>
+            <p>{insight.text}</p>
+          </div>
+        ))}
+      </div>
+
+      <h3>Head to head</h3>
       <div className="table-wrap">
       <table className="compare-table">
         <thead>
@@ -171,7 +190,9 @@ const ComparePortfolios = () => {
           {symbolRows.map((row) => (
             <tr key={row.symbol} className={row.shared ? "compare-shared" : ""}>
               <td className="compare-label">
-                {row.symbol}
+                <Link className="ticker-link" to={`/stock/${row.symbol}`}>
+                  {row.symbol}
+                </Link>
                 {row.shared && <span className="compare-badge">both</span>}
               </td>
               <td>{row.mine ? money(row.mine) : "—"}</td>

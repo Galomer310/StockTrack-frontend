@@ -2,9 +2,10 @@ import { useState, useEffect, useMemo } from "react"; // Import React hooks
 import axiosInstance from "../api/axiosInstance";
 import { useSelector } from "react-redux"; // Import useSelector to access Redux state
 import { RootState } from "../store"; // Import RootState for type definitions
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { useNavigate, Link } from "react-router-dom"; // Import useNavigate for navigation
 import StockDistributionPieChart from "../components/charts/StockDistributionPieChart"; // Import StockDistributionPieChart component
 import PortfolioPerformanceChart from "../components/charts/PortfolioPerformanceChart"; // Import PortfolioPerformanceChart component
+import { useToast } from "../components/ui/ToastProvider";
 
 // Define the Watchlist functional component
 const Watchlist = () => {
@@ -23,6 +24,7 @@ const Watchlist = () => {
   const user = useSelector((state: RootState) => state.auth.user); // Get current user from Redux state
   const accessToken = useSelector((state: RootState) => state.auth.accessToken); // Get access token from Redux state
   const navigate = useNavigate(); // Initialize navigate for redirection
+  const toast = useToast();
 
   // useEffect hook to fetch the watchlist when the component mounts or when user changes
   useEffect(() => {
@@ -181,7 +183,7 @@ const Watchlist = () => {
       setTotal(newTotal); // Update total state
       setEditingItemId(null); // Clear editing item id
       setEditingItemData({}); // Clear editing data state
-      alert("Watchlist item updated"); // Alert success message
+      toast.success("Your changes have been saved.", "Holding updated");
     } catch (err: any) {
       console.error(
         "Error updating watchlist item:",
@@ -214,7 +216,7 @@ const Watchlist = () => {
         return sum + parseFloat(item.price_at_time) * Number(item.quantity);
       }, 0);
       setTotal(newTotal); // Update total state
-      alert("Watchlist item removed"); // Alert success message
+      toast.success("The holding has been removed from your portfolio.", "Holding removed");
     } catch (err: any) {
       console.error(
         "Error removing watchlist item:",
@@ -285,7 +287,7 @@ const Watchlist = () => {
                   );
                 }, 0);
                 setTotal(newTotal);
-                alert("Watchlist item removed");
+                toast.success("The holding has been removed from your portfolio.", "Holding removed");
               } catch (err: any) {
                 console.error(
                   "Error removing watchlist item:",
@@ -300,7 +302,11 @@ const Watchlist = () => {
                   editingItemId === stock.id ? "editing" : ""
                 }`} // Add editing class if this row is being edited
               >
-                <div className="ticker">{stock.stock_symbol}</div>{" "}
+                <div className="ticker">
+                  <Link className="ticker-link" to={`/stock/${stock.stock_symbol}`}>
+                    {stock.stock_symbol}
+                  </Link>
+                </div>{" "}
                 {/* Display stock symbol */}
                 <div className="price">
                   {editingItemId === stock.id ? ( // If editing, render an input field
@@ -393,7 +399,11 @@ const Watchlist = () => {
                         }`}
                         style={{ paddingLeft: "1rem" }} // Indent rows in the expanded group
                       >
-                        <div className="ticker">{stock.stock_symbol}</div>{" "}
+                        <div className="ticker">
+                  <Link className="ticker-link" to={`/stock/${stock.stock_symbol}`}>
+                    {stock.stock_symbol}
+                  </Link>
+                </div>{" "}
                         {/* Display stock symbol */}
                         <div className="price">
                           {editingItemId === stock.id ? (

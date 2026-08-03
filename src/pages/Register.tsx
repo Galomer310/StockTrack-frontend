@@ -1,5 +1,6 @@
 import React, { useState } from "react"; // Import React and useState hook
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { useToast } from "../components/ui/ToastProvider";
 
 // Define the Register functional component
 const Register = () => {
@@ -7,6 +8,7 @@ const Register = () => {
   const [password, setPassword] = useState(""); // State for storing the password input
   const [displayName, setDisplayName] = useState(""); // Public name shown on the leaderboard
   const navigate = useNavigate(); // Initialize navigate for redirection
+  const toast = useToast();
 
   // Handler function for registration form submission
   const handleRegister = async (e: React.FormEvent) => {
@@ -25,14 +27,14 @@ const Register = () => {
       if (!response.ok) {
         // Check if response is not OK
         const errorData = await response.json(); // Parse error details
-        alert(errorData.error || "Registration failed"); // Alert the error message
+        toast.error(errorData.error || "Registration failed");
         return; // Exit the function
       }
       const data = await response.json(); // Parse the successful response data
       console.log("Registration successful:", data); // Log success to the console
       navigate("/login"); // Redirect to the Login page after successful registration
     } catch (error) {
-      alert("Error during registration: " + (error as Error).message); // Alert if an error occurs
+      toast.error((error as Error).message, "Could not create account");
     }
   };
 

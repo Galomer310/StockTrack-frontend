@@ -897,3 +897,102 @@ body.light-mode .leaderboard-page > h2 {
 body.light-mode .leaderboard-page > h2 { background-image:
     linear-gradient(100deg, rgba(8, 11, 17, 0.90) 0%, rgba(8, 11, 17, 0.72) 50%, rgba(8, 11, 17, 0.55) 100%),
     url('./images/trading-floor.jpg'); }
+
+/* ---------- Toasts ---------- */
+.toast-stack {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 9998;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-width: min(380px, calc(100vw - 2rem));
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.85rem 0.95rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  pointer-events: auto;
+  animation: toast-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(22px) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+.toast-icon {
+  flex: 0 0 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  margin-top: 1px;
+  border-radius: 999px;
+  background: var(--gold-wash);
+  border: 1px solid var(--gold-line);
+  color: var(--gold-bright);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.toast-body { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+
+.toast-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.toast-message { font-size: 0.88rem; color: var(--text); overflow-wrap: anywhere; }
+
+.toast-close {
+  flex: 0 0 auto;
+  padding: 0 0.25rem;
+  min-height: 0;
+  background: transparent;
+  border: none;
+  color: var(--text-faint);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.toast-close:hover { color: var(--gold-bright); background: transparent; }
+
+.toast-success { border-left-color: var(--gain); }
+.toast-success .toast-icon {
+  background: rgba(70, 192, 138, 0.12);
+  border-color: rgba(70, 192, 138, 0.4);
+  color: var(--gain);
+}
+
+.toast-error { border-left-color: var(--loss); }
+.toast-error .toast-icon {
+  background: rgba(224, 85, 97, 0.12);
+  border-color: rgba(224, 85, 97, 0.4);
+  color: var(--loss);
+}
+
+@media (max-width: 720px) {
+  .toast-stack {
+    top: auto;
+    bottom: 1rem;
+    left: 1rem;
+    right: 1rem;
+    max-width: none;
+  }
+  @keyframes toast-in {
+    from { opacity: 0; transform: translateY(18px) scale(0.97); }
+    to   { opacity: 1; transform: none; }
+  }
+}

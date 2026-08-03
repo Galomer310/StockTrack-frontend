@@ -18,6 +18,7 @@ import PortfolioPerformancePage from "./pages/PortfolioPerformancePage"; // Impo
 import Leaderboard from "./pages/Leaderboard"; // Public ranking of all investors
 import InvestorPortfolio from "./pages/InvestorPortfolio"; // Another investor's portfolio
 import ComparePortfolios from "./pages/ComparePortfolios"; // Side-by-side comparison
+import StockPage from "./pages/StockPage"; // Full detail view for one ticker
 
 // Define the main App functional component
 const App = () => {
@@ -60,6 +61,10 @@ const App = () => {
         <Route
           path="/investor/:id"
           element={user ? <InvestorPortfolio /> : <Navigate to="/login" />} // View one investor's portfolio
+        />
+        <Route
+          path="/stock/:ticker"
+          element={user ? <StockPage /> : <Navigate to="/login" />} // One stock in full
         />
         <Route
           path="/compare/:id"

@@ -2,6 +2,7 @@ import React, { useState } from "react"; // Import React and useState hook
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import { useDispatch } from "react-redux"; // Import useDispatch for Redux actions
 import { setUser } from "../features/authSlice"; // Import setUser action from authSlice
+import { useToast } from "../components/ui/ToastProvider";
 
 // Define the Login functional component
 const Login = () => {
@@ -9,6 +10,7 @@ const Login = () => {
   const [password, setPassword] = useState(""); // State for storing the password input
   const dispatch = useDispatch(); // Initialize dispatch for Redux actions
   const navigate = useNavigate(); // Initialize navigate for redirection
+  const toast = useToast();
 
   // Handler function for the login form submission
   const handleLogin = async (e: React.FormEvent) => {
@@ -27,7 +29,7 @@ const Login = () => {
       if (!response.ok) {
         // Check if the response is not OK
         const errorData = await response.json(); // Parse error details
-        alert(errorData.error || "Login failed"); // Alert the error message
+        toast.error(errorData.error || "Login failed");
         return; // Exit the function
       }
       const data = await response.json(); // Parse the successful response data
@@ -44,10 +46,10 @@ const Login = () => {
         );
         navigate("/user"); // Redirect to the user dashboard
       } else {
-        alert("Login response did not contain expected data."); // Alert if expected data is missing
+        toast.error("Login response did not contain expected data.");
       }
     } catch (error) {
-      alert("Error during login: " + (error as Error).message); // Alert if an error occurs during the request
+      toast.error((error as Error).message, "Could not sign in");
     }
   };
 

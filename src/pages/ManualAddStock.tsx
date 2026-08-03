@@ -3,6 +3,7 @@ import { useSelector } from "react-redux"; // Import useSelector to access Redux
 import { RootState } from "../store"; // Import RootState for type definitions
 import axiosInstance from "../api/axiosInstance";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { useToast } from "../components/ui/ToastProvider";
 
 // Define the ManualAddStock functional component
 const ManualAddStock = () => {
@@ -15,6 +16,7 @@ const ManualAddStock = () => {
   // Get the access token from Redux state
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
   const navigate = useNavigate(); // Initialize navigate for redirection
+  const toast = useToast();
 
   // Handler function for the form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -33,7 +35,10 @@ const ManualAddStock = () => {
         },
         { headers: { Authorization: `Bearer ${accessToken}` } } // Include access token in headers
       );
-      alert("Stock added manually!"); // Alert success message
+      toast.success(
+        `${stockSymbol.toUpperCase()} × ${quantity} at $${price} added to your portfolio.`,
+        "Holding added"
+      );
       navigate("/user"); // Redirect to user dashboard
     } catch (err: any) {
       // Update error state with error message from response if available

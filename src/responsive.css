@@ -363,3 +363,129 @@ body.nav-locked { overflow: hidden; }
   color: var(--gold-bright);
   background: var(--gold-wash);
 }
+
+/* ---------- Stock detail panel ---------- */
+.stock-page { max-width: 1120px; margin: 0 auto; padding: clamp(1rem, 3vw, 2.25rem); }
+.stock-panel-loading, .stock-empty { color: var(--text-muted); padding: 1.5rem 0; }
+
+.stock-headline {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+.stock-headline h2 { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+
+.stock-ticker-chip {
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: var(--gold-wash);
+  border: 1px solid var(--gold-line);
+  color: var(--gold-bright);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.stock-price-row { display: flex; align-items: baseline; gap: 0.75rem; flex-wrap: wrap; }
+.stock-price { font-family: var(--font-num); font-size: 1.85rem; font-weight: 700; }
+.stock-price-row span:last-child { font-family: var(--font-num); font-weight: 600; }
+.stock-asof { color: var(--text-faint); font-size: 0.78rem; }
+.stock-add { display: flex; gap: 0.5rem; align-items: center; }
+.stock-add input { width: 5.5rem; }
+
+/* Range picker */
+.range-picker { display: flex; gap: 0.35rem; flex-wrap: wrap; align-items: center; margin: 0.75rem 0; }
+.range-chip {
+  padding: 0.4rem 0.85rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  background: transparent;
+  border: 1px solid var(--border);
+  min-height: 0;
+}
+.range-chip.is-active {
+  background: var(--gold-wash);
+  border-color: var(--gold-line);
+  color: var(--gold-bright);
+}
+.range-loading { color: var(--text-faint); font-size: 0.78rem; margin-left: 0.4rem; }
+
+.chart-tall { height: 340px; }
+.chart-tall canvas { max-height: 300px; }
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.9rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+.profile-grid > div { display: flex; flex-direction: column; gap: 0.15rem; }
+
+.news-sentiment { color: var(--gold); }
+
+/* Clickable tickers */
+.ticker-link {
+  color: var(--text);
+  font-weight: 700;
+  border-bottom: 1px dotted var(--gold-line);
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.ticker-link:hover { color: var(--gold-bright); border-bottom-color: var(--gold); }
+
+/* ---------- Comparison insights ---------- */
+.comparison-chart { margin-bottom: 1.5rem; }
+
+.insight-list { display: grid; gap: 0.7rem; margin: 0.75rem 0 1.5rem; }
+
+.insight {
+  display: grid;
+  grid-template-columns: 7.5rem 1fr;
+  gap: 0.9rem;
+  align-items: start;
+  padding: 0.9rem 1.1rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border-strong);
+  border-radius: var(--radius);
+}
+.insight p { color: var(--text); font-size: 0.92rem; }
+
+.insight-label {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding-top: 0.15rem;
+}
+
+.insight-good { border-left-color: var(--gain); }
+.insight-good .insight-label { color: var(--gain); }
+.insight-bad { border-left-color: var(--loss); }
+.insight-bad .insight-label { color: var(--loss); }
+.insight-neutral { border-left-color: var(--gold); }
+.insight-neutral .insight-label { color: var(--gold); }
+
+.search-row { display: flex; gap: 0.5rem; margin: 1rem 0; flex-wrap: wrap; }
+.search-row input { flex: 1 1 220px; }
+
+@media (max-width: 720px) {
+  .stock-headline { flex-direction: column; }
+  .stock-add { width: 100%; }
+  .stock-add button { flex: 1; }
+  .stock-price { font-size: 1.5rem; }
+  .insight { grid-template-columns: 1fr; gap: 0.3rem; }
+  .chart-tall { height: 260px; }
+  .chart-tall canvas { max-height: 220px; }
+  .range-picker { gap: 0.3rem; }
+  .range-chip { flex: 1 1 auto; padding: 0.4rem 0.5rem; }
+  .search-row input { flex: 1 1 100%; }
+  .search-row button { width: 100%; }
+}

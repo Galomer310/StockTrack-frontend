@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   fetchPortfolio,
   PortfolioResponse,
@@ -105,7 +105,11 @@ const InvestorPortfolio = () => {
           <tbody>
             {holdings.map((h) => (
               <tr key={h.id}>
-                <td>{h.stock_symbol}</td>
+                <td>
+                  <Link className="ticker-link" to={`/stock/${h.stock_symbol}`}>
+                    {h.stock_symbol}
+                  </Link>
+                </td>
                 <td>{money(h.price_at_time)}</td>
                 <td>{money(h.latest_price)}</td>
                 <td>{h.quantity}</td>

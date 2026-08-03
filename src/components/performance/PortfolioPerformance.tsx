@@ -111,6 +111,7 @@ const PortfolioPerformance: React.FC<PortfolioPerformanceProps> = ({
       {" "}
       {/* Container with CSS class */}
       <h3>Portfolio Performance</h3> {/* Section title */}
+      <div className="table-wrap">
       <table>
         {" "}
         {/* Start of table */}
@@ -158,6 +159,7 @@ const PortfolioPerformance: React.FC<PortfolioPerformanceProps> = ({
           )}
         </tbody>
       </table>
+      </div>
     </div>
   );
 };

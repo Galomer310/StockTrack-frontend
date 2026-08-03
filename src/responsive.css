@@ -1,0 +1,365 @@
+/* ===========================================================================
+   Investments - motion, mobile navigation, responsive behaviour
+   ---------------------------------------------------------------------------
+   Imported after style.css so these rules win the cascade. Uses the same
+   tokens, so the dark luxury language carries down to the smallest screen.
+   =========================================================================== */
+
+:root {
+  --ease-out:   cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-soft:  cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast:   0.18s;
+  --dur:        0.32s;
+  --dur-slow:   0.46s;
+}
+
+/* ---------- Entrance motion ----------
+   Panels and rows ease in rather than snapping, staggered by position so a
+   list resolves as a sweep instead of all at once. */
+@keyframes fade-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.summary-card,
+.leaderboard-row:not(.leaderboard-head),
+.watchlist-row,
+.company-info,
+.company-details,
+.company-news,
+.stock-info,
+.range-selection,
+.chart-container,
+.compare-verdict,
+.table-wrap {
+  animation: fade-rise var(--dur-slow) var(--ease-out) both;
+}
+
+.summary-card:nth-child(1) { animation-delay: 0.02s; }
+.summary-card:nth-child(2) { animation-delay: 0.07s; }
+.summary-card:nth-child(3) { animation-delay: 0.12s; }
+.summary-card:nth-child(4) { animation-delay: 0.17s; }
+
+.leaderboard-row:nth-child(2)   { animation-delay: 0.03s; }
+.leaderboard-row:nth-child(3)   { animation-delay: 0.06s; }
+.leaderboard-row:nth-child(4)   { animation-delay: 0.09s; }
+.leaderboard-row:nth-child(5)   { animation-delay: 0.12s; }
+.leaderboard-row:nth-child(6)   { animation-delay: 0.15s; }
+.leaderboard-row:nth-child(7)   { animation-delay: 0.18s; }
+.leaderboard-row:nth-child(n+8) { animation-delay: 0.2s; }
+
+/* Layout changes ease rather than jump as the viewport resizes */
+.summary-cards,
+.leaderboard-row,
+.watchlist-row,
+.navbar {
+  transition: grid-template-columns var(--dur) var(--ease-soft),
+              gap var(--dur) var(--ease-soft),
+              padding var(--dur) var(--ease-soft);
+}
+
+/* ---------- Horizontal scroll for wide tables ----------
+   Numeric tables keep their column alignment and scroll inside their own
+   container, so the page body never scrolls sideways. */
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+.table-wrap table { margin-top: 0.85rem; }
+.table-wrap::-webkit-scrollbar { height: 8px; }
+.table-wrap::-webkit-scrollbar-track { background: transparent; }
+.table-wrap::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 999px;
+}
+.table-wrap::-webkit-scrollbar-thumb:hover { background: var(--gold-deep); }
+
+/* ---------- Mobile navigation ---------- */
+.nav-toggle {
+  display: none;               /* becomes flex at the tablet breakpoint */
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 44px;                 /* 44px is the comfortable minimum tap target */
+  height: 44px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  z-index: 130;
+}
+.nav-toggle:hover { border-color: var(--gold-line); }
+
+.nav-toggle span {
+  display: block;
+  width: 20px;
+  height: 1.5px;
+  margin: 0 auto;
+  background: var(--gold);
+  border-radius: 2px;
+  transition: transform var(--dur) var(--ease-out),
+              opacity var(--dur-fast) var(--ease-soft);
+}
+/* Bars fold into a cross while the drawer is open */
+.nav-toggle.is-open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.nav-toggle.is-open span:nth-child(2) { opacity: 0; transform: scaleX(0.4); }
+.nav-toggle.is-open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+.nav-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  background: rgba(4, 6, 10, 0.62);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur) var(--ease-soft);
+}
+.nav-scrim.is-open { opacity: 1; pointer-events: auto; }
+
+body.nav-locked { overflow: hidden; }
+
+.nav-controls { display: flex; align-items: center; gap: 0.4rem; }
+.nav-action { cursor: pointer; }
+.nav-disabled { color: var(--text-faint) !important; cursor: not-allowed; }
+
+@keyframes nav-item-in {
+  from { opacity: 0; transform: translateX(18px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ===========================================================================
+   Breakpoints
+   =========================================================================== */
+
+/* ---------- Tablet and below: header collapses into a drawer ---------- */
+@media (max-width: 900px) {
+  .nav-toggle { display: flex; }
+
+  .navbar-links {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 120;
+    width: min(330px, 84vw);
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 0.2rem;
+    padding: 5.5rem 1.1rem 2rem;
+    background: rgba(11, 15, 23, 0.97);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border-left: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+    overflow-y: auto;
+    transform: translateX(104%);
+    transition: transform var(--dur-slow) var(--ease-out);
+  }
+  body.light-mode .navbar-links { background: rgba(255, 255, 255, 0.97); }
+
+  .navbar-links.is-open { transform: none; }
+
+  /* Gold hairline down the drawer edge, echoing the navbar underline */
+  .navbar-links::before {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0; left: 0;
+    width: 1px;
+    background: linear-gradient(180deg, transparent, var(--gold-line), transparent);
+  }
+
+  .navbar-links li a,
+  .navbar-links li > span {
+    display: block;
+    padding: 0.85rem 0.9rem;
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Items sweep in one after another once the drawer opens */
+  .navbar-links.is-open li { animation: nav-item-in var(--dur) var(--ease-out) both; }
+  .navbar-links.is-open li:nth-child(1) { animation-delay: 0.08s; }
+  .navbar-links.is-open li:nth-child(2) { animation-delay: 0.13s; }
+  .navbar-links.is-open li:nth-child(3) { animation-delay: 0.18s; }
+  .navbar-links.is-open li:nth-child(4) { animation-delay: 0.23s; }
+  .navbar-links.is-open li:nth-child(5) { animation-delay: 0.28s; }
+  .navbar-links.is-open li:nth-child(6) { animation-delay: 0.33s; }
+
+  /* Theme and logout sit apart at the foot of the drawer */
+  .nav-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+  }
+  .nav-controls button { width: 100%; padding: 0.75rem; }
+
+  /* Leaderboard becomes a stacked card */
+  .leaderboard-head { display: none; }
+  .leaderboard-row {
+    grid-template-columns: 2.25rem 1fr auto;
+    row-gap: 0.55rem;
+    padding: 1rem;
+  }
+  .lb-rank   { grid-column: 1; grid-row: 1; align-self: center; }
+  .lb-name   { grid-column: 2; grid-row: 1; }
+  .lb-return { grid-column: 3; grid-row: 1; align-items: flex-end; text-align: right; }
+  .lb-holdings { display: none; }
+  .lb-value  { grid-column: 2 / 4; grid-row: 2; font-size: 0.82rem; }
+  .lb-value::before {
+    content: "Value ";
+    color: var(--text-faint);
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .lb-actions { grid-column: 1 / -1; grid-row: 3; }
+  .lb-actions button { flex: 1; padding: 0.6rem; }
+
+  .leaderboard-page > h2 { border-radius: var(--radius) var(--radius) 0 0; }
+  .leaderboard-page > .leaderboard-subtitle { border-radius: 0 0 var(--radius) var(--radius); }
+}
+
+/* ---------- Phones ---------- */
+@media (max-width: 720px) {
+  .navbar { padding: 0.7rem 1rem; }
+  .navbar-brand { font-size: 0.92rem; letter-spacing: 0.14em; }
+
+  .user-page-container,
+  .portfolio-performance-page,
+  .stock-search,
+  .manual-add-stock,
+  .leaderboard-page,
+  .investor-page,
+  .compare-page { padding: 1rem 0.9rem 2.5rem; }
+
+  /* Watchlist rows become labelled cards; the header row is redundant */
+  .watchlist-header { display: none; }
+  .watchlist-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem 1rem;
+    padding: 1rem;
+  }
+  .watchlist-row > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+  /* Label injected per cell, since the header is gone */
+  .watchlist-row > div::before {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+  .watchlist-row .ticker::before   { content: "Ticker"; }
+  .watchlist-row .price::before    { content: "Price"; }
+  .watchlist-row .quantity::before { content: "Qty"; }
+  .watchlist-row .added::before    { content: "Added"; }
+  .watchlist-row .ticker { font-size: 1.05rem; }
+  .watchlist-row .actions {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    gap: 0.5rem;
+    padding-top: 0.35rem;
+    border-top: 1px solid var(--border);
+  }
+  .watchlist-row .actions button { flex: 1; padding: 0.55rem; }
+
+  /* Tables stay legible and scroll rather than squash */
+  .table-wrap table { min-width: 520px; }
+  th, td { padding: 0.65rem 0.7rem; }
+  table, .holdings-table, .compare-table { font-size: 0.85rem; }
+
+  .summary-cards { grid-template-columns: repeat(2, 1fr); gap: 0.7rem; }
+  .summary-card { padding: 0.9rem; }
+  .summary-value { font-size: 1.15rem; }
+
+  .home-container { min-height: 82vh; background-position: 62% center; }
+  .hero { padding: 3rem 1.25rem; }
+  .hero-overlay::before { font-size: 0.6rem; letter-spacing: 0.24em; }
+  .hero-buttons { flex-direction: column; align-items: stretch; }
+  .hero-buttons .btn { width: 100%; text-align: center; }
+
+  .login-page, .register-page { min-height: auto; padding: 2.5rem 1rem 3rem; }
+  .login-container, .register-container { padding: 1.5rem 1.25rem; }
+
+  .stock-search > input { width: 100%; margin-right: 0; }
+  .stock-info { flex-direction: column; align-items: stretch; }
+  .stock-info input { width: 100%; }
+  .range-selection { flex-direction: column; align-items: stretch; }
+  .range-selection select { width: 100%; }
+
+  .manual-add-stock form { max-width: none; padding: 1.25rem; }
+
+  .compare-verdict { display: block; }
+  .lb-actions button { font-size: 0.72rem; }
+}
+
+/* ---------- Small phones ---------- */
+@media (max-width: 420px) {
+  .summary-cards { grid-template-columns: 1fr; }
+  .watchlist-row { grid-template-columns: 1fr; }
+  .leaderboard-row { grid-template-columns: 1.9rem 1fr; }
+  .lb-return { grid-column: 1 / -1; grid-row: 2; align-items: flex-start; text-align: left; }
+  .lb-value  { grid-column: 1 / -1; grid-row: 3; }
+  .lb-actions { grid-row: 4; flex-direction: column; }
+  .hero-overlay::before { font-size: 0.55rem; }
+  .navbar-brand { font-size: 0.82rem; }
+}
+
+/* ---------- Coarse pointers ----------
+   Hover styling is misleading on touch, and targets need more room. */
+@media (hover: none) {
+  .summary-card:hover { transform: none; border-color: var(--border); }
+  tbody tr:hover { background: transparent; }
+  .leaderboard-row:not(.leaderboard-head):hover { background: transparent; }
+  .leaderboard-row.is-me { background: var(--gold-wash); }
+  .watchlist-row:hover { background: transparent; }
+  button { min-height: 42px; }
+}
+
+/* ---------- Reduced motion ----------
+   Honour the OS setting: keep the layout, drop the movement. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .navbar-links { transition: none; }
+}
+
+/* ---------- Quota indicator ---------- */
+.quota-note, .quota-warning {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  margin: 0.5rem 0;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  background: var(--bg-surface);
+}
+.quota-warning {
+  border-color: var(--gold-line);
+  color: var(--gold-bright);
+  background: var(--gold-wash);
+}

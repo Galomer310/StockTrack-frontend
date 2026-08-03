@@ -1,5 +1,5 @@
 // frontend/src/components/Navbar.tsx
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../store";
@@ -9,6 +9,7 @@ import "../../style.css";
 const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
 
   // Current user from Redux; drives whether the Logout button is shown
   const user = useSelector((state: RootState) => state.auth.user);
@@ -17,6 +18,10 @@ const Navbar = () => {
   const [searchDisabled, setSearchDisabled] = useState(false);
   // State to store the countdown (in seconds) for the Search Stocks button
   const [countdown, setCountdown] = useState(60);
+
+  // Mobile menu. Below the tablet breakpoint the links collapse behind a
+  // hamburger; above it this state is irrelevant because the panel is static.
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // The design is dark by default; this opts into the light variant instead.
   // Restored from localStorage so the choice survives a reload.
@@ -29,6 +34,25 @@ const Navbar = () => {
     document.body.classList.toggle("light-mode", lightMode);
     localStorage.setItem("investments_theme", lightMode ? "light" : "dark");
   }, [lightMode]);
+
+  // Any navigation closes the menu, so tapping a link never leaves it hanging open
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
+
+  // Escape closes the menu, and while it is open the page behind must not scroll
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    document.body.classList.add("nav-locked");
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.classList.remove("nav-locked");
+    };
+  }, [menuOpen]);
 
   // useEffect to handle Search Stocks button countdown
   useEffect(() => {
@@ -72,48 +96,71 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar">
-      <div className="navbar-brand">Investments</div>
-      <ul className="navbar-links">
-        <li>
-          <Link to="/">Home</Link>
-        </li>
-        <li>
-          <Link to="/user">Dashboard</Link>
-        </li>
-        <li>
-          {searchDisabled ? (
-            <span style={{ cursor: "not-allowed", color: "gray" }}>
-              Search Stocks ({countdown})
-            </span>
-          ) : (
-            <span onClick={handleSearchClick} style={{ cursor: "pointer" }}>
-              Search Stocks
-            </span>
-          )}
-        </li>
-        <li>
-          <Link to="/performance">Performance</Link>
-        </li>
-        <li>
-          <Link to="/leaderboard">Leaderboard</Link>
-        </li>
-        <li>
-          {/* Dark Mode toggle button */}
-          <button onClick={toggleDarkMode} className="toggle-dark-mode">
-            {lightMode ? "Dark Mode" : "Light Mode"}
-          </button>
-        </li>
-        {user && (
+    <>
+      <nav className="navbar">
+        <div className="navbar-brand">Investments</div>
+
+        {/* Hamburger, shown only below the tablet breakpoint. The three bars
+            morph into a cross while the panel is open. */}
+        <button
+          className={`nav-toggle${menuOpen ? " is-open" : ""}`}
+          onClick={() => setMenuOpen((prev) => !prev)}
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={menuOpen}
+          aria-controls="primary-navigation"
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+
+        <ul
+          id="primary-navigation"
+          className={`navbar-links${menuOpen ? " is-open" : ""}`}
+        >
           <li>
-            {/* Logout button, only rendered while a session is active */}
-            <button onClick={handleLogout} className="logout-btn">
-              Logout
-            </button>
+            <Link to="/">Home</Link>
           </li>
-        )}
-      </ul>
-    </nav>
+          <li>
+            <Link to="/user">Dashboard</Link>
+          </li>
+          <li>
+            {searchDisabled ? (
+              <span className="nav-disabled">Search Stocks ({countdown})</span>
+            ) : (
+              <span className="nav-action" onClick={handleSearchClick}>
+                Search Stocks
+              </span>
+            )}
+          </li>
+          <li>
+            <Link to="/performance">Performance</Link>
+          </li>
+          <li>
+            <Link to="/leaderboard">Leaderboard</Link>
+          </li>
+          <li className="nav-controls">
+            {/* Theme toggle */}
+            <button onClick={toggleDarkMode} className="toggle-dark-mode">
+              {lightMode ? "Dark Mode" : "Light Mode"}
+            </button>
+            {user && (
+              /* Logout, only rendered while a session is active */
+              <button onClick={handleLogout} className="logout-btn">
+                Logout
+              </button>
+            )}
+          </li>
+        </ul>
+      </nav>
+
+      {/* Tap-anywhere-to-close scrim behind the open mobile panel */}
+      <div
+        className={`nav-scrim${menuOpen ? " is-open" : ""}`}
+        onClick={() => setMenuOpen(false)}
+        aria-hidden="true"
+      />
+    </>
   );
 };
 

@@ -90,6 +90,7 @@ const InvestorPortfolio = () => {
       {holdings.length === 0 ? (
         <p>This investor has no holdings yet.</p>
       ) : (
+        <div className="table-wrap">
         <table className="holdings-table">
           <thead>
             <tr>
@@ -116,6 +117,7 @@ const InvestorPortfolio = () => {
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   );

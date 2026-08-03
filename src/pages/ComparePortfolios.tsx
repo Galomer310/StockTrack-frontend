@@ -135,6 +135,7 @@ const ComparePortfolios = () => {
           : `You are behind by ${Math.abs(diffPct).toFixed(2)} percentage points.`}
       </p>
 
+      <div className="table-wrap">
       <table className="compare-table">
         <thead>
           <tr>
@@ -153,9 +154,11 @@ const ComparePortfolios = () => {
           ))}
         </tbody>
       </table>
+      </div>
 
       <h3>Positions by ticker</h3>
       <p className="compare-note">Current market value held in each ticker.</p>
+      <div className="table-wrap">
       <table className="compare-table">
         <thead>
           <tr>
@@ -177,6 +180,7 @@ const ComparePortfolios = () => {
           ))}
         </tbody>
       </table>
+      </div>
       {symbolRows.length === 0 && <p>Neither portfolio has any positions yet.</p>}
     </div>
   );

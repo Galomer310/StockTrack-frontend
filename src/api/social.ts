@@ -9,8 +9,9 @@ export interface LeaderboardEntry {
   id: number;
   display_name: string;
   member_since: string;
-  invested: number;
-  current_value: number;
+  invested: number;      // every buy ever made, not just open positions
+  current_value: number; // open positions at latest price + proceeds from sales
+  realized: number;      // proceeds from sales, already inside current_value
   profit: number;
   return_pct: number;
   holdings_count: number;
@@ -32,6 +33,7 @@ export interface Holding {
 export interface PortfolioSummary {
   invested: number;
   current_value: number;
+  realized: number; // proceeds from sales, already inside current_value
   profit: number;
   return_pct: number;
   holdings_count: number;

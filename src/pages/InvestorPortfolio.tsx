@@ -58,7 +58,7 @@ const InvestorPortfolio = () => {
 
       <div className="summary-cards">
         <div className="summary-card">
-          <span className="summary-label">Invested</span>
+          <span className="summary-label">Capital deployed</span>
           <span className="summary-value">{money(summary.invested)}</span>
         </div>
         <div className="summary-card">
@@ -71,6 +71,12 @@ const InvestorPortfolio = () => {
             {money(summary.profit)}
           </span>
         </div>
+        {summary.realized > 0 && (
+          <div className="summary-card">
+            <span className="summary-label">Realised</span>
+            <span className="summary-value">{money(summary.realized)}</span>
+          </div>
+        )}
         <div className="summary-card">
           <span className="summary-label">Total return</span>
           <span

@@ -740,3 +740,17 @@ body.nav-locked { overflow: hidden; }
   .journal-entry { grid-template-columns: 1rem 1fr; gap: 0.7rem; }
   .journal-entry::before { left: 0.45rem; }
 }
+
+/* A trade past its correction window: the record stands. */
+.locked-hint {
+  align-self: center;
+  padding: 0.3rem 0.6rem;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--border-strong);
+  color: var(--text-faint);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: help;
+}

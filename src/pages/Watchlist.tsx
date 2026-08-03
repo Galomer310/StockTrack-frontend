@@ -27,6 +27,14 @@ const Watchlist = () => {
   const accessToken = useSelector((state: RootState) => state.auth.accessToken); // Get access token from Redux state
   const navigate = useNavigate(); // Initialize navigate for redirection
   const toast = useToast();
+
+  // Mirrors CORRECTION_WINDOW_MS on the server. A trade can be corrected or
+  // deleted for an hour; after that it is part of the public record and the
+  // only way out is a sale. Checked here purely so the buttons reflect
+  // reality - the server is what actually enforces it.
+  const CORRECTION_WINDOW_MS = 60 * 60 * 1000;
+  const isCorrectable = (addedAt: string) =>
+    Date.now() - new Date(addedAt).getTime() < CORRECTION_WINDOW_MS;
   // The holding currently being sold, if the note window is open
   const [selling, setSelling] = useState<any | null>(null);
 
@@ -189,9 +197,9 @@ const Watchlist = () => {
       setEditingItemData({}); // Clear editing data state
       toast.success("Your changes have been saved.", "Holding updated");
     } catch (err: any) {
-      console.error(
-        "Error updating watchlist item:",
-        err.response?.data || err.message // Log error if update fails
+      toast.error(
+        err.response?.data?.error || "Could not save your correction.",
+        err.response?.data?.code === "CORRECTION_WINDOW_CLOSED" ? "Record is locked" : undefined
       );
     }
   };
@@ -237,9 +245,9 @@ const Watchlist = () => {
       setTotal(newTotal); // Update total state
       toast.success("The holding has been removed from your portfolio.", "Holding removed");
     } catch (err: any) {
-      console.error(
-        "Error removing watchlist item:",
-        err.response?.data || err.message // Log error if removal fails
+      toast.error(
+        err.response?.data?.error || "Could not delete this entry.",
+        err.response?.data?.code === "CORRECTION_WINDOW_CLOSED" ? "Record is locked" : undefined
       );
     }
   };
@@ -323,9 +331,9 @@ const Watchlist = () => {
                 setTotal(newTotal);
                 toast.success("The holding has been removed from your portfolio.", "Holding removed");
               } catch (err: any) {
-                console.error(
-                  "Error removing watchlist item:",
-                  err.response?.data || err.message
+                toast.error(
+                  err.response?.data?.error || "Could not delete this entry.",
+                  err.response?.data?.code === "CORRECTION_WINDOW_CLOSED" ? "Record is locked" : undefined
                 );
               }
             };
@@ -396,12 +404,23 @@ const Watchlist = () => {
                     // Otherwise, show Edit and Remove buttons
                     <>
                       <button onClick={() => setSelling(stock)}>Sell…</button>
-                      <button onClick={() => handleEdit(stock)}>Edit</button>
-                      <button
-                        onClick={() => handleRemoveFromWatchlist(stock.id)}
-                      >
-                        Remove
-                      </button>
+                      {isCorrectable(stock.added_at) ? (
+                        <>
+                          <button onClick={() => handleEdit(stock)}>Edit</button>
+                          <button
+                            onClick={() => handleRemoveFromWatchlist(stock.id)}
+                          >
+                            Remove
+                          </button>
+                        </>
+                      ) : (
+                        <span
+                          className="locked-hint"
+                          title="Trades can be corrected for one hour. After that the record stands and the only way out is a sale."
+                        >
+                          locked
+                        </span>
+                      )}
                     </>
                   )}
                 </div>
@@ -495,16 +514,27 @@ const Watchlist = () => {
                               <button onClick={() => setSelling(stock)}>
                                 Sell…
                               </button>
-                              <button onClick={() => handleEdit(stock)}>
-                                Edit
-                              </button>
-                              <button
-                                onClick={() =>
-                                  handleRemoveFromWatchlist(stock.id)
-                                }
-                              >
-                                Remove
-                              </button>
+                              {isCorrectable(stock.added_at) ? (
+                                <>
+                                  <button onClick={() => handleEdit(stock)}>
+                                    Edit
+                                  </button>
+                                  <button
+                                    onClick={() =>
+                                      handleRemoveFromWatchlist(stock.id)
+                                    }
+                                  >
+                                    Remove
+                                  </button>
+                                </>
+                              ) : (
+                                <span
+                          className="locked-hint"
+                          title="Trades can be corrected for one hour. After that the record stands and the only way out is a sale."
+                        >
+                          locked
+                        </span>
+                              )}
                             </>
                           )}
                         </div>

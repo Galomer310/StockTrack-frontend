@@ -1,4 +1,4 @@
-// frontend/src/components/StockSearch.tsx
+// frontend/src/pages/StockSearch.tsx
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import axiosInstance from "../api/axiosInstance";
@@ -15,10 +15,10 @@ import {
   Title,
   Tooltip,
   Legend,
-  Filler, // Import Filler plugin
+  Filler,
 } from "chart.js";
+import { SERIES } from "../charts/chartTheme";
 
-// Register Chart.js components including Filler
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -30,118 +30,128 @@ ChartJS.register(
   Filler
 );
 
-// Market data is proxied through our backend, which holds the Polygon API key.
+const API = import.meta.env.VITE_BACKEND_API_URL;
 
-// Define the available time range options.
+// Time ranges, expressed as a number of days for the backend's ?days= param.
 const rangeOptions = [
-  {
-    value: "5d",
-    label: "Last 5 Days",
-    days: 5,
-    multiplier: 1,
-    timespan: "hour",
-  },
-  {
-    value: "30d",
-    label: "Last 30 Days",
-    days: 30,
-    multiplier: 1,
-    timespan: "day",
-  },
-  {
-    value: "3m",
-    label: "Last 3 Months",
-    days: 90,
-    multiplier: 1,
-    timespan: "week",
-  },
-  {
-    value: "6m",
-    label: "Last 6 Months",
-    days: 180,
-    multiplier: 1,
-    timespan: "week",
-  },
-  {
-    value: "1y",
-    label: "Last Year",
-    days: 365,
-    multiplier: 1,
-    timespan: "week",
-  },
-  {
-    value: "2y",
-    label: "Last 2 Years",
-    days: 730,
-    multiplier: 1,
-    timespan: "month",
-  },
+  { value: "5d", label: "Last 5 Days", days: 5 },
+  { value: "30d", label: "Last 30 Days", days: 30 },
+  { value: "3m", label: "Last 3 Months", days: 90 },
+  { value: "6m", label: "Last 6 Months", days: 180 },
+  { value: "1y", label: "Last Year", days: 365 },
+  { value: "2y", label: "Last 2 Years", days: 730 },
 ];
 
+// Shapes returned by our backend, which normalises Alpha Vantage's awkward
+// numbered-and-spaced keys into plain fields.
+interface Quote {
+  symbol: string;
+  open: number;
+  high: number;
+  low: number;
+  price: number;
+  volume: number;
+  previous_close: number;
+  change: number;
+  change_percent: number;
+  latest_trading_day: string;
+}
+
+interface Overview {
+  symbol: string;
+  name: string;
+  description: string;
+  exchange: string;
+  sector: string;
+  industry: string;
+  market_cap: number;
+  pe_ratio: number;
+  week52_high: number;
+  week52_low: number;
+}
+
+interface Article {
+  title: string;
+  url: string;
+  published: string;
+  source: string;
+  summary: string;
+  sentiment: string;
+}
+
+interface Bar {
+  t: number;
+  o: number;
+  h: number;
+  l: number;
+  c: number;
+  v: number;
+}
+
 const StockSearch: React.FC = () => {
-  // Basic states for stock, company, news, and aggregated data
   const [query, setQuery] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [stockData, setStockData] = useState<any>(null);
-  const [companyInfo, setCompanyInfo] = useState<any>(null);
-  const [companyDetails, setCompanyDetails] = useState<any>(null);
-  const [news, setNews] = useState<any[]>([]);
-  const [aggregatedData, setAggregatedData] = useState<any[]>([]);
-  const [marketStatus, setMarketStatus] = useState<string | null>(null);
+  const [quote, setQuote] = useState<Quote | null>(null);
+  const [overview, setOverview] = useState<Overview | null>(null);
+  const [news, setNews] = useState<Article[]>([]);
+  const [bars, setBars] = useState<Bar[]>([]);
+  const [marketNote, setMarketNote] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // Timestamp state for market status caching
-  const [lastMarketStatusFetched, setLastMarketStatusFetched] =
-    useState<number>(0);
+  // Remaining requests in today's Alpha Vantage budget, read from the
+  // X-Quota-Remaining header the backend sets on every market data response.
+  const [quotaLeft, setQuotaLeft] = useState<number | null>(null);
 
-  // --- Search Button Disable Feature (for overall search) ---
   const [searchDisabled, setSearchDisabled] = useState(false);
-  const [searchCountdown, setSearchCountdown] = useState(30);
-  // -------------------------------------------------------------
+  const [searchCountdown, setSearchCountdown] = useState(12);
 
-  // --- New States for Range Selection Cooldown Feature ---
   const [selectedRange, setSelectedRange] = useState("30d");
-  const [rangeDisabled, setRangeDisabled] = useState(false);
-  const [rangeCountdown, setRangeCountdown] = useState(30);
-  // ---------------------------------------------------------
-
-  const [showAggregatedData, setShowAggregatedData] = useState(false);
+  const [showChart, setShowChart] = useState(false);
+  const [barsLoading, setBarsLoading] = useState(false);
 
   const user = useSelector((state: RootState) => state.auth.user);
-  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
 
-  // Table styling lives in style.css so it follows the active theme.
+  // Record the quota figure the backend reports alongside each response.
+  const readQuota = (headers: any) => {
+    const remaining = headers?.["x-quota-remaining"];
+    if (remaining !== undefined) setQuotaLeft(Number(remaining));
+  };
 
-  // useEffect to check market status with caching
+  // Turn an axios failure into something a person can act on. 429 is the
+  // interesting case: it means today's 25 requests are gone.
+  const describeError = (err: any, fallback: string) => {
+    if (err.response?.status === 429) {
+      return err.response.data?.error || "Daily market data limit reached.";
+    }
+    if (err.response?.status === 404) {
+      return err.response.data?.error || "Ticker not found.";
+    }
+    return fallback;
+  };
+
+  // Market status is derived from the clock on the server, so polling it is
+  // free and does not eat into the request budget.
   useEffect(() => {
-    const checkMarketStatus = async () => {
-      const now = Date.now();
-      if (now - lastMarketStatusFetched < 60000 && marketStatus !== null) {
-        return;
-      }
+    const checkMarket = async () => {
       try {
-        const res = await axiosInstance.get(
-          `${import.meta.env.VITE_BACKEND_API_URL}/stocks/market-status`
+        const res = await axiosInstance.get(`${API}/stocks/market-status`);
+        setMarketNote(
+          res.data.is_open
+            ? null
+            : `🚫 Market closed (${res.data.reason}). Prices reflect the last close.`
         );
-        if (res.data.market === "closed") {
-          setMarketStatus(
-            "🚫 The market is closed, stock prices won’t update in real time."
-          );
-        } else {
-          setMarketStatus(null);
-        }
-        setLastMarketStatusFetched(now);
-      } catch (err) {
-        console.error("Error checking market status", err);
+      } catch {
+        /* non-critical banner */
       }
     };
-
-    checkMarketStatus();
-    const interval = setInterval(checkMarketStatus, 60000);
+    checkMarket();
+    const interval = setInterval(checkMarket, 60000);
     return () => clearInterval(interval);
-  }, [lastMarketStatusFetched, marketStatus]);
+  }, []);
 
-  // useEffect for search button cooldown (30s)
+  // Search cooldown
   useEffect(() => {
     let timer: number;
     if (searchDisabled) {
@@ -150,7 +160,7 @@ const StockSearch: React.FC = () => {
           if (prev <= 1) {
             clearInterval(timer);
             setSearchDisabled(false);
-            return 13;
+            return 12;
           }
           return prev - 1;
         });
@@ -159,149 +169,111 @@ const StockSearch: React.FC = () => {
     return () => clearInterval(timer);
   }, [searchDisabled]);
 
-  // useEffect for range selection cooldown (30s)
+  // Historical bars are fetched lazily. Each fetch costs a request, so it
+  // happens only once the chart is actually opened, or the range changes
+  // while it is open.
   useEffect(() => {
-    let timer: number;
-    if (rangeDisabled) {
-      timer = window.setInterval(() => {
-        setRangeCountdown((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            setRangeDisabled(false);
-            return 13;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-    return () => clearInterval(timer);
-  }, [rangeDisabled]);
+    if (!showChart || !quote) return;
+    const option = rangeOptions.find((r) => r.value === selectedRange);
+    if (!option) return;
 
-  // Function to handle range selection change
-  const handleRangeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    // Only process change if range selection is not disabled
-    if (!rangeDisabled) {
-      setSelectedRange(e.target.value);
-      // Disable the dropdown for 20 seconds after a change
-      setRangeDisabled(true);
-      setRangeCountdown(13);
-    }
-  };
-
-  // Function to fetch aggregated data based on the selected range and current query
-  const fetchAggregatedData = async () => {
-    if (!query) return;
-    try {
-      const rangeOption = rangeOptions.find((r) => r.value === selectedRange);
-      if (!rangeOption) return;
-      const { days, multiplier, timespan } = rangeOption;
-      const today = new Date();
-      const pastDate = new Date();
-      pastDate.setDate(today.getDate() - days);
-      const fromDate = pastDate.toISOString().split("T")[0];
-      const toDate = today.toISOString().split("T")[0];
-
-      const aggRes = await axiosInstance.get(
-        `${import.meta.env.VITE_BACKEND_API_URL}/stocks/${query}/aggregates`,
-        { params: { multiplier, timespan, from: fromDate, to: toDate } }
-      );
-      if (aggRes.data.results && aggRes.data.results.length > 0) {
-        setAggregatedData(aggRes.data.results);
-      } else {
-        setAggregatedData([]);
+    const loadBars = async () => {
+      setBarsLoading(true);
+      try {
+        const res = await axiosInstance.get(
+          `${API}/stocks/${quote.symbol}/aggregates`,
+          { params: { days: option.days } }
+        );
+        readQuota(res.headers);
+        setBars(res.data.bars || []);
+        setNotice(res.headers?.["x-cache"] === "STALE" ? "Chart data is from an earlier fetch." : "");
+      } catch (err: any) {
+        setBars([]);
+        setError(describeError(err, "Could not load historical prices."));
+      } finally {
+        setBarsLoading(false);
       }
-    } catch (err) {
-      console.error("Error fetching aggregated data", err);
-      setAggregatedData([]);
-    }
-  };
+    };
+    loadBars();
+  }, [showChart, selectedRange, quote]);
 
-  // Refetch aggregated data when the selected range changes (if a query is present)
-  useEffect(() => {
-    if (query) {
-      fetchAggregatedData();
-    }
-  }, [selectedRange]);
-
-  // Function to search for a stock and fetch its various data
+  // A search costs 3 requests: quote, company overview, news.
   const searchStock = async () => {
-    // Disable search button for 30 seconds when search is initiated
-    if (searchDisabled) return;
+    const symbol = query.trim().toUpperCase();
+    if (!symbol || searchDisabled) return;
+
     setSearchDisabled(true);
     setSearchCountdown(12);
+    setLoading(true);
+    setError("");
+    setNotice("");
+    setBars([]);
+    setShowChart(false);
 
     try {
-      setError("");
-
-      // 1. Fetch previous close aggregated data (basic stock info)
-      const stockRes = await axiosInstance.get(
-        `${import.meta.env.VITE_BACKEND_API_URL}/stocks/${query}/prev`
-      );
-      if (stockRes.data.results && stockRes.data.results.length > 0) {
-        setStockData(stockRes.data.results[0]);
-      } else {
-        setError("No stock data available.");
-        setStockData(null);
+      const quoteRes = await axiosInstance.get(`${API}/stocks/${symbol}/quote`);
+      readQuota(quoteRes.headers);
+      setQuote(quoteRes.data);
+      if (quoteRes.headers?.["x-cache"] === "STALE") {
+        setNotice("Showing the last known price; today's request budget is used up.");
       }
-
-      // 2. Fetch basic company info
-      const companyRes = await axiosInstance.get(
-        `${import.meta.env.VITE_BACKEND_API_URL}/stocks/${query}/details`
-      );
-      setCompanyInfo(companyRes.data.results);
-
-      // 3. Fetch additional company details
-      const companyDetailsRes = await axiosInstance.get(
-        `${import.meta.env.VITE_BACKEND_API_URL}/stocks/${query}/company`
-      );
-      setCompanyDetails(companyDetailsRes.data);
-
-      // 4. Fetch latest news articles
-      const newsRes = await axiosInstance.get(
-        `${import.meta.env.VITE_BACKEND_API_URL}/stocks/${query}/news`
-      );
-      setNews(newsRes.data.results);
-
-      // 5. Fetch aggregated historical data for the selected range
-      await fetchAggregatedData();
-    } catch (err) {
-      setError("Stock not found or API error.");
-      setStockData(null);
-      setCompanyInfo(null);
-      setCompanyDetails(null);
+    } catch (err: any) {
+      setQuote(null);
+      setOverview(null);
       setNews([]);
-      setAggregatedData([]);
+      setError(describeError(err, "Stock not found or provider error."));
+      setLoading(false);
+      return;
     }
+
+    // Company details and news are secondary: a failure here should not wipe
+    // out the quote we just paid for.
+    try {
+      const res = await axiosInstance.get(`${API}/stocks/${symbol}/details`);
+      readQuota(res.headers);
+      setOverview(res.data);
+    } catch {
+      setOverview(null);
+    }
+
+    try {
+      const res = await axiosInstance.get(`${API}/stocks/${symbol}/news`);
+      readQuota(res.headers);
+      setNews(res.data.articles || []);
+    } catch {
+      setNews([]);
+    }
+
+    setLoading(false);
   };
 
-  // Function to add the searched stock to the watchlist
   const addToWatchlist = async () => {
-    if (!user) {
+    if (!user || !quote) {
       setError("You must be logged in to add to watchlist");
       return;
     }
     try {
-      await axiosInstance.post(
-        `${import.meta.env.VITE_BACKEND_API_URL}/watchlist`,
-        { stock_symbol: query, quantity },
-        { headers: { Authorization: `Bearer ${accessToken}` } }
-      );
-      alert(`${query} added to watchlist with quantity ${quantity}`);
-    } catch (err) {
-      setError("Failed to add to watchlist");
+      await axiosInstance.post(`${API}/watchlist`, {
+        stock_symbol: quote.symbol,
+        quantity,
+      });
+      alert(`${quote.symbol} added to watchlist with quantity ${quantity}`);
+    } catch (err: any) {
+      setError(describeError(err, "Failed to add to watchlist"));
     }
   };
 
-  // Prepare the chart data from the aggregated data
   const chartData = {
-    labels: aggregatedData.map((item) => new Date(item.t).toLocaleDateString()),
+    labels: bars.map((b) => new Date(b.t).toLocaleDateString()),
     datasets: [
       {
-        label: `${query} Closing Price`,
-        data: aggregatedData.map((item) => item.c),
-        borderColor: "rgb(75, 192, 97)",
-        backgroundColor: "rgba(75, 192, 118, 0.2)",
+        label: `${quote?.symbol ?? ""} Closing Price`,
+        data: bars.map((b) => b.c),
+        borderColor: SERIES.gold,
+        backgroundColor: SERIES.goldFill,
         fill: true,
+        tension: 0.3,
+        pointRadius: 0,
       },
     ],
   };
@@ -310,70 +282,58 @@ const StockSearch: React.FC = () => {
     responsive: true,
     plugins: {
       legend: { position: "top" as const },
-      title: { display: true, text: `${query} Closing Prices` },
+      title: { display: true, text: `${quote?.symbol ?? ""} Closing Prices` },
     },
   };
+
+  const compact = (n: number) =>
+    n >= 1e12 ? `$${(n / 1e12).toFixed(2)}T`
+    : n >= 1e9 ? `$${(n / 1e9).toFixed(2)}B`
+    : n >= 1e6 ? `$${(n / 1e6).toFixed(2)}M`
+    : `$${n.toLocaleString()}`;
 
   return (
     <div className="stock-search">
       <h2>Search Stocks</h2>
-      <p>Get stock data, company info, news, and historical prices.</p>
-      <p>Search for a stock symbol to get started.</p>
-      <p>Example: AAPL, TSLA, MSFT, AMZN, GOOGL</p>
-      <p>Market data provided by Polygon.io</p>
+      <p>Quote, company profile, news and price history. Data by Alpha Vantage.</p>
+      <p>Example tickers: AAPL, TSLA, MSFT, AMZN, GOOGL</p>
+
+      {/* The free plan allows 25 requests a day, so it is worth showing. */}
+      {quotaLeft !== null && (
+        <p className={quotaLeft <= 5 ? "quota-warning" : "quota-note"}>
+          {quotaLeft} of today's market data requests remaining
+          {quotaLeft <= 5 && " — resets at midnight UTC"}
+        </p>
+      )}
 
       <input
         type="text"
         placeholder="Enter stock symbol"
         value={query}
         onChange={(e) => setQuery(e.target.value.toUpperCase())}
+        onKeyDown={(e) => e.key === "Enter" && searchStock()}
       />
-      {/* Disable the search button for 30s after click and show countdown */}
-      <button onClick={searchStock} disabled={searchDisabled}>
-        {searchDisabled ? `Search disabled (${searchCountdown})` : "Search"}
+      <button onClick={searchStock} disabled={searchDisabled || loading}>
+        {loading
+          ? "Searching…"
+          : searchDisabled
+          ? `Search disabled (${searchCountdown})`
+          : "Search"}
       </button>
-      {marketStatus && <p className="market-status">{marketStatus}</p>}
+
+      {marketNote && <p className="market-status">{marketNote}</p>}
+      {notice && <p className="market-status">{notice}</p>}
       {error && <p className="error">{error}</p>}
 
-      {/* Company Info */}
-      {companyInfo && (
-        <div className="company-info">
-          <h3>{companyInfo.name}</h3>
-          <p>Industry: {companyInfo.sic_description}</p>
-        </div>
-      )}
-
-      {/* Company Details */}
-      {companyDetails && (
-        <div className="company-details">
-          <h4>About {companyDetails.name}</h4>
-          {companyDetails.description && <p>{companyDetails.description}</p>}
-          {companyDetails.ceo && (
-            <p>
-              <strong>CEO:</strong> {companyDetails.ceo}
-            </p>
-          )}
-          {companyDetails.industry && (
-            <p>
-              <strong>Industry:</strong> {companyDetails.industry}
-            </p>
-          )}
-          {companyDetails.employees && (
-            <p>
-              <strong>Employees:</strong> {companyDetails.employees}
-            </p>
-          )}
-          <p>
-            <strong>Volume:</strong> {stockData.v}
-          </p>
-        </div>
-      )}
-
-      {/* Basic Stock Info */}
-      {stockData && (
+      {/* Quote */}
+      {quote && (
         <div className="stock-info">
           <h3>
-            {query} - Closing Price: ${stockData.c}
+            {quote.symbol} — ${quote.price.toFixed(2)}{" "}
+            <span className={quote.change >= 0 ? "gain" : "loss"}>
+              {quote.change >= 0 ? "+" : ""}
+              {quote.change.toFixed(2)} ({quote.change_percent.toFixed(2)}%)
+            </span>
           </h3>
           <button onClick={addToWatchlist} disabled={!user}>
             Add to Watchlist
@@ -381,98 +341,157 @@ const StockSearch: React.FC = () => {
           <input
             type="number"
             min="1"
-            placeholder="Choose quantity"
+            placeholder="Quantity"
             value={quantity}
             onChange={(e) => setQuantity(Number(e.target.value))}
           />
         </div>
       )}
 
-      {/* Range Selection Dropdown with cooldown */}
-      {aggregatedData && aggregatedData.length > 0 && (
-        <div className="range-selection">
-          <label htmlFor="range-select">Select Time Range: </label>
-          <select
-            id="range-select"
-            value={selectedRange}
-            onChange={handleRangeChange}
-            disabled={rangeDisabled} // Disable dropdown when cooldown is active
-          >
-            {rangeOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-          {rangeDisabled && (
-            <span>
-              (Change disabled for {rangeCountdown} s)
+      {/* Quote detail */}
+      {quote && (
+        <div className="summary-cards">
+          <div className="summary-card">
+            <span className="summary-label">Open</span>
+            <span className="summary-value">${quote.open.toFixed(2)}</span>
+          </div>
+          <div className="summary-card">
+            <span className="summary-label">Day range</span>
+            <span className="summary-value">
+              ${quote.low.toFixed(2)}–${quote.high.toFixed(2)}
             </span>
+          </div>
+          <div className="summary-card">
+            <span className="summary-label">Prev close</span>
+            <span className="summary-value">${quote.previous_close.toFixed(2)}</span>
+          </div>
+          <div className="summary-card">
+            <span className="summary-label">Volume</span>
+            <span className="summary-value">{quote.volume.toLocaleString()}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Company profile */}
+      {overview && overview.name && (
+        <div className="company-details">
+          <h4>About {overview.name}</h4>
+          {overview.description && <p>{overview.description}</p>}
+          {overview.sector && (
+            <p>
+              <strong>Sector:</strong> {overview.sector}
+            </p>
+          )}
+          {overview.industry && (
+            <p>
+              <strong>Industry:</strong> {overview.industry}
+            </p>
+          )}
+          {overview.exchange && (
+            <p>
+              <strong>Exchange:</strong> {overview.exchange}
+            </p>
+          )}
+          {overview.market_cap > 0 && (
+            <p>
+              <strong>Market cap:</strong> {compact(overview.market_cap)}
+            </p>
+          )}
+          {overview.pe_ratio > 0 && (
+            <p>
+              <strong>P/E ratio:</strong> {overview.pe_ratio.toFixed(2)}
+            </p>
+          )}
+          {overview.week52_high > 0 && (
+            <p>
+              <strong>52-week range:</strong> ${overview.week52_low.toFixed(2)}–$
+              {overview.week52_high.toFixed(2)}
+            </p>
           )}
         </div>
       )}
 
-      {/* Aggregated Data Section with Dropdown Toggle */}
-      {aggregatedData && aggregatedData.length > 0 && (
+      {/* Price history, loaded on demand so it only spends a request when asked */}
+      {quote && (
         <div className="aggregated-data">
-          <button onClick={() => setShowAggregatedData(!showAggregatedData)}>
-            {showAggregatedData
-              ? "Hide Aggregated Data"
-              : "Show Aggregated Data"}
+          <button onClick={() => setShowChart(!showChart)}>
+            {showChart ? "Hide Price History" : "Show Price History"}
           </button>
-          {showAggregatedData && (
+
+          {showChart && (
             <>
-              {/* Chart Display */}
-              <div className="chart-container" style={{ marginTop: "20px" }}>
-                <Line data={chartData} options={chartOptions} />
-              </div>
-              {/* Aggregated Data Table */}
-              <table>
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Open</th>
-                    <th>High</th>
-                    <th>Low</th>
-                    <th>Close</th>
-                    <th>Volume</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {aggregatedData.map((agg: any) => (
-                    <tr key={agg.t}>
-                      <td>
-                        {new Date(agg.t).toLocaleDateString()}
-                      </td>
-                      <td>{agg.o}</td>
-                      <td>{agg.h}</td>
-                      <td>{agg.l}</td>
-                      <td>{agg.c}</td>
-                      <td>{agg.v}</td>
-                    </tr>
+              <div className="range-selection">
+                <label htmlFor="range-select">Time range</label>
+                <select
+                  id="range-select"
+                  value={selectedRange}
+                  onChange={(e) => setSelectedRange(e.target.value)}
+                  disabled={barsLoading}
+                >
+                  {rangeOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
                   ))}
-                </tbody>
-              </table>
+                </select>
+                {barsLoading && <span>Loading…</span>}
+              </div>
+
+              {bars.length > 0 && (
+                <>
+                  <div className="chart-container">
+                    <Line data={chartData} options={chartOptions} />
+                  </div>
+                  <div className="table-wrap">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Date</th>
+                          <th>Open</th>
+                          <th>High</th>
+                          <th>Low</th>
+                          <th>Close</th>
+                          <th>Volume</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {bars.map((bar) => (
+                          <tr key={bar.t}>
+                            <td>{new Date(bar.t).toLocaleDateString()}</td>
+                            <td>{bar.o.toFixed(2)}</td>
+                            <td>{bar.h.toFixed(2)}</td>
+                            <td>{bar.l.toFixed(2)}</td>
+                            <td>{bar.c.toFixed(2)}</td>
+                            <td>{bar.v.toLocaleString()}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
+              {!barsLoading && bars.length === 0 && <p>No price history available.</p>}
             </>
           )}
         </div>
       )}
 
-      {/* Latest News */}
+      {/* News */}
       {news.length > 0 && (
         <div className="company-news">
           <h4>Latest News</h4>
           <ul>
-            {news.map((article) => (
-              <li key={article.id}>
-                <a
-                  href={article.article_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+            {news.map((article, i) => (
+              <li key={article.url || i}>
+                <a href={article.url} target="_blank" rel="noopener noreferrer">
                   {article.title}
                 </a>
-                <p>{new Date(article.published_utc).toLocaleString()}</p>
+                <p>
+                  {article.source}
+                  {article.published &&
+                    ` · ${new Date(article.published).toLocaleString()}`}
+                  {article.sentiment && ` · ${article.sentiment}`}
+                </p>
               </li>
             ))}
           </ul>

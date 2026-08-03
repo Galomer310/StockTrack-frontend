@@ -3,76 +3,75 @@ import axiosInstance from "../api/axiosInstance";
 import { useParams } from "react-router-dom"; // Import useParams to access route parameters
 import { Line } from "react-chartjs-2"; // Import Line chart component from react-chartjs-2
 import "chart.js/auto"; // Import auto-registration for Chart.js components
+import { SERIES } from "../charts/chartTheme";
 
-// Market data is proxied through our backend, which holds the Polygon API key.
+// Market data is proxied through our backend, which holds the Alpha Vantage key.
+const API = import.meta.env.VITE_BACKEND_API_URL;
 
-// Define the StockDetails functional component (note: file name is StackDetails.tsx but component is StockDetails)
 const StockDetails = () => {
   const { ticker } = useParams(); // Destructure the ticker parameter from the URL
-  const [companyInfo, setCompanyInfo] = useState<any>(null); // State for storing company information
-  const [chartData, setChartData] = useState<any>(null); // State for storing chart data
+  const [companyInfo, setCompanyInfo] = useState<any>(null); // Company profile
+  const [chartData, setChartData] = useState<any>(null); // Prepared chart data
+  const [error, setError] = useState("");
 
-  // useEffect hook to fetch company info and chart data when ticker changes
   useEffect(() => {
     const fetchStockDetails = async () => {
+      setError("");
       try {
-        // Fetch company information from Polygon API
-        const companyRes = await axiosInstance.get(
-          `${import.meta.env.VITE_BACKEND_API_URL}/stocks/${ticker}/details`
-        );
-        setCompanyInfo(companyRes.data.results); // Update companyInfo state with fetched data
+        // Company fundamentals
+        const companyRes = await axiosInstance.get(`${API}/stocks/${ticker}/details`);
+        setCompanyInfo(companyRes.data);
 
-        // Fetch aggregated chart data from Polygon API for a specific date range
+        // Last 30 days of daily bars, already in { t, o, h, l, c, v } form
         const chartRes = await axiosInstance.get(
-          `${import.meta.env.VITE_BACKEND_API_URL}/stocks/${ticker}/aggregates`,
-          {
-            params: {
-              multiplier: 1,
-              timespan: "day",
-              from: "2024-01-01",
-              to: "2024-02-01",
-            },
-          }
+          `${API}/stocks/${ticker}/aggregates`,
+          { params: { days: 30 } }
         );
-        // Prepare chart data object
+        const bars = chartRes.data.bars || [];
         setChartData({
-          labels: chartRes.data.results.map(
-            (entry: any) => new Date(entry.t).toLocaleDateString() // Convert timestamp to locale date string
-          ),
+          labels: bars.map((bar: any) => new Date(bar.t).toLocaleDateString()),
           datasets: [
             {
-              label: `${ticker} Stock Price`, // Label for the dataset
-              data: chartRes.data.results.map((entry: any) => entry.c), // Use closing prices as data points
-              borderColor: "red", // Set the line color to red
-              borderWidth: 2, // Set the line width
+              label: `${ticker} Stock Price`,
+              data: bars.map((bar: any) => bar.c),
+              borderColor: SERIES.gold,
+              backgroundColor: SERIES.goldFill,
+              borderWidth: 2,
+              fill: true,
+              tension: 0.3,
+              pointRadius: 0,
             },
           ],
         });
-      } catch (error) {
-        console.error("Error fetching stock details:", error); // Log error if fetching fails
+      } catch (err: any) {
+        // 429 means today's Alpha Vantage budget is spent
+        setError(
+          err.response?.status === 429
+            ? err.response.data?.error || "Daily market data limit reached."
+            : "Could not load stock details."
+        );
       }
     };
-    fetchStockDetails(); // Invoke the async function to fetch details
-  }, [ticker]); // Dependency array: re-run when ticker changes
+    fetchStockDetails();
+  }, [ticker]);
 
-  // Return the UI for the StockDetails page
   return (
-    <div>
-      {companyInfo && ( // If companyInfo is available, display it
+    <div className="investor-page">
+      {error && <p className="error">{error}</p>}
+      {companyInfo && (
         <div>
-          <img
-            src={`${companyInfo.branding?.logo_url}?format=png`} // Display company logo if available
-            alt="Company Logo" // Alt text for the image
-            width="100" // Set width of the image
-          />
           <h1>
-            {companyInfo.name} ({ticker}){" "}
-            {/* Display company name and ticker */}
+            {companyInfo.name} ({companyInfo.symbol})
           </h1>
+          {companyInfo.sector && <p className="investor-since">{companyInfo.sector}</p>}
+          {companyInfo.description && <p>{companyInfo.description}</p>}
         </div>
       )}
-      {chartData && <Line data={chartData} />}{" "}
-      {/* Render Line chart if chartData is available */}
+      {chartData && (
+        <div className="chart-container">
+          <Line data={chartData} />
+        </div>
+      )}
     </div>
   );
 };

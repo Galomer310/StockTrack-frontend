@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from "react"; // Import React, FC type, and useMemo hook
+import { FC, useMemo } from "react"; // Import the FC type and useMemo hook
 import { Line } from "react-chartjs-2"; // Import the Line chart component from react-chartjs-2
 import {
   Chart as ChartJS, // Import Chart.js core object

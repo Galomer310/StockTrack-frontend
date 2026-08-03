@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import axiosInstance from "../api/axiosInstance";
 import { RootState } from "../store";
-import { useNavigate } from "react-router-dom";
 
 // Import Chart.js and react-chartjs-2 components
 import { Line } from "react-chartjs-2";
@@ -31,7 +30,7 @@ ChartJS.register(
   Filler
 );
 
-const POLYGON_API_KEY = import.meta.env.VITE_POLYGON_API_KEY;
+// Market data is proxied through our backend, which holds the Polygon API key.
 
 // Define the available time range options.
 const rangeOptions = [
@@ -108,7 +107,6 @@ const StockSearch: React.FC = () => {
 
   const [showAggregatedData, setShowAggregatedData] = useState(false);
 
-  const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.auth.user);
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
 
@@ -144,7 +142,7 @@ const StockSearch: React.FC = () => {
       }
       try {
         const res = await axiosInstance.get(
-          `https://api.polygon.io/v1/marketstatus/now?apiKey=${POLYGON_API_KEY}`
+          `${import.meta.env.VITE_BACKEND_API_URL}/stocks/market-status`
         );
         if (res.data.market === "closed") {
           setMarketStatus(
@@ -225,7 +223,8 @@ const StockSearch: React.FC = () => {
       const toDate = today.toISOString().split("T")[0];
 
       const aggRes = await axiosInstance.get(
-        `https://api.polygon.io/v2/aggs/ticker/${query}/range/${multiplier}/${timespan}/${fromDate}/${toDate}?adjusted=true&apiKey=${POLYGON_API_KEY}`
+        `${import.meta.env.VITE_BACKEND_API_URL}/stocks/${query}/aggregates`,
+        { params: { multiplier, timespan, from: fromDate, to: toDate } }
       );
       if (aggRes.data.results && aggRes.data.results.length > 0) {
         setAggregatedData(aggRes.data.results);
@@ -257,7 +256,7 @@ const StockSearch: React.FC = () => {
 
       // 1. Fetch previous close aggregated data (basic stock info)
       const stockRes = await axiosInstance.get(
-        `https://api.polygon.io/v2/aggs/ticker/${query}/prev?adjusted=true&apiKey=${POLYGON_API_KEY}`
+        `${import.meta.env.VITE_BACKEND_API_URL}/stocks/${query}/prev`
       );
       if (stockRes.data.results && stockRes.data.results.length > 0) {
         setStockData(stockRes.data.results[0]);
@@ -268,19 +267,19 @@ const StockSearch: React.FC = () => {
 
       // 2. Fetch basic company info
       const companyRes = await axiosInstance.get(
-        `https://api.polygon.io/v3/reference/tickers/${query}?apiKey=${POLYGON_API_KEY}`
+        `${import.meta.env.VITE_BACKEND_API_URL}/stocks/${query}/details`
       );
       setCompanyInfo(companyRes.data.results);
 
       // 3. Fetch additional company details
       const companyDetailsRes = await axiosInstance.get(
-        `https://api.polygon.io/v1/meta/symbols/${query}/company?apiKey=${POLYGON_API_KEY}`
+        `${import.meta.env.VITE_BACKEND_API_URL}/stocks/${query}/company`
       );
       setCompanyDetails(companyDetailsRes.data);
 
       // 4. Fetch latest news articles
       const newsRes = await axiosInstance.get(
-        `https://api.polygon.io/v2/reference/news?ticker=${query}&apiKey=${POLYGON_API_KEY}`
+        `${import.meta.env.VITE_BACKEND_API_URL}/stocks/${query}/news`
       );
       setNews(newsRes.data.results);
 

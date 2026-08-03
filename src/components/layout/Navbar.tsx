@@ -1,10 +1,17 @@
 // frontend/src/components/Navbar.tsx
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../../store";
+import { clearUser } from "../../features/authSlice";
 import "../../style.css";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  // Current user from Redux; drives whether the Logout button is shown
+  const user = useSelector((state: RootState) => state.auth.user);
 
   // State to track if the Search Stocks link is disabled
   const [searchDisabled, setSearchDisabled] = useState(false);
@@ -57,6 +64,13 @@ const Navbar = () => {
     setDarkMode((prev) => !prev);
   };
 
+  // Handler for logging out: clear the session (which also removes the
+  // persisted copy in localStorage) and return to the landing page.
+  const handleLogout = () => {
+    dispatch(clearUser());
+    navigate("/");
+  };
+
   return (
     <nav className="navbar">
       <div className="navbar-brand">Investment Hub</div>
@@ -87,6 +101,14 @@ const Navbar = () => {
             {darkMode ? "Light Mode" : "Dark Mode"}
           </button>
         </li>
+        {user && (
+          <li>
+            {/* Logout button, only rendered while a session is active */}
+            <button onClick={handleLogout} className="logout-btn">
+              Logout
+            </button>
+          </li>
+        )}
       </ul>
     </nav>
   );

@@ -61,6 +61,22 @@ body {
   font-size: 1rem;                       /* Set font size for links */
 }
 
+.logout-btn {
+  background-color: #b5654a;             /* Warm tone to set it apart from the dark-mode toggle */
+  color: #fff;
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.logout-btn:hover {
+  background-color: #94513b;             /* Darken slightly on hover */
+}
+
 .toggle-dark-mode {
   background-color: #5a8cc3;
   color: #fff;                          

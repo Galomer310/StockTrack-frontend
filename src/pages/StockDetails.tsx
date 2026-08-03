@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom"; // Import useParams to access rout
 import { Line } from "react-chartjs-2"; // Import Line chart component from react-chartjs-2
 import "chart.js/auto"; // Import auto-registration for Chart.js components
 
-const POLYGON_API_KEY = import.meta.env.VITE_POLYGON_API_KEY; // Get the Polygon API key from environment variables
+// Market data is proxied through our backend, which holds the Polygon API key.
 
 // Define the StockDetails functional component (note: file name is StackDetails.tsx but component is StockDetails)
 const StockDetails = () => {
@@ -18,13 +18,21 @@ const StockDetails = () => {
       try {
         // Fetch company information from Polygon API
         const companyRes = await axiosInstance.get(
-          `https://api.polygon.io/v3/reference/tickers/${ticker}?apiKey=${POLYGON_API_KEY}`
+          `${import.meta.env.VITE_BACKEND_API_URL}/stocks/${ticker}/details`
         );
         setCompanyInfo(companyRes.data.results); // Update companyInfo state with fetched data
 
         // Fetch aggregated chart data from Polygon API for a specific date range
         const chartRes = await axiosInstance.get(
-          `https://api.polygon.io/v2/aggs/ticker/${ticker}/range/1/day/2024-01-01/2024-02-01?adjusted=true&apiKey=${POLYGON_API_KEY}`
+          `${import.meta.env.VITE_BACKEND_API_URL}/stocks/${ticker}/aggregates`,
+          {
+            params: {
+              multiplier: 1,
+              timespan: "day",
+              from: "2024-01-01",
+              to: "2024-02-01",
+            },
+          }
         );
         // Prepare chart data object
         setChartData({

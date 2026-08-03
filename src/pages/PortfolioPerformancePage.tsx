@@ -11,9 +11,6 @@ const PortfolioPerformancePage: React.FC = () => {
   const [latestPrices, setLatestPrices] = useState<{
     [symbol: string]: number;
   }>({}); // State for latest prices per stock
-  const [expandedSymbols, setExpandedSymbols] = useState<{
-    [symbol: string]: boolean;
-  }>({}); // State for expanded symbol groups (if needed)
   const user = useSelector((state: RootState) => state.auth.user); // Get the current user from Redux state
   const accessToken = useSelector((state: RootState) => state.auth.accessToken); // Get the access token from Redux state
 
@@ -105,34 +102,6 @@ const PortfolioPerformancePage: React.FC = () => {
       return profitLoss < 0 ? loss + profitLoss : loss; // Only add negative values (losses)
     }, 0);
   }, [watchlist, latestPrices]); // Recalculate if watchlist or latestPrices change
-
-  // useMemo hook to group watchlist items by stock symbol
-  const groupedStocks = useMemo(() => {
-    const groups: { [symbol: string]: WatchlistItem[] } = {}; // Initialize groups object
-    const groupOrder: string[] = []; // Array to preserve group order
-    watchlist.forEach((item) => {
-      // Loop over each watchlist item
-      if (!groups[item.stock_symbol]) {
-        // If group for the symbol doesn't exist
-        groups[item.stock_symbol] = []; // Create a new array for that symbol
-        groupOrder.push(item.stock_symbol); // Add the symbol to the order array
-      }
-      groups[item.stock_symbol].push(item); // Add the item to its group
-    });
-    // Return an array of objects with symbol and corresponding items, preserving order
-    return groupOrder.map((symbol) => ({
-      symbol,
-      items: groups[symbol],
-    }));
-  }, [watchlist]); // Recalculate if watchlist changes
-
-  // Function to toggle the expanded state for a given symbol group
-  const toggleGroup = (symbol: string) => {
-    setExpandedSymbols((prev) => ({
-      ...prev,
-      [symbol]: !prev[symbol], // Toggle the current expanded state for the symbol
-    }));
-  };
 
   // Return the performance page UI
   return (

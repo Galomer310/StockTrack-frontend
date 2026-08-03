@@ -11,6 +11,17 @@ const axiosInstance = axios.create({
   },
 });
 
+// Request interceptor: attach the current access token to every call. Every
+// request through this instance now targets our own backend, so this is safe —
+// no third-party host ever receives the token.
+axiosInstance.interceptors.request.use((config) => {
+  const { accessToken } = store.getState().auth;
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+  return config;
+});
+
 // Response interceptor: catch 403 errors and try to refresh the token
 axiosInstance.interceptors.response.use(
   (response) => response,

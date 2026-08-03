@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react"; // Import React and the useState and useEffect hooks
-import { clearUser } from "../features/authSlice"; // Import the clearUser action creator
+import { useState, useEffect } from "react"; // Import the useState and useEffect hooks
+import { clearUser, setUser } from "../features/authSlice"; // Import the clearUser and setUser action creators
 import { useSelector, useDispatch } from "react-redux"; // Import useSelector to access Redux state
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import { RootState } from "../store"; // Import RootState for type definitions
@@ -40,15 +40,24 @@ const UserPage = () => {
             body: JSON.stringify({ refreshToken }), // Send the refresh token in the body
           }
         );
-        if (response.ok) {
-          const data = await response.json();
-          console.log("New refresh token:", data.refreshToken);
-          // Optionally, update your state with the new refresh token
-          // Reset the timer for the next session as needed.
-          setShowRefreshAlert(false);
-        } else {
+        if (!response.ok) {
           throw new Error("Refresh failed");
         }
+        const data = await response.json();
+        // The endpoint returns both a new access token and a rotated refresh token.
+        if (!data.accessToken || !data.refreshToken || !user) {
+          throw new Error("Refresh response missing tokens");
+        }
+        // Store the new pair in Redux. Because the timer effect above depends on
+        // accessToken, this also re-arms the 60 minute countdown for the next session.
+        dispatch(
+          setUser({
+            user,
+            accessToken: data.accessToken,
+            refreshToken: data.refreshToken,
+          })
+        );
+        setShowRefreshAlert(false);
       } catch (error) {
         console.error("Error during refresh:", error);
         // If refresh fails, clear user state and redirect to login.

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react"; // Import React and necessary hooks
-import axios from "axios"; // Import axios for HTTP requests
+import axiosInstance from "../../api/axiosInstance"; // Shared axios instance (attaches auth token, handles refresh)
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js"; // Import Chart.js components
 
 // Register Chart.js components (if using a pie chart, for example)
@@ -47,7 +47,7 @@ const PortfolioPerformance: React.FC<PortfolioPerformanceProps> = ({
           // For each unique symbol
           try {
             // Make a GET request to fetch the latest price for the symbol
-            const response = await axios.get(
+            const response = await axiosInstance.get(
               `${import.meta.env.VITE_BACKEND_API_URL}/stocks/${symbol}`
             );
             // Parse and store the latest price

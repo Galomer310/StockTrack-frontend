@@ -5,12 +5,13 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate for naviga
 const Register = () => {
   const [email, setEmail] = useState(""); // State for storing the email input
   const [password, setPassword] = useState(""); // State for storing the password input
+  const [displayName, setDisplayName] = useState(""); // Public name shown on the leaderboard
   const navigate = useNavigate(); // Initialize navigate for redirection
 
   // Handler function for registration form submission
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault(); // Prevent default form submission behavior
-    const userData = { email, password }; // Prepare the user data object
+    const userData = { email, password, display_name: displayName }; // Prepare the user data object
     try {
       // Make a POST request to the register API endpoint
       const response = await fetch(
@@ -45,6 +46,14 @@ const Register = () => {
           <form onSubmit={handleRegister}>
             {" "}
             {/* Form submission triggers handleRegister */}
+            <input
+              type="text" // Public display name, shown to everyone on the leaderboard
+              placeholder="Display name (shown on the leaderboard)"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              maxLength={40}
+              required
+            />
             <input
               type="email" // Input field for email
               placeholder="Email" // Placeholder text

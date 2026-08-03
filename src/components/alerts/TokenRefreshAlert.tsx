@@ -26,31 +26,9 @@ const TokenRefreshAlert: React.FC<TokenRefreshAlertProps> = ({
   }, [onUserResponse]);
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100%",
-        zIndex: 9999,
-        display: "flex",
-        justifyContent: "center",
-        padding: "10px",
-        backgroundColor: "#fff",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: "600px",
-          width: "100%",
-          padding: "20px",
-          backgroundColor: "#ffeb3b",
-          textAlign: "center",
-          border: "1px solid #ccc",
-          borderRadius: "5px",
-        }}
-      >
+    <div className="session-alert-backdrop">
+      <div className="session-alert">
+        <span className="session-alert-label">Session expiring</span>
         <p>
           Your session will expire in {countdown} second
           {countdown !== 1 && "s"}. Click the button if you are still here.

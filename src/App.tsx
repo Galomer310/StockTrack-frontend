@@ -15,6 +15,9 @@ import StockSearch from "./pages/StockSearch"; // Import StockSearch page compon
 import ManualAddStock from "./pages/ManualAddStock"; // Import ManualAddStock page component
 import Navbar from "./components/layout/Navbar"; // Import Navbar component
 import PortfolioPerformancePage from "./pages/PortfolioPerformancePage"; // Import PortfolioPerformancePage component
+import Leaderboard from "./pages/Leaderboard"; // Public ranking of all investors
+import InvestorPortfolio from "./pages/InvestorPortfolio"; // Another investor's portfolio
+import ComparePortfolios from "./pages/ComparePortfolios"; // Side-by-side comparison
 
 // Define the main App functional component
 const App = () => {
@@ -49,6 +52,18 @@ const App = () => {
           element={
             user ? <PortfolioPerformancePage /> : <Navigate to="/login" /> // Render PortfolioPerformancePage if logged in, otherwise redirect to login
           }
+        />
+        <Route
+          path="/leaderboard"
+          element={user ? <Leaderboard /> : <Navigate to="/login" />} // Ranked list of all investors
+        />
+        <Route
+          path="/investor/:id"
+          element={user ? <InvestorPortfolio /> : <Navigate to="/login" />} // View one investor's portfolio
+        />
+        <Route
+          path="/compare/:id"
+          element={user ? <ComparePortfolios /> : <Navigate to="/login" />} // Compare yours against theirs
         />
       </Routes>
     </Router>

@@ -1,982 +1,915 @@
-/* Reset and Base Styles */
-/* Apply to all elements: remove default margin and padding, and set box-sizing to border-box */
-* {
-  margin: 0;                           /* Remove default margin from all elements */
-  padding: 0;                          /* Remove default padding from all elements */
-  box-sizing: border-box;              /* Include padding and border in an element’s total width and height */
+/* ===========================================================================
+   Investments - dark luxury design system
+   ---------------------------------------------------------------------------
+   Palette is sampled from the hero photography: near-black navy grounds,
+   brushed-gold accents, cool steel-blue secondaries. Everything is driven by
+   the tokens below, so re-theming means editing this block and nothing else.
+   =========================================================================== */
+
+:root {
+  /* Grounds, darkest to lightest */
+  --bg-base:        #080B11;   /* page */
+  --bg-surface:     #10151F;   /* cards, panels */
+  --bg-raised:      #171E2B;   /* hover states, table heads */
+  --bg-inset:       #0B0F17;   /* inputs, wells */
+
+  /* Hairlines */
+  --border:         #232C3C;
+  --border-strong:  #33405A;
+
+  /* Type */
+  --text:           #E9ECF3;
+  --text-muted:     #8D97AC;
+  --text-faint:     #5C6679;
+
+  /* Brushed gold - the single accent */
+  --gold:           #D6A344;
+  --gold-bright:    #EFC067;
+  --gold-deep:      #A97C28;
+  --gold-wash:      rgba(214, 163, 68, 0.10);
+  --gold-line:      rgba(214, 163, 68, 0.32);
+
+  /* Steel blue - secondary, used sparingly */
+  --steel:          #5B8CB8;
+  --steel-deep:     #2E4A66;
+
+  /* Semantic */
+  --gain:           #46C08A;
+  --loss:           #E05561;
+
+  /* Depth */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.55);
+  --glow-gold: 0 0 0 1px var(--gold-line), 0 8px 28px rgba(214, 163, 68, 0.16);
+
+  /* Geometry */
+  --radius-sm: 6px;
+  --radius:    10px;
+  --radius-lg: 16px;
+
+  --font-sans: 'Inter', 'Open Sans', -apple-system, BlinkMacSystemFont,
+               'Segoe UI', Roboto, sans-serif;
+  --font-num:  'SF Mono', 'Roboto Mono', 'Consolas', ui-monospace, monospace;
 }
-  
-/* Styles for the <body> element */
+
+/* Light variant, driven by the navbar toggle. Same structure, inverted grounds,
+   with the gold darkened so it stays legible on a pale surface. */
+body.light-mode {
+  --bg-base:        #F4F5F8;
+  --bg-surface:     #FFFFFF;
+  --bg-raised:      #EDEFF4;
+  --bg-inset:       #F8F9FB;
+  --border:         #DDE1E9;
+  --border-strong:  #C2C9D6;
+  --text:           #171C26;
+  --text-muted:     #5C6679;
+  --text-faint:     #8D97AC;
+  --gold:           #9A6F1C;
+  --gold-bright:    #B8892C;
+  --gold-deep:      #7A5714;
+  --gold-wash:      rgba(154, 111, 28, 0.08);
+  --gold-line:      rgba(154, 111, 28, 0.28);
+  --gain:           #17794A;
+  --loss:           #B3242F;
+  --shadow-md: 0 8px 24px rgba(20, 28, 44, 0.10);
+  --shadow-lg: 0 24px 60px rgba(20, 28, 44, 0.14);
+}
+
+/* ---------- Reset & base ---------- */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
 body {
-  font-family: 'Open Sans', sans-serif; /* Use "Open Sans" font with sans-serif fallback */
-  background: #f4f6f8;                    /* Set a light background color */
-  color: #333;                           /* Set default text color to a dark gray */
-  line-height: 1.6;                      /* Set line height for readability */
-  padding: 20px;                         /* Add some padding around the body content */
-  
+  font-family: var(--font-sans);
+  background: var(--bg-base);
+  color: var(--text);
+  line-height: 1.6;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Container for centralized content */
-.container {
-  max-width: 960px;                      /* Limit the container width to 960px */
-  margin: 0 auto;                        /* Center the container horizontally */
-  padding: 20px;                         /* Add padding inside the container */
-  
+/* Ambient gradient wash so the base never reads as flat black */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(60rem 40rem at 12% -10%, rgba(91, 140, 184, 0.10), transparent 60%),
+    radial-gradient(50rem 36rem at 92% 4%, rgba(214, 163, 68, 0.08), transparent 62%);
+}
+body.light-mode::before { opacity: 0.5; }
+
+#root { position: relative; z-index: 1; }
+
+h1, h2, h3, h4 { line-height: 1.25; letter-spacing: -0.015em; font-weight: 600; }
+h1 { font-size: clamp(2rem, 5vw, 3.25rem); }
+h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
+h3 { font-size: 1.2rem; }
+
+a { color: var(--gold); text-decoration: none; }
+a:hover { color: var(--gold-bright); }
+
+.container { max-width: 1120px; margin: 0 auto; padding: 20px; }
+
+.error {
+  color: var(--loss);
+  background: rgba(224, 85, 97, 0.08);
+  border: 1px solid rgba(224, 85, 97, 0.25);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.9rem;
+  margin: 0.75rem 0;
 }
 
-/* ---------- Navbar Styles ---------- */
-/* Styles for the navbar component (for example in frontend/src/components/Navbar.css) */
-.navbar {
-  display: flex;                         /* Use flexbox layout for the navbar */
-  justify-content: space-between;        /* Distribute space between navbar items */
-  align-items: center;                   /* Vertically center the navbar items */
-  background-color: #5C7285;               /* Set a dark blue-gray background color */
-  padding: 20px 20px;                    /* Add vertical and horizontal padding */
-  color: #fff;                   
-  border-radius: 5px;
-  width: 100%;        
-}
-
-.navbar-brand {
-  font-size: 1rem;                       /* Set font size for the brand/logo text */
-  font-weight: bold;                     /* Make the brand/logo text bold */
-}
-
-.navbar-links {
-  list-style: none;                      /* Remove default bullet points from list */
-  display: flex;                         /* Display links in a row using flexbox */
-  margin: 3px;                          
-  padding: 3px;                          
-  font-size: 1rem;
-  font-weight: bold;
-}
-
-.navbar-links li {
-  margin-left: 20px;                     /* Space each list item from the left */
-}
-
-.navbar-links li a {
-  color: #fff;                           /* Set link text color to white */
-  text-decoration: none;                 /* Remove underline from links */
-  font-size: 1rem;                       /* Set font size for links */
-}
-
-.logout-btn {
-  background-color: #b5654a;             /* Warm tone to set it apart from the dark-mode toggle */
-  color: #fff;
-  font-weight: bold;
-  font-size: 1rem;
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
+/* ---------- Buttons ---------- */
+/* Gold fill is the primary action. Everything else is a ghost so the accent
+   keeps its weight. */
+button {
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding: 0.6rem 1.15rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-raised);
+  color: var(--text);
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+              color 0.2s ease, transform 0.12s ease, box-shadow 0.2s ease;
+}
+button:hover { border-color: var(--gold-line); color: var(--gold-bright); }
+button:active { transform: translateY(1px); }
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  border-color: var(--border);
+  color: var(--text-faint);
 }
 
-.logout-btn:hover {
-  background-color: #94513b;             /* Darken slightly on hover */
+button[type="submit"],
+.btn-primary,
+.compare-btn,
+.manual-add-btn {
+  background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+  border-color: var(--gold-deep);
+  color: #17130A;
+}
+button[type="submit"]:hover,
+.btn-primary:hover,
+.compare-btn:hover,
+.manual-add-btn:hover {
+  background: linear-gradient(180deg, #F6CE7B, var(--gold-bright));
+  color: #17130A;
+  box-shadow: var(--glow-gold);
 }
 
-.toggle-dark-mode {
-  background-color: #5a8cc3;
-  color: #fff;                          
-  font-weight: bold;
-  font-size: 1rem;
-  padding: 10px;                      
-  border: none;                         
-  border-radius: 5px;                   
-  cursor: pointer;                       
-  transition: background-color 0.3s;     
+/* ---------- Forms ---------- */
+input, select {
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.85rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
+input::placeholder { color: var(--text-faint); }
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--gold-line);
+  box-shadow: 0 0 0 3px var(--gold-wash);
+}
+select option { background: var(--bg-surface); color: var(--text); }
 
-/* Responsive Navbar */
-/* Apply these styles when the viewport width is 768px or less */
-@media (max-width: 768px) {
+/* ---------- Navbar ---------- */
 .navbar {
-  flex-direction: column;              /* Stack navbar items vertically */
-  align-items: flex-start;             /* Align items to the start of the container */
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem clamp(1rem, 4vw, 2.5rem);
+  background: rgba(8, 11, 17, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  width: 100%;
 }
+body.light-mode .navbar { background: rgba(255, 255, 255, 0.82); }
 
-.navbar-links {
-  flex-direction: column;              /* Stack links vertically */
-  width: 100%;                         /* Make links container full width */
-}
-
-.navbar-links li {
-  margin: 10px 0;                      /* Add vertical margin between links */
+/* Hairline of gold under the bar - the signature detail */
+.navbar::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-line), transparent);
 }
 
 .navbar-brand {
-  font-size: 1.2rem;                   /* Increase brand font size slightly */
-  margin-bottom: 10px;                 /* Add space below the brand */
-}
-}
-
-/* ---------- Home Page ---------- */
-/* Ensure the container fills the entire viewport */
-.home-container {
-width: 100%;                             /* Full width */
-height: 120vh;                           /* Full viewport height */
-position: relative;                      /* Establish positioning context for absolute children */
-background-image: url('./images/stockMarketChart.jpg');  /* Set background image */
-background-size:cover;                  /* Ensure the image covers the entire container */
-background-position:top;             /* Center the background image */
-border-radius: 5px;
-
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, var(--gold-bright), var(--gold-deep));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  white-space: nowrap;
 }
 
-/* Hero section styling */
-.hero {
-position: relative;                      /* Allow positioning of inner elements */
-width: 100%;                             /* Full width */
-height: 100%;                            /* Full height of parent (.home-container) */
-}
-
-/* Full-screen background image */
-.hero-image {
-width: 100%;                             /* Full width */
-height: 100%;                            /* Full height */
-object-fit: cover;                       /* Cover the container without distortion */
-filter: brightness(0.7);                 /* Darken image for better text contrast */
-}
-
-/* Apply animation to hero overlay */
-.hero-overlay {
-position: absolute;                      /* Position absolutely within .hero */
-top: 50%;                                /* Position at 50% from the top */
-left: 50%;                               /* Position at 50% from the left */
-transform: translate(-50%, -50%);        /* Center the overlay exactly */
-text-align: center;                      /* Center-align text inside the overlay */
-color: #d30000;                          /* Set text color to a red hue */
-padding: 0 20px;                         /* Horizontal padding inside the overlay */
-animation: dynamic-color 10s infinite;   /* Apply an infinite color-changing animation over 10 seconds */
-}
-
-
-/* Paragraph style with dynamic color */
-.hero-overlay p {
-font-size: 1.5rem;                       /* Increase font size for readability */
-margin-bottom: 2rem;                     /* Space below the paragraph */
-text-align: left;                        /* Left-align the paragraph text */
-font-family: 'Courier New', Courier, monospace; /* Use a monospace font */
-font-weight: 900;                        /* Use a very bold weight */
-animation: dynamic-color 10s infinite;   /* Apply dynamic color animation */
-}
-
-/* Button container and individual button styling */
-.hero-buttons .btn {
-background-color: #007bff;               /* Set button background color (blue) */
-padding: 0.75rem 1.5rem;                 /* Vertical and horizontal padding */
-margin: 0 0.5rem;                        /* Horizontal margin between buttons */
-color: #fff;                             /* White text color */
-text-decoration: none;                   /* Remove underline from button text */
-border-radius: 4px;                      /* Rounded corners */
-transition: background-color 0.3s ease;  /* Smooth transition for background color on hover */
-font-size: 1rem;                         /* Set font size for button text */
-}
-
-.hero-buttons .btn:hover {
-background-color: #0056b3;               /* Darken button background on hover */
-}
-
-/* Responsive Hero Section */
-@media (max-width: 1024px) {
-.hero-overlay h1 {
-  font-size: 2.5rem;                     /* Slightly reduce heading font size for medium screens */
-}
-
-.hero-overlay p {
-  font-size: 1.3rem;                     /* Slightly reduce paragraph font size */
-}
-}
-
-@media (max-width: 768px) {
-.hero-overlay h1 {
-  font-size: 2rem;                       /* Further reduce heading font size for smaller screens */
-}
-
-.hero-overlay p {
-  font-size: 1.1rem;                     /* Further reduce paragraph font size */
-}
-
-.hero-buttons .btn {
-  padding: 0.6rem 1.2rem;                /* Reduce button padding */
-  font-size: 0.9rem;                     /* Reduce button font size */
-}
-}
-
-/* ---------- Authentication (Login & Register) ---------- */
-/* Full-page background for Login */
-.login-page {
-  background-image: url('./images/moneyPig.jpg'); /* Change to your login image path */
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-  min-height: 100vh;       /* Ensure it fills the viewport height */
+.navbar-links {
+  list-style: none;
   display: flex;
-  align-items: center;     /* Center the form vertically */
-  justify-content: center; /* Center the form horizontally */
-  border-radius: 5px;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  flex-wrap: wrap;
+}
+.navbar-links li { margin: 0; }
+
+.navbar-links li a,
+.navbar-links li > span {
+  display: inline-block;
+  padding: 0.45rem 0.8rem;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+.navbar-links li a:hover,
+.navbar-links li > span:hover { color: var(--text); background: var(--gold-wash); }
+
+.toggle-dark-mode, .logout-btn {
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.45rem 0.8rem;
+  background: transparent;
+}
+.logout-btn { border-color: rgba(224, 85, 97, 0.35); color: #E9A0A6; }
+.logout-btn:hover {
+  border-color: var(--loss);
+  color: #fff;
+  background: rgba(224, 85, 97, 0.16);
 }
 
-/* Full-page background for Register */
-.register-page {
-  background-image: url('./images/calcChart.jpg'); 
+/* ---------- Home / hero ---------- */
+.home-container {
+  position: relative;
+  width: 100%;
+  min-height: calc(100vh - 64px);
+  background-image:
+    linear-gradient(180deg, rgba(8, 11, 17, 0.55) 0%, rgba(8, 11, 17, 0.80) 55%, var(--bg-base) 100%),
+    url('./images/hero-network.jpg');
   background-size: cover;
-  background-repeat: no-repeat;
   background-position: center;
-  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 5px;
+  overflow: hidden;
 }
 
-/* Optional: Adjust the container styles if needed */
-.login-container,
-.register-container {
-  background: rgba(255, 255, 255, 0.9); /* Semi-transparent white to help the form stand out */
-  max-width: 400px;
-  margin: 20px;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
+.hero { position: relative; width: 100%; padding: clamp(2rem, 8vw, 6rem); }
 
-
-.login-container,
-.register-container {
-  background: #fff;                      /* White background for forms */
-  max-width: 400px;                      /* Limit width to 400px */
-  margin: 50px auto;                     /* Center horizontally with top/bottom margin */
-  padding: 30px;                         /* Padding inside the container */
-  border-radius: 8px;                    /* Rounded corners */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);/* Subtle shadow for depth */
-  
-}
-
-.login-container form,
-.register-container form {
-  display: flex;                         /* Use flexbox for form layout */
-  flex-direction: column;                /* Stack form elements vertically */
-}
-
-.login-container input,
-.register-container input {
-  padding: 10px;                         /* Padding inside input fields */
-  margin: 10px 0;                        /* Vertical margin between inputs */
-  border: 1px solid #ddd;                /* Light gray border */
-  border-radius: 4px;                    /* Rounded input corners */
-}
-
-.login-container button,
-.register-container button {
-  padding: 10px;                         /* Padding for buttons */
-  background: #007bff;                    /* Blue background color */
-  color: #fff;                           /* White text */
-  border: none;                          /* Remove border */
-  margin-top: 10px;                      /* Top margin */
-  cursor: pointer;                       /* Pointer cursor on hover */
-  border-radius: 4px;                    /* Rounded corners */
-  transition: background 0.3s ease;      /* Smooth background transition on hover */
-}
-
-.login-container button:hover,
-.register-container button:hover {
-  background: #53d2a3;                   /* Change button background on hover */
-}
-
-/* Responsive Authentication Forms */
-@media (max-width: 576px) {
-.login-container,
-.register-container {
-  max-width: 90%;                        /* Make form width responsive (90% of viewport) */
-  padding: 20px;                         /* Reduce padding for smaller screens */
-}
-
-.login-container input,
-.register-container input {
-  font-size: 0.9rem;                     /* Slightly reduce input font size */
-}
-
-.login-container button,
-.register-container button {
-  font-size: 0.9rem;                     /* Slightly reduce button font size */
-}
-}
-
-/* ---------- Stock Search Page ---------- */
-.stock-search {
-  /* Use a soft gradient background and increased padding */
-  background: rgb(255, 255, 255); 
-  padding: 30px;
-  border-radius: 10px;
-  margin: 20px auto;
-  max-width: 800px;
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
-  /* Use a modern font for the stock search section */
-  font-family: 'Roboto', sans-serif;
-}
-
-.stock-search h2 {
+.hero-overlay {
+  position: relative;
+  max-width: 720px;
+  margin: 0 auto;
   text-align: center;
-  margin: 20px;
-  font-family:'Times New Roman', Times, serif ;
-  font-size: 2rem;
-  background-color: #A7B49E;
-  color: white;
-  border-radius: 4px;
+  color: var(--text);
+  animation: rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.stock-search p {
-  margin: 20px;
-  font-size: 1.1rem;;
-  color: #333;
-}
-body.dark-mode .stock-search p{
-  color: white;
-}
-
-.stock-search input[type="text"],
-.stock-search input[type="number"] {
-
+/* Eyebrow rule above the buttons */
+.hero-overlay::before {
+  content: "PRIVATE MARKET INTELLIGENCE";
   display: block;
-  padding: 12px;
-  margin: 10px 5px;
-  width: calc(30% - 10px);
-  border-radius: 6px;
-  font-size: 1rem;
-  font-family: 'Roboto', sans-serif;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+  margin-bottom: 1.1rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.34em;
+  color: var(--gold);
+}
+.hero-overlay::after {
+  content: "";
+  display: block;
+  width: 64px;
+  height: 1px;
+  margin: 1.75rem auto 0;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
 }
 
-.stock-search button {
-  margin: 5px;
-  padding: 12px 24px;
-  background: #007bff;  
-  border: none;
-  color: #fff;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-  font-family: 'Roboto', sans-serif;
-  font-size: 1rem;
+.hero-overlay p {
+  font-size: clamp(1.05rem, 2.4vw, 1.4rem);
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+  text-align: center;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  letter-spacing: 0;
 }
 
-.stock-search button:hover {
-  background: #0056b3;
+.hero-buttons { display: flex; gap: 0.9rem; justify-content: center; flex-wrap: wrap; }
+
+.hero-buttons .btn {
+  display: inline-block;
+  padding: 0.85rem 2rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid var(--gold-deep);
+  background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+  color: #17130A;
+  transition: box-shadow 0.25s ease, transform 0.15s ease;
+}
+.hero-buttons .btn:hover { box-shadow: var(--glow-gold); transform: translateY(-1px); color: #17130A; }
+
+/* Second CTA reads as the quiet option */
+.hero-buttons .btn:last-child {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--border-strong);
+  color: var(--text);
+  backdrop-filter: blur(6px);
+}
+.hero-buttons .btn:last-child:hover {
+  border-color: var(--gold-line);
+  color: var(--gold-bright);
+  background: var(--gold-wash);
 }
 
-.stock-search .market-status {
-  margin-top: 10px;
-  color: #d9534f; /* Bootstrap's danger red */
-  font-weight: bold;
+@keyframes rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: none; }
 }
 
-.stock-search .error {
-  margin-top: 10px;
-  color: #dc3545;
-  font-weight: bold;
+/* ---------- Auth pages ---------- */
+/* Split layout: photography on one side, a floating glass card on the other. */
+.login-page, .register-page {
+  min-height: calc(100vh - 64px);
+  display: grid;
+  place-items: center;
+  padding: 2rem 1rem;
+  background-size: cover;
+  background-position: center;
+}
+.login-page {
+  background-image:
+    linear-gradient(105deg, rgba(8, 11, 17, 0.94) 0%, rgba(8, 11, 17, 0.72) 55%, rgba(8, 11, 17, 0.55) 100%),
+    url('./images/auth-dashboard.jpg');
+}
+.register-page {
+  background-image:
+    linear-gradient(105deg, rgba(8, 11, 17, 0.94) 0%, rgba(8, 11, 17, 0.72) 55%, rgba(8, 11, 17, 0.55) 100%),
+    url('./images/auth-datastream.jpg');
 }
 
+.login-container, .register-container {
+  width: min(420px, 100%);
+  padding: clamp(1.75rem, 4vw, 2.5rem);
+  background: rgba(16, 21, 31, 0.86);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+body.light-mode .login-container,
+body.light-mode .register-container { background: rgba(255, 255, 255, 0.92); }
 
-/* ---------- Company Info Section ---------- */
-.company-info {
-  display: flex;                        
-  align-items:start;                  
-  margin: 20px 0;                      
-  padding: 15px;                        
-  background-color: #A7B49E;
-  border-radius: 4px;                   /* Rounded corners */
-  font-family:'Times New Roman', Times, serif ;
-  font-size: 1.5rem;
-  color: white;
-  font-weight: bold;
-  justify-content: center;
+.login-container::before, .register-container::before {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  margin-bottom: 0.4rem;
 }
+.login-container::before { content: "WELCOME BACK"; }
+.register-container::before { content: "OPEN AN ACCOUNT"; }
 
-/* company name header search stock */
-.company-info h3 {
- padding: 10px;                       
-}
-.company-info h3:hover {
-  background-color: rgba(255, 255, 255);
-  transform: scale(1.1);
-  transition: 0.25s ease;
-  border-radius: 5px;
-  color: #A7B49E;
-  padding: 15px;
-}
-/* company industry header search stock */
-.company-info p {
+.login-container form, .register-container form {
   display: flex;
-  flex-wrap: wrap;
-  color: white;                   
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 1.25rem 0 0.9rem;
 }
-.company-info p:hover {
-  transform: scale(1.10);
-  transition: 0.25s ease;
-  border-radius: 5px;
-  color: white;
-  background-color: skyblue;
-  padding: 15px;
+.login-container input, .register-container input { width: 100%; }
+.login-container button, .register-container button { width: 100%; }
 
+/* The secondary link-style button under each form */
+.login-container > button:last-child,
+.register-container > button:last-child {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-muted);
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
 }
-
-/* ---------- Stock Info Section ---------- */
-.stock-info {
-  margin: 20px 0;                       /* Vertical margin */
-  padding: 15px;                        /* Padding inside the container */
-  background: #f8f9fa;                  /* Light background color */
-  border-radius: 4px;                   /* Rounded corners */
-}
-body.dark-mode .stock-info {
-  background-color: #3f3f3f;
-  border: 1px solid black;
-}
-body.dark-mode .stock-info h3 {
-  color: white;
-  padding: 10px;
+.login-container > button:last-child:hover,
+.register-container > button:last-child:hover {
+  color: var(--gold-bright);
+  background: transparent;
 }
 
-.stock-info h3 {
-  margin-bottom: 10px;   
-  color: #008000b3; 
-}
-
-.stock-info p {
-  margin-bottom: 5px;                   /* Space below paragraphs */
-}
-.range-selection {
-  padding: 10px;
-  background-color: #A7B49E;
-  color: white;
-  text-align: center;
-  font-weight: bold;
-  font-size: 1.5rem;
-  font-family:'Times New Roman', Times, serif ;
-  border-radius: 4px;
-}
-
-#range-select {
-  font-size: 1rem;
-  padding: 5px;
-  margin: 5px;
-  border-radius: 4px;
-}
-
-/* ---------- Additional Company Details ---------- */
-.company-details {
-  padding: 15px;                        /* Padding inside the container */
-  border-radius: 4px;                   /* Rounded corners */
-  margin-bottom: 20px;                  /* Space below the section */
-}
-
-.company-details h4 {
-  margin-bottom: 10px;                  /* Space below the heading */
-  color: #A7B49E;
-  font-weight: bold;
-}
-
-
-.company-details p {
-  margin-bottom: 5px;                   /* Space below paragraphs */
-}
-
-/* ---------- Company News Section ---------- */
-.company-news {
-  margin: 20px 0;                       /* Vertical margin */
-  border-radius: 4px;                   /* Rounded corners */
-  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1); /* Shadow for depth */
-  padding: 5px;
-}
-
-.company-news h4 {
-  margin-bottom: 10px;                  /* Space below the heading */
-  text-align: center;
-  font-size: 1.5rem;
-  background-color: #A7B49E;
-  border-radius: 4px;
-  color: white;
-  font-family:'Times New Roman', Times, serif ;
-
-}
-
-.company-news ul {
-  list-style: none;                     /* Remove bullet points */
-  padding-left: 0;                      /* Remove default padding */
-}
-
-.company-news li {
-  margin-bottom: 10px;                  /* Space between news items */
-  border-bottom: 1px solid #f3f3f3;        /* Light bottom border */
-  font-weight: bold;
-  padding: 2px;
-}
-.company-news li:hover {
-  background-color: hsla(228, 73%, 75%, 0.2);
-  transform: scale(0.99);
-  transition: 0.1s ease;
-  padding: 5px;
-  border-radius: 10px;
-}
-
-.company-news a {
-  color: #007bff;                       /* Blue color for links */
-  text-decoration: none;                /* Remove underline */
-}
-
-.company-news a:hover {
-  text-decoration: underline;           /* Underline links on hover */
-}
-
-.aggregated-data {
-  padding: 15px;                       
-}
-/* the  Aggregated chart  */
-.chart-container :hover{
-  background-color: rgba(255, 255, 255, 0.1);
-  transform: scale(1.10);
-  border: 1px solid rgb(190, 190, 190);
-  transition: 0.25s ease;
-  border-radius: 5px;
-}
-
-
-
-
-/* ---------- User Dashboard ---------- */
-.user-page-container {
-  max-width: 800px;                     /* Limit container width */
-  margin: 20px auto;                    /* Center container with vertical margins */
-  padding: 20px;                        /* Padding inside the container */
-  text-align: center;
-  color:#2f4a66;
-  font-family:Arial, Helvetica, sans-serif;
+/* ---------- Page shells ---------- */
+.user-page-container,
+.portfolio-performance-page,
+.stock-search,
+.manual-add-stock,
+.leaderboard-page,
+.investor-page,
+.compare-page {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: clamp(1.25rem, 3vw, 2.25rem);
 }
 
 .dashboard-info {
-  margin-bottom: 20px;                  
-  font-size: 1.5rem;
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
 }
-/* ---------- Watchlist ---------- */
-.watchlist {
-  background: #fff;                     /* White background */
-  border-radius: 8px;                   /* Rounded corners */
-  padding: 20px;                        /* Padding inside the container */
-  margin: 20px auto;                    /* Center container with vertical margins */
-  box-shadow: 0 7px 6px rgba(0, 0, 0, 0.1); /* Shadow for depth */
-  border: 1px solid #ccc;               
-}
-
-.watchlist h3 {
-  margin-bottom: 10px;                  /* Space below the heading */
+.dashboard-info h1 {
+  font-size: clamp(1.6rem, 3.5vw, 2.25rem);
+  background: linear-gradient(120deg, var(--text) 25%, var(--gold-bright));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
-.watchlist h4 {
-  margin-bottom: 15px;                  /* Space below subheadings */
+/* Section headings get a small gold tick */
+.portfolio-performance h3,
+.investor-page h3,
+.compare-page h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 1.75rem 0 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.portfolio-performance h3::before,
+.investor-page h3::before,
+.compare-page h3::before {
+  content: "";
+  width: 18px; height: 2px;
+  background: var(--gold);
+  border-radius: 2px;
 }
 
-.watchlist ul {
-  list-style: none;                     /* Remove bullet points */
-  padding: 0;                           /* Remove default padding */
+.portfolio-performance-page h2 {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
 }
-
-.watchlist li {
-  display: flex;                        /* Use flexbox for row layout */
-  justify-content: space-between;       /* Distribute space between columns */
-  align-items: center;                  /* Vertically center items */
-  border-bottom: 1px solid #ddd;        
-  padding: 10px 0;                     
-}
-
-.watchlist li:last-child {
-  border-bottom: none;                  /* Remove border from the last item */
-}
-
-/* ---------- Edit Mode for Watchlist Items ---------- */
-.watchlist input[type="number"],
-.watchlist input[type="datetime-local"] {
-  padding: 5px;                         /* Padding for input fields */
-  margin: 5px 0;                        /* Vertical margin */
-  border: 1px solid #ddd;               /* Light border */
-  border-radius: 4px;                   /* Rounded corners */
-  width: 100%;                          /* Full width */
-}
-
-.watchlist button {
-  background: #ffc107;                  /* Amber background for action buttons */
-  border: none;                         /* Remove border */
-  color: #fff;                          /* White text */
-  padding: 5px 10px;                    /* Padding for buttons */
-  border-radius: 4px;                   /* Rounded corners */
-  cursor: pointer;                      /* Pointer cursor on hover */
-  margin-left: 5px;                     /* Left margin for spacing */
-  transition: background 0.3s ease;     /* Smooth background transition */
-}
-
-.watchlist button:hover {
-  background: #e78127;                  /* Darken background on hover */
-}
-
-/* ---------- Watchlist Table Styles ---------- */
-/* Watchlist table container */
-
-.watchlist-row {
-display: flex;                           /* Use flexbox for row layout */
-align-items: center;                     /* Vertically center items */
-padding: 12px 16px;                      /* Padding for each row */
-border-bottom: 1px solid #e0e0e0;         /* Light bottom border */
-background-color: #ffffff;               /* White background */
-transition: background-color 0.3s ease;  /* Smooth background change on hover */
-font-family:Arial, Helvetica, sans-serif;    
-font-size: 14px;                         
-color: rgb(0, 128, 0, 0.7);                        
-border: 2px solid #ccc;
-}
-
-/* Change background on hover for watchlist rows */
-.watchlist-row:hover {
-background-color: #f8f9fa;               /* Light background when hovered */
-}
-
-/* Each child div inside the watchlist row */
-.watchlist-row div {
-flex: 1;                               /* Default flex value for equal spacing */
-padding: 0 8px;                        /* Horizontal padding */
-}
-
-/* Style for the ticker column; narrower and bold */
-.watchlist-row .ticker {
-flex: 0.5;                             /* Narrower column */
-font-weight: 600;                      /* Bold text */
-}
-
-/* Right-align numeric or date fields */
-.watchlist-row .price,
-.watchlist-row .quantity,
-.watchlist-row .added {
-text-align: right;                     
-color: #5f6368;                        
-}
-
-/* Actions column (buttons) styling */
-.watchlist-row .actions {
-flex: 1;                              /* Take equal space */
-text-align: right;                    /* Right-align content */
-}
-
-/* Optional: Style for editing mode in watchlist rows */
-.watchlist-row.editing {
-background-color: #fff7e6;             /* Light yellow background when editing */
-}
-
-.watchlist-row.editing input[type="number"],
-.watchlist-row.editing input[type="datetime-local"] {
-width: 100%;                          /* Full width for input fields */
-padding: 4px;                         /* Padding for inputs */
-font-size: 14px;                      /* Font size for inputs */
-border: 1px solid #ccc;               /* Border for inputs */
-border-radius: 4px;                   /* Rounded corners for inputs */
-}
-
-/* ---------- Global Button Styles ---------- */
-button {
-  padding: 10px 20px;                   /* Padding for all buttons */
-  background: #007bff;                  /* Blue background for buttons */
-  color: #fff;                          /* White text */
-  border: none;                         /* Remove border */
-  border-radius: 4px;                   /* Rounded corners */
-  cursor: pointer;                      /* Pointer cursor on hover */
-}
-
-/* ---------- Responsive Styles ---------- */
-/* Adjust stock search input widths on smaller screens */
-@media (max-width: 768px) {
-  .stock-search input[type="text"],
-  .stock-search input[type="number"] {
-    width: calc(100% - 20px);           /* Full width minus margins */
-    margin: 10px 0;                    /* Vertical margin */
-  }
-}
-
-/* Example styles for the portfolio performance table */
-.portfolio-performance {
-margin: 20px auto;                     /* Center with vertical margins */
-max-width: 800px;                      /* Limit width */
-background: #fff;                      /* White background */
-padding: 20px;                         /* Padding inside the container */
-border-radius: 8px;                    /* Rounded corners */
-box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-
-}
-
-.portfolio-performance h3 {
-text-align: center;                    /* Center-align heading */
-margin-bottom: 20px;                   /* Space below heading */
-}
-
-.portfolio-performance table {
-width: 100%;                           /* Full width table */
-border-collapse: collapse;             /* Collapse borders */
-}
-
-.portfolio-performance th,
-.portfolio-performance td {
-padding: 10px;                         /* Padding for table cells */
-text-align: center;                    
-box-shadow: 1px 1px 1px #2f4a66; /* Subtle shadow */
-}
-
-.portfolio-performance th {
-background-color: #f1f3f4;             /* Light gray background for table header */
-}
-
-
-.portfolio-performance-page h2{
-  text-align: center;
-  padding: 5px;
-  margin: 10px;
-}
-
-.portfolio-performance-page p {
-  text-align: center;
-  padding: 5px;
-  margin: 10px;
-  font-size: 1.2rem;
-  font-weight: bold;
-}
-
-#h2Gain{
-  color: green;
-}
-#h2Lost{
-  color: red;
-}
-.watchlist {
-  background-color: rgb(255, 255, 255);
-}
-body.dark-mode .watchlist {
-  background-color: #3f3f3f;
-  border: 1px solid black;
-}
-/* Styles for the watchlist header row */
-.watchlist-header {
-display: flex;                     
-align-items: center;                   /* Vertically center items */
-padding: 12px 16px;                    /* Padding for the header row */
-background-color: #f1f3f4;               /* Light gray background */
-border-bottom: 2px solid #ccc;         /* Darker bottom border for separation */
-font-weight: bold;                     /* Bold text */
-font-size: 14px;                       /* Font size */
-border: 2px solid #ccc;
-border-radius: 4px;
-
-}
-
-/* Each column in the header */
-.watchlist-header > div {
-flex: 1;                               /* Equal spacing for each header column */
-text-align: center;                    /* Center text */
-cursor: pointer;                       /* Indicate that columns are clickable (for sorting) */
-}
-
-/* Ticker column: narrower and left-aligned */
-.watchlist-header .ticker {
-flex: 0.7;                             /* Narrower column */
-text-align: left;                      /* Left-align text */
-padding-left: 8px;                     /* Left padding */
-color: black;
-
-}
-
-/* Price column: right-aligned for numbers */
-.watchlist-header .price {
-flex: 1;                               /* Standard flex size */
-text-align: right;                     /* Right-align text */
-padding-right: 8px;                    /* Right padding */
-color: black;
-
-}
-
-/* Quantity column: right-aligned */
-.watchlist-header .quantity {
-flex: 1;                               /* Standard flex size */
-text-align: right;                     /* Right-align text */
-padding-right: 8px;                    /* Right padding */
-color: black;
-
-}
-
-/* Added column: slightly wider and right-aligned */
-.watchlist-header .added {
-flex: 1.2;                             /* Slightly more space */
-text-align: right;                     /* Right-align text */
-padding-right: 8px;                    /* Right padding */
-color: black;
-
-}
-
-/* Actions column: center-aligned */
-.watchlist-header .actions {
-flex: 1;                               /* Standard flex size */
-text-align: center;                    /* Center text */
-color: black;
-
-}
-.watchlist-group {
-  cursor: pointer;
-  padding: 0.5rem;
-  background-color: white;
-  text-align: left;
-  font-family:sans-serif;
-  font-weight: bold;
-  border: 2px solid #ccc;
-  border-radius: 4px;
-  color: black;
-}
-
-.group-header {
-  cursor: pointer;
-  padding: 0.5rem;
-  background-color: white;
-  text-align: left;
-  font-family:sans-serif;
-  font-weight: bold;
-}
-
-
-/* Style for Manual add stock page */
-.manual-add-stock {
-max-width: 600px;                      /* Limit width */
-margin: 40px auto;                     /* Center with vertical margins */
-padding: 20px;                         /* Padding inside container */
-border-radius: 10px;                   /* Rounded corners */
-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow for depth */
-background-color: #f9f9f9;             /* Light gray background */
-font-family: Arial, sans-serif;        /* Use Arial font */
-}
-
-.manual-add-stock h2 {
-text-align: center;                    /* Center-align heading */
-color: #333;                           /* Dark text color */
-margin-bottom: 20px;                   /* Space below heading */
-font-size: 24px;                       /* Font size */
-font-weight: bold;                     /* Bold text */
-}
-
-.manual-add-stock .error {
-color: red;                            /* Red text for errors */
-font-weight: bold;                     /* Bold error text */
-text-align: center;                    /* Center-align error message */
-margin-bottom: 10px;                   /* Space below error message */
-}
+.portfolio-performance-page h2 span { color: var(--text); font-weight: 700; }
+#h2Gain { color: var(--gain); }
+#h2Lost { color: var(--loss); }
 
 .manual-add-stock form {
-display: flex;                         /* Use flexbox for form layout */
-flex-direction: column;                /* Stack form elements vertically */
-gap: 15px;                             /* Gap between form elements */
-}
-
-.manual-add-stock input {
-padding: 12px;                         /* Padding for input fields */
-font-size: 16px;                       /* Font size for input text */
-border: 1px solid #ccc;                /* Light border for inputs */
-border-radius: 6px;                    /* Rounded corners for inputs */
-outline: none;                         /* Remove default outline */
-transition: border-color 0.3s;         /* Smooth transition for border-color on focus */
-}
-
-.manual-add-stock input:focus {
-border-color: #007bff;                 /* Change border color when input is focused */
-box-shadow: 0 0 4px rgba(0, 123, 255, 0.5); /* Add a subtle blue glow on focus */
-}
-
-.manual-add-stock button {
-padding: 12px;                         /* Padding for button */
-font-size: 16px;                       /* Font size for button text */
-font-weight: bold;                     /* Bold text */
-color: white;                          /* White text color */
-background-color: #007bff;             /* Blue background color */
-border: none;                         /* Remove border */
-border-radius: 6px;                    /* Rounded corners */
-cursor: pointer;                       /* Pointer cursor on hover */
-transition: background-color 0.3s;     /* Smooth background transition on hover */
-}
-
-.manual-add-stock button:hover {
-background-color: #0056b3;             /* Darken background on hover */
-}
-.manual-add-btn {
-  background-color: rgb(164, 64, 97);
-}
-
-.manual-add-btn:hover {
-  transform: scale(1.1);
-  transition: 0.5s ease;
-  background-color: #e78127;
-}
-/* Image Section for Manual Add Stock Page */
-.manual-add-stock-image {
-text-align: center;                    /* Center-align image container */
-margin-bottom: 20px;                   /* Space below the image */
-}
-
-.manual-add-stock-image img {
-max-width: 100%;                       /* Image should not exceed container width */
-height: auto;                          /* Maintain image aspect ratio */
-border-radius: 8px;                    /* Rounded image corners */
-}
-
-
-
-/* Dark Mode Styles */
-body.dark-mode {
-  background-color: #121212 ;
-  color: #ffffff ;
-}
-
-/* Dark mode adjustments for common elements */
-body.dark-mode .navbar {
-  background-color: #1f1f1f ;
-}
-
-body.dark-mode .navbar-links li a {
-  color: #e0e0e0 ;
-}
-
-body.dark-mode .stock-search,
-body.dark-mode .portfolio-performance,
-body.dark-mode .user-page-container {
-  background-color: #1e1e1e ;
-  color: #e0e0e0 ;
-}
-
-/* Optional: adjust buttons and table headers for dark mode */
-body.dark-mode button {
-  background-color: #58a375 ;
-  color: #e0e0e0 ;
-}
-
-body.dark-mode th {
-  background-color: #333 ;
-}
-
-
-/* overlay UserPage */
-/* style.css */
-.welcome-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
-  color: white;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  font-size: 20px;
+  gap: 0.75rem;
+  max-width: 420px;
+  margin-top: 1.25rem;
+  padding: 1.5rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
 }
+
+/* ---------- Cards & tables ---------- */
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.9rem;
+  margin: 1.5rem 0;
+}
+
+.summary-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1.15rem 1.25rem;
+  background: linear-gradient(160deg, var(--bg-surface), var(--bg-base));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+.summary-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold), transparent);
+  opacity: 0.7;
+}
+.summary-card:hover { border-color: var(--gold-line); transform: translateY(-2px); }
+
+.summary-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.summary-value { font-size: 1.5rem; font-weight: 700; font-family: var(--font-num); }
+
+table, .holdings-table, .compare-table, .aggregated-data table, .portfolio-performance table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 0.85rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  font-size: 0.92rem;
+}
+
+th {
+  background: var(--bg-raised);
+  color: var(--text-muted);
+  text-align: left;
+  padding: 0.8rem 0.9rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  cursor: pointer;
+}
+th:hover { color: var(--gold-bright); }
+
+td {
+  padding: 0.75rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr { transition: background-color 0.15s ease; }
+tbody tr:hover { background: var(--gold-wash); }
+
+.gain { color: var(--gain); }
+.loss { color: var(--loss); }
+
+/* ---------- Watchlist ---------- */
+.watchlist {
+  margin-top: 1.25rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.watchlist-header, .watchlist-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 0.7fr 1.4fr 1.4fr;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.watchlist-row:last-child { border-bottom: none; }
+
+.watchlist-header {
+  background: var(--bg-raised);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.watchlist-header > div { cursor: pointer; transition: color 0.2s ease; }
+.watchlist-header > div:hover { color: var(--gold-bright); }
+
+.watchlist-row { transition: background-color 0.15s ease; }
+.watchlist-row:hover { background: var(--gold-wash); }
+.watchlist-row.editing { background: rgba(91, 140, 184, 0.10); }
+.watchlist-row .ticker { font-weight: 700; letter-spacing: 0.04em; }
+.watchlist-row .price,
+.watchlist-row .quantity { font-family: var(--font-num); }
+.watchlist-row .added { color: var(--text-muted); font-size: 0.85rem; }
+.watchlist-row .actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.watchlist-row .actions button { padding: 0.35rem 0.7rem; font-size: 0.78rem; }
+.watchlist-row input { padding: 0.35rem 0.5rem; width: 100%; font-size: 0.85rem; }
+
+.group-header {
+  padding: 0.7rem 1rem;
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--border);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.group-header:hover { background: var(--gold-wash); color: var(--gold-bright); }
+
+.manual-add-btn { margin-top: 1.25rem; }
+
+/* ---------- Leaderboard ---------- */
+.leaderboard-page h2 { margin-bottom: 0.25rem; }
+
+.leaderboard-subtitle, .investor-since, .compare-note {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 1.25rem;
+}
+
+.leaderboard-table {
+  margin-top: 1.25rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.leaderboard-row {
+  display: grid;
+  grid-template-columns: 3rem 1fr 6rem 9rem 9.5rem 11rem;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.1rem;
+  border-bottom: 1px solid var(--border);
+  transition: background-color 0.15s ease;
+}
+.leaderboard-row:last-child { border-bottom: none; }
+.leaderboard-row:not(.leaderboard-head):hover { background: var(--gold-wash); }
+
+.leaderboard-head {
+  background: var(--bg-raised);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Your own row is marked with a gold edge rather than a fill */
+.leaderboard-row.is-me {
+  background: var(--gold-wash);
+  box-shadow: inset 3px 0 0 var(--gold);
+}
+
+.lb-rank { font-family: var(--font-num); font-weight: 700; color: var(--text-faint); }
+.leaderboard-row:nth-child(2) .lb-rank { color: var(--gold); font-size: 1.05rem; }
+.lb-name { font-weight: 600; }
+.lb-holdings, .lb-value { font-family: var(--font-num); color: var(--text-muted); }
+
+.lb-you {
+  margin-left: 0.5rem;
+  padding: 0.12rem 0.5rem;
+  border-radius: 999px;
+  background: var(--gold-wash);
+  border: 1px solid var(--gold-line);
+  color: var(--gold-bright);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.lb-return { display: flex; flex-direction: column; font-family: var(--font-num); font-weight: 700; }
+.lb-profit { font-size: 0.76rem; font-weight: 400; color: var(--text-faint); }
+.lb-actions { display: flex; gap: 0.4rem; }
+.lb-actions button { padding: 0.4rem 0.8rem; font-size: 0.76rem; }
+
+/* ---------- Investor & compare ---------- */
+.back-btn {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  margin-bottom: 1.25rem;
+}
+.back-btn:hover { color: var(--gold-bright); border-color: var(--gold-line); }
+
+.investor-page h2, .compare-page h2 { margin-bottom: 0.2rem; }
+
+.compare-verdict {
+  display: inline-block;
+  padding: 0.7rem 1.1rem;
+  margin: 0.5rem 0 1.5rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid currentColor;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+
+.compare-label { font-weight: 600; color: var(--text-muted); }
+.compare-winner { font-weight: 700; color: var(--gold-bright); }
+.compare-shared { background: rgba(91, 140, 184, 0.07); }
+
+.compare-badge {
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(91, 140, 184, 0.18);
+  border: 1px solid rgba(91, 140, 184, 0.4);
+  color: var(--steel);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ---------- Stock search ---------- */
+.stock-search > p { color: var(--text-muted); font-size: 0.92rem; }
+.stock-search > input { margin: 1rem 0.5rem 1rem 0; min-width: 240px; }
+
+.market-status {
+  padding: 0.7rem 1rem;
+  margin: 1rem 0;
+  background: var(--gold-wash);
+  border: 1px solid var(--gold-line);
+  border-radius: var(--radius-sm);
+  color: var(--gold-bright);
+  font-weight: 500;
+}
+
+.company-info, .company-details, .company-news, .stock-info, .range-selection {
+  margin-top: 1.25rem;
+  padding: 1.25rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.company-info h3, .stock-info h3 { color: var(--text); }
+.company-details p, .company-info p { color: var(--text-muted); }
+.company-details strong { color: var(--text); }
+
+.stock-info { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+.stock-info h3 { flex: 1 1 100%; font-family: var(--font-num); }
+.stock-info input { width: 8rem; }
+
+.company-news ul { list-style: none; display: grid; gap: 0.75rem; margin-top: 0.75rem; }
+.company-news li {
+  padding: 0.85rem 1rem;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.2s ease;
+}
+.company-news li:hover { border-color: var(--gold-line); }
+.company-news li p { color: var(--text-faint); font-size: 0.8rem; margin-top: 0.25rem; }
+
+.range-selection { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.range-selection label {
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--text-muted);
+}
+.range-selection span { color: var(--text-faint) !important; font-size: 0.85rem; }
+
+.aggregated-data { margin-top: 1.5rem; }
+.chart-container {
+  padding: 1.25rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .leaderboard-row { grid-template-columns: 2.25rem 1fr 8.5rem; grid-row-gap: 0.5rem; }
+  .lb-holdings, .lb-value { display: none; }
+  .lb-actions { grid-column: 1 / -1; }
+  .watchlist-header, .watchlist-row { grid-template-columns: 1fr 1fr; }
+  .watchlist-header .added, .watchlist-row .added { grid-column: 1 / -1; }
+  .watchlist-row .actions { grid-column: 1 / -1; }
+}
+
+@media (max-width: 768px) {
+  .navbar { flex-direction: column; align-items: flex-start; gap: 0.6rem; }
+  .navbar-links { width: 100%; }
+  .home-container, .login-page, .register-page { min-height: auto; padding-block: 3rem; }
+  table, .holdings-table, .compare-table { font-size: 0.82rem; }
+  th, td { padding: 0.6rem 0.5rem; }
+}
+
+/* ---------- Session expiry alert ---------- */
+.session-alert-backdrop {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+  background: linear-gradient(180deg, rgba(8, 11, 17, 0.92), transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: rise 0.35s ease both;
+}
+
+.session-alert {
+  width: min(560px, 100%);
+  padding: 1.4rem 1.6rem;
+  text-align: center;
+  background: var(--bg-surface);
+  border: 1px solid var(--gold-line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg), var(--glow-gold);
+}
+
+.session-alert-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.session-alert p { color: var(--text-muted); margin-bottom: 1rem; }
+
+.session-alert button {
+  background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+  border-color: var(--gold-deep);
+  color: #17130A;
+}
+
+/* ---------- Section banners ---------- */
+/* Photography used as a deep, heavily-scrimmed ground so it reads as texture
+   behind the type rather than as a picture competing with it. */
+.dashboard-info {
+  position: relative;
+  padding: clamp(1.75rem, 4vw, 2.75rem);
+  margin-bottom: 1.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  background-image:
+    linear-gradient(100deg, rgba(8, 11, 17, 0.96) 0%, rgba(8, 11, 17, 0.80) 45%, rgba(8, 11, 17, 0.58) 100%),
+    url('./images/market-globe.jpg');
+  background-size: cover;
+  background-position: center 30%;
+}
+.dashboard-info::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold-line), transparent 70%);
+}
+
+.leaderboard-page > h2 {
+  position: relative;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  margin-bottom: 0;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  overflow: hidden;
+  background-image:
+    linear-gradient(100deg, rgba(8, 11, 17, 0.95) 0%, rgba(8, 11, 17, 0.78) 50%, rgba(8, 11, 17, 0.60) 100%),
+    url('./images/trading-floor.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.leaderboard-page > .leaderboard-subtitle {
+  padding: 0.9rem clamp(1.5rem, 4vw, 2.5rem) 1.1rem;
+  margin-bottom: 0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+body.light-mode .dashboard-info,
+body.light-mode .leaderboard-page > h2 {
+  background-image:
+    linear-gradient(100deg, rgba(8, 11, 17, 0.90) 0%, rgba(8, 11, 17, 0.72) 50%, rgba(8, 11, 17, 0.55) 100%),
+    url('./images/market-globe.jpg');
+  color: #fff;
+}
+body.light-mode .leaderboard-page > h2 { background-image:
+    linear-gradient(100deg, rgba(8, 11, 17, 0.90) 0%, rgba(8, 11, 17, 0.72) 50%, rgba(8, 11, 17, 0.55) 100%),
+    url('./images/trading-floor.jpg'); }

@@ -10,6 +10,7 @@ import {
   Tooltip, // Import Tooltip plugin for hover information
   Legend, // Import Legend plugin for chart legends
 } from "chart.js";
+import { SERIES } from "../../charts/chartTheme"; // Shared gold/steel series colours
 
 // Register the necessary Chart.js modules for the line chart
 ChartJS.register(
@@ -73,16 +74,20 @@ const PortfolioPerformanceChart: FC<PortfolioPerformanceChartProps> = ({
         {
           label: "Invested Value", // Label for the invested value line
           data: investedData, // Data points for invested value
-          borderColor: "blue", // Line color for invested value
-          backgroundColor: "rgba(0, 0, 255, 0.1)", // Background color under the line
+          borderColor: SERIES.steel, // Steel blue, the secondary accent
+          backgroundColor: SERIES.steelFill,
           fill: false, // Do not fill the area under the line
+          tension: 0.3,
+          pointRadius: 2,
         },
         {
           label: "Current Value", // Label for the current value line
           data: currentData, // Data points for current portfolio value
-          borderColor: "green", // Line color for current value
-          backgroundColor: "rgba(17, 0, 128, 0.1)", // Background color under the line
-          fill: true, // Do not fill the area under the line
+          borderColor: SERIES.gold, // Gold, the primary accent
+          backgroundColor: SERIES.goldFill,
+          fill: true, // Fill the area under the line
+          tension: 0.3,
+          pointRadius: 2,
         },
       ],
     };

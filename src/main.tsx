@@ -3,6 +3,7 @@ import App from "./App";
 import { Provider } from "react-redux";
 import store from "./store";
 import "./style.css";
+import "./charts/chartTheme"; // Global Chart.js defaults for the dark theme
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <Provider store={store}>

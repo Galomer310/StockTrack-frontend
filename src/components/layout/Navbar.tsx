@@ -18,17 +18,17 @@ const Navbar = () => {
   // State to store the countdown (in seconds) for the Search Stocks button
   const [countdown, setCountdown] = useState(60);
 
-  // State to track Dark Mode; false means light mode, true means dark mode
-  const [darkMode, setDarkMode] = useState(false);
+  // The design is dark by default; this opts into the light variant instead.
+  // Restored from localStorage so the choice survives a reload.
+  const [lightMode, setLightMode] = useState(
+    () => localStorage.getItem("investments_theme") === "light"
+  );
 
-  // Update the document's body class based on darkMode state
+  // Apply the variant to <body> and remember the preference
   useEffect(() => {
-    if (darkMode) {
-      document.body.classList.add("dark-mode");
-    } else {
-      document.body.classList.remove("dark-mode");
-    }
-  }, [darkMode]);
+    document.body.classList.toggle("light-mode", lightMode);
+    localStorage.setItem("investments_theme", lightMode ? "light" : "dark");
+  }, [lightMode]);
 
   // useEffect to handle Search Stocks button countdown
   useEffect(() => {
@@ -59,9 +59,9 @@ const Navbar = () => {
     }
   };
 
-  // Handler for toggling dark mode
+  // Handler for switching between the dark and light variants
   const toggleDarkMode = () => {
-    setDarkMode((prev) => !prev);
+    setLightMode((prev) => !prev);
   };
 
   // Handler for logging out: clear the session (which also removes the
@@ -73,7 +73,7 @@ const Navbar = () => {
 
   return (
     <nav className="navbar">
-      <div className="navbar-brand">Investment Hub</div>
+      <div className="navbar-brand">Investments</div>
       <ul className="navbar-links">
         <li>
           <Link to="/">Home</Link>
@@ -96,9 +96,12 @@ const Navbar = () => {
           <Link to="/performance">Performance</Link>
         </li>
         <li>
+          <Link to="/leaderboard">Leaderboard</Link>
+        </li>
+        <li>
           {/* Dark Mode toggle button */}
           <button onClick={toggleDarkMode} className="toggle-dark-mode">
-            {darkMode ? "Light Mode" : "Dark Mode"}
+            {lightMode ? "Dark Mode" : "Light Mode"}
           </button>
         </li>
         {user && (

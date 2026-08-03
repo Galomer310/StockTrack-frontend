@@ -110,28 +110,7 @@ const StockSearch: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
 
-  // Inline styling for the table
-  const tableStyle: React.CSSProperties = {
-    width: "100%",
-    borderCollapse: "collapse",
-    marginTop: "30px",
-    fontFamily: "Arial, sans-serif",
-  };
-
-  const thStyle: React.CSSProperties = {
-    backgroundColor: "#A7B49E",
-    color: "#ffffff",
-    textAlign: "left",
-    padding: "15px",
-  };
-
-  const tdStyle: React.CSSProperties = {
-    borderBottom: "1px solid #A7B49E",
-    borderLeft: "1px solid #A7B49E",
-    borderRight: "1px solid #A7B49E",
-    textAlign: "left",
-    padding: "12px",
-  };
+  // Table styling lives in style.css so it follows the active theme.
 
   // useEffect to check market status with caching
   useEffect(() => {
@@ -411,7 +390,7 @@ const StockSearch: React.FC = () => {
 
       {/* Range Selection Dropdown with cooldown */}
       {aggregatedData && aggregatedData.length > 0 && (
-        <div className="range-selection" style={{ marginTop: "20px" }}>
+        <div className="range-selection">
           <label htmlFor="range-select">Select Time Range: </label>
           <select
             id="range-select"
@@ -426,7 +405,7 @@ const StockSearch: React.FC = () => {
             ))}
           </select>
           {rangeDisabled && (
-            <span style={{ marginLeft: "10px", color: "white" }}>
+            <span>
               (Change disabled for {rangeCountdown} s)
             </span>
           )}
@@ -436,18 +415,7 @@ const StockSearch: React.FC = () => {
       {/* Aggregated Data Section with Dropdown Toggle */}
       {aggregatedData && aggregatedData.length > 0 && (
         <div className="aggregated-data">
-          <button
-            onClick={() => setShowAggregatedData(!showAggregatedData)}
-            style={{
-              marginTop: "20px",
-              padding: "10px 20px",
-              backgroundColor: "#A7B49E",
-              color: "#fff",
-              border: "none",
-              cursor: "pointer",
-              borderRadius: "5px",
-            }}
-          >
+          <button onClick={() => setShowAggregatedData(!showAggregatedData)}>
             {showAggregatedData
               ? "Hide Aggregated Data"
               : "Show Aggregated Data"}
@@ -459,28 +427,28 @@ const StockSearch: React.FC = () => {
                 <Line data={chartData} options={chartOptions} />
               </div>
               {/* Aggregated Data Table */}
-              <table style={tableStyle}>
+              <table>
                 <thead>
                   <tr>
-                    <th style={thStyle}>Date</th>
-                    <th style={thStyle}>Open</th>
-                    <th style={thStyle}>High</th>
-                    <th style={thStyle}>Low</th>
-                    <th style={thStyle}>Close</th>
-                    <th style={thStyle}>Volume</th>
+                    <th>Date</th>
+                    <th>Open</th>
+                    <th>High</th>
+                    <th>Low</th>
+                    <th>Close</th>
+                    <th>Volume</th>
                   </tr>
                 </thead>
                 <tbody>
                   {aggregatedData.map((agg: any) => (
                     <tr key={agg.t}>
-                      <td style={tdStyle}>
+                      <td>
                         {new Date(agg.t).toLocaleDateString()}
                       </td>
-                      <td style={tdStyle}>{agg.o}</td>
-                      <td style={tdStyle}>{agg.h}</td>
-                      <td style={tdStyle}>{agg.l}</td>
-                      <td style={tdStyle}>{agg.c}</td>
-                      <td style={tdStyle}>{agg.v}</td>
+                      <td>{agg.o}</td>
+                      <td>{agg.h}</td>
+                      <td>{agg.l}</td>
+                      <td>{agg.c}</td>
+                      <td>{agg.v}</td>
                     </tr>
                   ))}
                 </tbody>

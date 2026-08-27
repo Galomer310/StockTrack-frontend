@@ -6,6 +6,8 @@ import { RootState } from "../store"; // Import RootState for type definitions
 import Watchlist from "./Watchlist"; // Import the Watchlist component
 import TokenRefreshAlert from "../components/alerts/TokenRefreshAlert";
 import TradeJournal from "../components/trades/TradeJournal";
+import PortfolioSwitcher from "../components/portfolio/PortfolioSwitcher";
+import { MyPortfolio } from "../api/portfolios";
 
 // Define the UserPage functional component
 
@@ -16,6 +18,13 @@ const UserPage = () => {
   const [showRefreshAlert, setShowRefreshAlert] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  // The book currently open. Everything below it - holdings, cash, the trade
+  // journal - is scoped to this one, and switching swaps all of them at once.
+  const [active, setActive] = useState<MyPortfolio | null>(null);
+  // Bumped after a trade so the switcher re-reads cash and equity, which a
+  // buy or a sell has just changed.
+  const [portfolioRefresh, setPortfolioRefresh] = useState(0);
 
   useEffect(() => {
     // Set timer for 60 minutes (60 * 60 * 1000 ms)
@@ -82,11 +91,33 @@ const UserPage = () => {
             {/* Section for dashboard descriptive text */}
             <h1>My Investment Dashboard</h1> {/* Dashboard heading */}
           </section>
-          <Watchlist /> {/* Render the Watchlist component */}
-          <section className="dashboard-journal">
-            <h3>Your trade journal</h3>
-            <TradeJournal userId={user.id} />
-          </section>
+
+          {/* Pick the book to work in. Everything below follows it. */}
+          <PortfolioSwitcher
+            refreshKey={portfolioRefresh}
+            onPortfolioChange={setActive}
+          />
+
+          {active ? (
+            <>
+              {/* Remounted per portfolio: switching books should start from a
+                  clean fetch rather than briefly showing the previous one's
+                  holdings under the new one's name. */}
+              <Watchlist
+                key={active.id}
+                portfolio={active}
+                onTraded={() => setPortfolioRefresh((k) => k + 1)}
+              />
+              <section className="dashboard-journal">
+                <h3>{active.name} · trade journal</h3>
+                <TradeJournal key={active.id} portfolioId={active.id} />
+              </section>
+            </>
+          ) : (
+            <p className="stock-empty">
+              Open a portfolio above to start trading.
+            </p>
+          )}
         </div>
       ) : (
         <p>Loading...</p> // Show loading text if user data is not yet available

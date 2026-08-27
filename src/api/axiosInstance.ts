@@ -19,6 +19,16 @@ axiosInstance.interceptors.request.use((config) => {
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
+
+  // Which portfolio the user currently has open. Sent on every call so that a
+  // buy, a sell or a holdings fetch lands in the right book without each call
+  // site having to thread the id through. Requests that do not care simply
+  // ignore it; the server checks the portfolio belongs to the caller.
+  const { activeId } = store.getState().portfolio;
+  if (activeId !== null) {
+    config.headers["X-Portfolio-Id"] = String(activeId);
+  }
+
   return config;
 });
 

@@ -19,16 +19,28 @@ export interface WatchlistItem {
 // Define the props interface for the component
 interface PortfolioPerformanceProps {
   watchlist: WatchlistItem[]; // Array of watchlist items
+  /**
+   * Prices the caller has already fetched. Passing them skips this component's
+   * own lookup, which matters now that it sits on the dashboard beside two
+   * other things that need the same quotes - three components each firing one
+   * request per symbol would spend the market-data budget three times over for
+   * one screen.
+   */
+  latestPrices?: { [symbol: string]: number };
 }
 
 // Define the functional component using the props interface
 const PortfolioPerformance: React.FC<PortfolioPerformanceProps> = ({
   watchlist, // Destructure watchlist from props
+  latestPrices: providedPrices, // Prices from the caller, when it has them
 }) => {
   // State for storing the latest prices from the backend
-  const [latestPrices, setLatestPrices] = useState<{
+  const [fetchedPrices, setFetchedPrices] = useState<{
     [symbol: string]: number;
   }>({});
+
+  // Prefer what the caller supplied; fall back to fetching them here.
+  const latestPrices = providedPrices ?? fetchedPrices;
 
   // State for sorting: field to sort by and sort order (ascending/descending)
   const [sortBy, setSortBy] = useState<string>("stock_symbol"); // Default sort by stock_symbol
@@ -59,13 +71,13 @@ const PortfolioPerformance: React.FC<PortfolioPerformanceProps> = ({
         })
       );
       // Update the latestPrices state with the fetched prices
-      setLatestPrices(prices);
+      setFetchedPrices(prices);
     };
-    if (uniqueSymbols.length > 0) {
-      // If there are symbols to fetch
+    if (uniqueSymbols.length > 0 && !providedPrices) {
+      // Only when the caller has not already supplied them
       fetchLatestPrices(); // Call the fetch function
     }
-  }, [watchlist]); // Re-run if the watchlist changes
+  }, [watchlist, providedPrices]); // Re-run if the watchlist changes
 
   // useMemo hook to compute sorted data with computed profit/loss values
   const sortedData = useMemo(() => {

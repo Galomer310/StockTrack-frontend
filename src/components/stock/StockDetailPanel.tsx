@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -17,6 +17,8 @@ import { RootState } from "../../store";
 import { SERIES } from "../../charts/chartTheme";
 import { useToast } from "../ui/ToastProvider";
 import TradeNoteModal, { TradeSubmission } from "../trades/TradeNoteModal";
+import { fetchMyPortfolios, MyPortfolio } from "../../api/portfolios";
+import { setActivePortfolio as selectPortfolio } from "../../features/portfolioSlice";
 
 ChartJS.register(
   CategoryScale,
@@ -138,6 +140,20 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
   const [quantity, setQuantity] = useState(1);
   const [noteOpen, setNoteOpen] = useState(false);
 
+  // The portfolio the buy will land in, and what it can afford. A purchase is
+  // paid for out of that book's cash, so the button has to know about it -
+  // otherwise the only feedback would be the server's refusal after the user
+  // has already written a thesis.
+  //
+  // The whole list is held, not just the active one: when someone runs three
+  // books, "which one am I about to spend from" is the first thing they need to
+  // know on this page, and being able to change it here saves a trip back to
+  // the dashboard.
+  const dispatch = useDispatch();
+  const activePortfolioId = useSelector((state: RootState) => state.portfolio.activeId);
+  const [portfolios, setPortfolios] = useState<MyPortfolio[]>([]);
+  const [activePortfolio, setActivePortfolio] = useState<MyPortfolio | null>(null);
+
   const user = useSelector((state: RootState) => state.auth.user);
   const toast = useToast();
 
@@ -239,20 +255,69 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
     };
   }, [symbol, range]);
 
+  // Which book is open, and what is left in it. Re-read after each purchase so
+  // the affordable quantity reflects the money just spent.
+  const [cashRefresh, setCashRefresh] = useState(0);
+  useEffect(() => {
+    if (!allowAdd || !user) return;
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const data = await fetchMyPortfolios();
+        if (cancelled) return;
+        setPortfolios(data.portfolios);
+        setActivePortfolio(
+          data.portfolios.find((p) => p.id === activePortfolioId) ??
+            data.portfolios[0] ??
+            null
+        );
+      } catch {
+        // A failed lookup only costs the affordability hint; the server still
+        // refuses anything the portfolio cannot pay for.
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [allowAdd, user, activePortfolioId, cashRefresh]);
+
   // Buying opens the note window first: the trade and its thesis are recorded
   // together, so the journal can never contain a trade with no reasoning.
   const recordPurchase = async ({ note }: TradeSubmission) => {
     if (!quote) return;
-    await axiosInstance.post(`${API}/watchlist`, {
+    const res = await axiosInstance.post(`${API}/watchlist`, {
       stock_symbol: quote.symbol,
       quantity,
       note,
     });
     setNoteOpen(false);
+    setCashRefresh((k) => k + 1);
     toast.success(
-      `${quote.symbol} × ${quantity} at ${money(quote.price)} added, with your note.`,
+      `${quote.symbol} × ${quantity} at ${money(quote.price)} added. ${money(
+        res.data?.cash_remaining ?? 0
+      )} cash left in ${activePortfolio?.name ?? "this portfolio"}.`,
       "Purchase recorded"
     );
+  };
+
+  // What this order costs, and what the portfolio is left with if it goes
+  // through. Both are shown before the buy rather than after it: the whole
+  // point of a fixed starting balance is knowing what you are giving up.
+  const cash = activePortfolio?.cash ?? 0;
+  const maxAffordable = quote && quote.price > 0 ? Math.floor(cash / quote.price) : 0;
+  const orderCost = quote ? quote.price * quantity : 0;
+  const cashAfter = cash - orderCost;
+  const tooExpensive = Boolean(quote) && orderCost > cash;
+
+  // Switching book from here, so a purchase can be aimed at the right one
+  // without going back to the dashboard first. This is the same selection the
+  // dashboard makes, so it persists after the buy.
+  const handlePortfolioChange = (id: number) => {
+    const next = portfolios.find((p) => p.id === id);
+    if (!next) return;
+    dispatch(selectPortfolio(id));
+    setActivePortfolio(next);
   };
 
   const positive = bars.length > 1 ? bars[bars.length - 1].c >= bars[0].c : true;
@@ -314,6 +379,45 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
         />
       )}
 
+      {/* Which book you are about to spend from, before anything else on the
+          page. With three portfolios in play, buying into the wrong one is the
+          easy mistake to make, and it cannot be edited away afterwards. */}
+      {allowAdd && user && activePortfolio && (
+        <div className="buying-into">
+          <div className="buying-into-which">
+            <span className="summary-label">Buying into</span>
+            {portfolios.length > 1 ? (
+              <select
+                className="buying-into-select"
+                value={activePortfolio.id}
+                onChange={(e) => handlePortfolioChange(Number(e.target.value))}
+                aria-label="Portfolio this purchase goes into"
+              >
+                {portfolios.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} — {money(p.cash)} available
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <span className="buying-into-name">{activePortfolio.name}</span>
+            )}
+          </div>
+
+          <div className="buying-into-cash">
+            <span className="summary-label">Available to trade</span>
+            <span className="summary-value">{money(cash)}</span>
+          </div>
+
+          {portfolios.length > 1 && (
+            <span className="field-hint">
+              {portfolios.findIndex((p) => p.id === activePortfolio.id) + 1} of{" "}
+              {portfolios.length} portfolios
+            </span>
+          )}
+        </div>
+      )}
+
       {notice && <p className="market-status">{notice}</p>}
 
       {/* Headline */}
@@ -338,16 +442,67 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
 
           {allowAdd && user && (
             <div className="stock-add">
-              <input
-                type="number"
-                min="1"
-                value={quantity}
-                onChange={(e) => setQuantity(Number(e.target.value))}
-                aria-label="Quantity"
-              />
-              <button className="compare-btn" onClick={() => setNoteOpen(true)}>
-                Buy…
-              </button>
+              <div className="stock-add-row">
+                <label className="stock-qty">
+                  <span className="summary-label">Shares</span>
+                  <input
+                    type="number"
+                    min="1"
+                    value={quantity}
+                    onChange={(e) => setQuantity(Number(e.target.value))}
+                    aria-label="Quantity"
+                  />
+                </label>
+                <button
+                  className="compare-btn"
+                  onClick={() => setNoteOpen(true)}
+                  disabled={tooExpensive}
+                >
+                  Buy…
+                </button>
+              </div>
+
+              {/* The cost of this order and what would be left afterwards,
+                  updating as the quantity changes. The server enforces the
+                  limit either way; showing it here means nobody writes a
+                  thesis for a trade that was never going to clear. */}
+              {activePortfolio && (
+                <div className={`order-preview${tooExpensive ? " is-over" : ""}`}>
+                  <div className="order-line">
+                    <span>
+                      {quantity} × {money(quote.price)}
+                    </span>
+                    <span className="order-figure">{money(orderCost)}</span>
+                  </div>
+                  <div className="order-line">
+                    <span>Cash after this purchase</span>
+                    <span className={`order-figure ${tooExpensive ? "loss" : ""}`}>
+                      {money(cashAfter)}
+                    </span>
+                  </div>
+                  {tooExpensive ? (
+                    <p className="order-warning">
+                      {activePortfolio.name} is {money(orderCost - cash)} short. You
+                      can afford {maxAffordable} share{maxAffordable === 1 ? "" : "s"}{" "}
+                      at this price.
+                      {maxAffordable > 0 && (
+                        <button
+                          type="button"
+                          className="link-btn"
+                          onClick={() => setQuantity(maxAffordable)}
+                        >
+                          buy {maxAffordable}
+                        </button>
+                      )}
+                    </p>
+                  ) : (
+                    <p className="field-hint">
+                      Leaves {((cashAfter / (activePortfolio.equity || 1)) * 100).toFixed(0)}%
+                      of {activePortfolio.name} in cash.
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -5,19 +5,26 @@ import { RootState } from "../store";
 import {
   fetchPortfolio,
   PortfolioResponse,
-  money,
+  Holding,
+  isOwnHolding,
   percent,
 } from "../api/social";
 import { buildInsights } from "../api/comparison";
 import PortfolioComparisonChart from "../components/charts/PortfolioComparisonChart";
 
-// Side-by-side comparison of your portfolio against another investor's.
-// Both sides come from the same endpoint so the two columns are always
-// computed identically.
+/* Side-by-side comparison of your portfolio against another investor's.
+   ---------------------------------------------------------------------------
+   Both sides come from the same endpoint, but they do NOT arrive in the same
+   shape: yours carries prices, theirs carries percentages, because the server
+   will not send another investor's money to you. Every row below is therefore
+   a ratio - return, weight, position count - which is the only basis on which
+   the two can honestly be compared anyway. */
 const ComparePortfolios = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const me = useSelector((state: RootState) => state.auth.user);
+  // Your side of the comparison is whichever portfolio you currently have
+  // open, since you may be running three of them.
+  const myPortfolioId = useSelector((state: RootState) => state.portfolio.activeId);
 
   const [mine, setMine] = useState<PortfolioResponse | null>(null);
   const [theirs, setTheirs] = useState<PortfolioResponse | null>(null);
@@ -26,12 +33,16 @@ const ComparePortfolios = () => {
 
   useEffect(() => {
     const load = async () => {
-      if (!me) return;
+      if (myPortfolioId === null) {
+        setError("Open one of your portfolios first, then come back to compare.");
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       setError("");
       try {
         const [a, b] = await Promise.all([
-          fetchPortfolio(me.id),
+          fetchPortfolio(myPortfolioId),
           fetchPortfolio(Number(id)),
         ]);
         setMine(a);
@@ -47,20 +58,34 @@ const ComparePortfolios = () => {
       }
     };
     load();
-  }, [id, me]);
+  }, [id, myPortfolioId]);
 
   // Union of both tickers, so shared and unique positions are both visible.
+  //
+  // Compared by WEIGHT rather than by value: "18% of the book" is comparable
+  // across two portfolios of different sizes, and unlike a dollar figure it
+  // discloses nothing about how large either one is.
   const symbolRows = useMemo(() => {
     if (!mine || !theirs) return [];
-    const totals = (p: PortfolioResponse) => {
+    const weights = (p: PortfolioResponse) => {
       const map: Record<string, number> = {};
-      for (const h of p.holdings) {
-        map[h.stock_symbol] = (map[h.stock_symbol] || 0) + h.latest_price * h.quantity;
+      // Your own holdings carry prices, so weights are derived here. Theirs
+      // arrive already expressed as a share of their book.
+      const ownTotal = p.holdings
+        .filter(isOwnHolding)
+        .reduce((sum, h) => sum + h.latest_price * h.quantity, 0);
+      for (const h of p.holdings as Holding[]) {
+        const weight = isOwnHolding(h)
+          ? ownTotal > 0
+            ? (h.latest_price * h.quantity * 100) / ownTotal
+            : 0
+          : h.weight_pct;
+        map[h.stock_symbol] = (map[h.stock_symbol] || 0) + weight;
       }
       return map;
     };
-    const mineBySymbol = totals(mine);
-    const theirsBySymbol = totals(theirs);
+    const mineBySymbol = weights(mine);
+    const theirsBySymbol = weights(theirs);
     const symbols = Array.from(
       new Set([...Object.keys(mineBySymbol), ...Object.keys(theirsBySymbol)])
     ).sort();
@@ -93,29 +118,6 @@ const ComparePortfolios = () => {
           : "b",
     },
     {
-      label: "Profit / loss",
-      a: money(mine.summary.profit),
-      b: money(theirs.summary.profit),
-      winner:
-        mine.summary.profit === theirs.summary.profit
-          ? null
-          : mine.summary.profit > theirs.summary.profit
-          ? "a"
-          : "b",
-    },
-    {
-      label: "Invested",
-      a: money(mine.summary.invested),
-      b: money(theirs.summary.invested),
-      winner: null,
-    },
-    {
-      label: "Current value",
-      a: money(mine.summary.current_value),
-      b: money(theirs.summary.current_value),
-      winner: null,
-    },
-    {
       label: "Holdings",
       a: String(mine.summary.holdings_count),
       b: String(theirs.summary.holdings_count),
@@ -130,7 +132,7 @@ const ComparePortfolios = () => {
       </button>
 
       <h2>
-        {mine.user.display_name} vs {theirs.user.display_name}
+        {mine.portfolio.name} vs {theirs.portfolio.name}
       </h2>
       <p className={`compare-verdict ${diffPct >= 0 ? "gain" : "loss"}`}>
         {diffPct >= 0
@@ -159,8 +161,8 @@ const ComparePortfolios = () => {
         <thead>
           <tr>
             <th></th>
-            <th>{mine.user.display_name}</th>
-            <th>{theirs.user.display_name}</th>
+            <th>{mine.portfolio.name}</th>
+            <th>{theirs.portfolio.name}</th>
           </tr>
         </thead>
         <tbody>
@@ -176,14 +178,16 @@ const ComparePortfolios = () => {
       </div>
 
       <h3>Positions by ticker</h3>
-      <p className="compare-note">Current market value held in each ticker.</p>
+      <p className="compare-note">
+        How much of each book sits in each ticker, as a share of the whole.
+      </p>
       <div className="table-wrap">
       <table className="compare-table">
         <thead>
           <tr>
             <th>Ticker</th>
-            <th>{mine.user.display_name}</th>
-            <th>{theirs.user.display_name}</th>
+            <th>{mine.portfolio.name}</th>
+            <th>{theirs.portfolio.name}</th>
           </tr>
         </thead>
         <tbody>
@@ -195,8 +199,8 @@ const ComparePortfolios = () => {
                 </Link>
                 {row.shared && <span className="compare-badge">both</span>}
               </td>
-              <td>{row.mine ? money(row.mine) : "—"}</td>
-              <td>{row.theirs ? money(row.theirs) : "—"}</td>
+              <td>{row.mine ? `${row.mine.toFixed(1)}%` : "—"}</td>
+              <td>{row.theirs ? `${row.theirs.toFixed(1)}%` : "—"}</td>
             </tr>
           ))}
         </tbody>

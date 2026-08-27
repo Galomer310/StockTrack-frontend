@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -11,7 +11,7 @@ import {
   Legend,
   Filler,
 } from "chart.js";
-import { PortfolioResponse } from "../../api/social";
+import { PortfolioResponse, isOwnHolding } from "../../api/social";
 import { SERIES } from "../../charts/chartTheme";
 
 ChartJS.register(
@@ -37,6 +37,11 @@ ChartJS.register(
    So each point answers: "of the positions owned by this date, what were they
    bought for, and what are they worth now?" That still shows how each book was
    built and which purchases carried it, which is what a comparison needs.
+
+   The value/dollar mode has been removed along with it. Another investor's
+   holdings arrive as percentages - the server does not send their prices - so
+   there is no second axis to plot them on, and inventing one from your side
+   alone would be a chart of two different things.
    =========================================================================== */
 
 interface Props {
@@ -44,13 +49,7 @@ interface Props {
   theirs: PortfolioResponse;
 }
 
-type Mode = "return" | "value";
-
 const PortfolioComparisonChart: React.FC<Props> = ({ mine, theirs }) => {
-  // Percentage is the default: it compares skill rather than capital, matching
-  // how the leaderboard ranks.
-  const [mode, setMode] = useState<Mode>("return");
-
   const { labels, mineSeries, theirsSeries } = useMemo(() => {
     // Shared, ordered timeline of every purchase date across both portfolios.
     const dates = Array.from(
@@ -61,18 +60,39 @@ const PortfolioComparisonChart: React.FC<Props> = ({ mine, theirs }) => {
       )
     ).sort();
 
+    // Return of the positions owned by each date.
+    //
+    // Your own side is cost-weighted, which is the true return on what was
+    // deployed. The other investor's holdings carry no prices, so their side
+    // weights each position's gain by its share of their book - the same
+    // measure, computed from the only inputs that leave the server.
     const seriesFor = (portfolio: PortfolioResponse) =>
       dates.map((date) => {
         const cutoff = new Date(`${date}T23:59:59Z`).getTime();
-        let invested = 0;
-        let value = 0;
-        for (const h of portfolio.holdings) {
-          if (new Date(h.added_at).getTime() > cutoff) continue;
-          invested += h.price_at_time * h.quantity;
-          value += h.latest_price * h.quantity;
+        const owned = portfolio.holdings.filter(
+          (h) => new Date(h.added_at).getTime() <= cutoff
+        );
+        if (owned.length === 0) return 0;
+
+        if (isOwnHolding(owned[0])) {
+          let invested = 0;
+          let value = 0;
+          for (const h of owned) {
+            if (!isOwnHolding(h)) continue;
+            invested += h.price_at_time * h.quantity;
+            value += h.latest_price * h.quantity;
+          }
+          return invested > 0 ? ((value - invested) / invested) * 100 : 0;
         }
-        if (mode === "value") return value;
-        return invested > 0 ? ((value - invested) / invested) * 100 : 0;
+
+        let weighted = 0;
+        let totalWeight = 0;
+        for (const h of owned) {
+          if (isOwnHolding(h)) continue;
+          weighted += h.gain_pct * h.weight_pct;
+          totalWeight += h.weight_pct;
+        }
+        return totalWeight > 0 ? weighted / totalWeight : 0;
       });
 
     return {
@@ -80,7 +100,7 @@ const PortfolioComparisonChart: React.FC<Props> = ({ mine, theirs }) => {
       mineSeries: seriesFor(mine),
       theirsSeries: seriesFor(theirs),
     };
-  }, [mine, theirs, mode]);
+  }, [mine, theirs]);
 
   if (labels.length === 0) return null;
 
@@ -88,17 +108,17 @@ const PortfolioComparisonChart: React.FC<Props> = ({ mine, theirs }) => {
     labels,
     datasets: [
       {
-        label: mine.user.display_name,
+        label: mine.portfolio.name,
         data: mineSeries,
         borderColor: SERIES.gold,
         backgroundColor: SERIES.goldFill,
-        fill: mode === "value",
+        fill: false,
         tension: 0.3,
         pointRadius: 2,
         borderWidth: 2,
       },
       {
-        label: theirs.user.display_name,
+        label: theirs.portfolio.name,
         data: theirsSeries,
         borderColor: SERIES.steel,
         backgroundColor: SERIES.steelFill,
@@ -120,16 +140,14 @@ const PortfolioComparisonChart: React.FC<Props> = ({ mine, theirs }) => {
       tooltip: {
         callbacks: {
           label: (ctx: any) =>
-            mode === "value"
-              ? `${ctx.dataset.label}: $${Number(ctx.parsed.y).toFixed(2)}`
-              : `${ctx.dataset.label}: ${Number(ctx.parsed.y).toFixed(2)}%`,
+            `${ctx.dataset.label}: ${Number(ctx.parsed.y).toFixed(2)}%`,
         },
       },
     },
     scales: {
       y: {
         ticks: {
-          callback: (v: any) => (mode === "value" ? `$${v}` : `${v}%`),
+          callback: (v: any) => `${v}%`,
         },
       },
     },
@@ -137,21 +155,6 @@ const PortfolioComparisonChart: React.FC<Props> = ({ mine, theirs }) => {
 
   return (
     <div className="comparison-chart">
-      <div className="range-picker">
-        <button
-          className={`range-chip${mode === "return" ? " is-active" : ""}`}
-          onClick={() => setMode("return")}
-        >
-          Return %
-        </button>
-        <button
-          className={`range-chip${mode === "value" ? " is-active" : ""}`}
-          onClick={() => setMode("value")}
-        >
-          Value
-        </button>
-      </div>
-
       <div className="chart-container chart-tall">
         <Line data={data} options={options} />
       </div>

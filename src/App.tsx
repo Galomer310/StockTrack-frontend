@@ -14,8 +14,9 @@ import UserPage from "./pages/UserPage"; // Import UserPage component
 import StockSearch from "./pages/StockSearch"; // Import StockSearch page component
 import ManualAddStock from "./pages/ManualAddStock"; // Import ManualAddStock page component
 import Navbar from "./components/layout/Navbar"; // Import Navbar component
-import PortfolioPerformancePage from "./pages/PortfolioPerformancePage"; // Import PortfolioPerformancePage component
 import Leaderboard from "./pages/Leaderboard"; // Public ranking of all investors
+import Feed from "./pages/Feed"; // Shared timeline of everyone's trades
+import Market from "./pages/Market"; // Outbound links to research sites
 import InvestorPortfolio from "./pages/InvestorPortfolio"; // Another investor's portfolio
 import ComparePortfolios from "./pages/ComparePortfolios"; // Side-by-side comparison
 import StockPage from "./pages/StockPage"; // Full detail view for one ticker
@@ -48,15 +49,21 @@ const App = () => {
           path="/manual-add"
           element={user ? <ManualAddStock /> : <Navigate to="/login" />} // Render ManualAddStock if logged in, otherwise redirect to login
         />
-        <Route
-          path="/performance"
-          element={
-            user ? <PortfolioPerformancePage /> : <Navigate to="/login" /> // Render PortfolioPerformancePage if logged in, otherwise redirect to login
-          }
-        />
+        {/* Performance moved onto the dashboard, under the over-time chart.
+            The route is kept as a redirect so an old bookmark still lands
+            somewhere useful instead of on a blank 404. */}
+        <Route path="/performance" element={<Navigate to="/user" replace />} />
         <Route
           path="/leaderboard"
           element={user ? <Leaderboard /> : <Navigate to="/login" />} // Ranked list of all investors
+        />
+        <Route
+          path="/feed"
+          element={user ? <Feed /> : <Navigate to="/login" />} // Everyone's trades as they happen
+        />
+        <Route
+          path="/market"
+          element={user ? <Market /> : <Navigate to="/login" />} // Research links, outbound
         />
         <Route
           path="/investor/:id"

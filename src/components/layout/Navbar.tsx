@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../store";
 import { clearUser } from "../../features/authSlice";
+import { clearActivePortfolio } from "../../features/portfolioSlice";
 import "../../style.css";
 
 const Navbar = () => {
@@ -92,6 +93,9 @@ const Navbar = () => {
   // persisted copy in localStorage) and return to the landing page.
   const handleLogout = () => {
     dispatch(clearUser());
+    // Forget which portfolio was open too: whoever signs in on this browser
+    // next must not start out pointing at someone else's book.
+    dispatch(clearActivePortfolio());
     navigate("/");
   };
 
@@ -133,8 +137,14 @@ const Navbar = () => {
               </span>
             )}
           </li>
+          {/* No Performance link: it lives on the dashboard now, under the
+              over-time chart, because it describes whichever portfolio you
+              have open rather than being a place of its own. */}
           <li>
-            <Link to="/performance">Performance</Link>
+            <Link to="/market">Market</Link>
+          </li>
+          <li>
+            <Link to="/feed">Feed</Link>
           </li>
           <li>
             <Link to="/leaderboard">Leaderboard</Link>

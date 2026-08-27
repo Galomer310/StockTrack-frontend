@@ -7,13 +7,25 @@ import StockDistributionPieChart from "../components/charts/StockDistributionPie
 import PortfolioPerformanceChart from "../components/charts/PortfolioPerformanceChart"; // Import PortfolioPerformanceChart component
 import { useToast } from "../components/ui/ToastProvider";
 import TradeNoteModal, { TradeSubmission } from "../components/trades/TradeNoteModal";
+import { MyPortfolio } from "../api/portfolios";
+import { money } from "../api/social";
+import PortfolioPerformance from "../components/performance/PortfolioPerformance";
+
+interface Props {
+  /** The portfolio being shown. Its cash is what limits what can be bought. */
+  portfolio: MyPortfolio;
+  /** Tells the dashboard a trade moved the cash, so the switcher re-reads it */
+  onTraded?: () => void;
+}
 
 // Define the Watchlist functional component
-const Watchlist = () => {
+const Watchlist = ({ portfolio, onTraded }: Props) => {
   const [watchlist, setWatchlist] = useState<any[]>([]); // State for storing the watchlist data
   const [total, setTotal] = useState<number>(0); // State for storing the total portfolio value
-  const [editingItemId, setEditingItemId] = useState<number | null>(null); // State to track which item is being edited
-  const [editingItemData, setEditingItemData] = useState<any>({}); // State to store the current editing data
+  // Cash left in this portfolio. Seeded from the portfolio the dashboard
+  // passed in, then kept current from each trade's response, so the figure on
+  // screen is the server's rather than one guessed at locally.
+  const [cash, setCash] = useState<number>(portfolio.cash);
   const [sortBy, setSortBy] = useState<string>("added_at"); // State for sort field (default is added_at)
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc"); // State for sort order (default is ascending)
   const [expandedSymbols, setExpandedSymbols] = useState<{
@@ -28,13 +40,28 @@ const Watchlist = () => {
   const navigate = useNavigate(); // Initialize navigate for redirection
   const toast = useToast();
 
-  // Mirrors CORRECTION_WINDOW_MS on the server. A trade can be corrected or
-  // deleted for an hour; after that it is part of the public record and the
-  // only way out is a sale. Checked here purely so the buttons reflect
-  // reality - the server is what actually enforces it.
-  const CORRECTION_WINDOW_MS = 60 * 60 * 1000;
-  const isCorrectable = (addedAt: string) =>
-    Date.now() - new Date(addedAt).getTime() < CORRECTION_WINDOW_MS;
+  // Mirrors REMOVAL_WINDOW_MS on the server. A buy can be taken back for 60
+  // seconds; after that it is part of the public record and the only way out
+  // is a sale. There is no edit: a recorded trade cannot be rewritten, so the
+  // actions on a position are buy and sell. Checked here purely so the buttons
+  // reflect reality - the server is what actually enforces it.
+  //
+  // Measured from recorded_at - when the buy was written down - and not from
+  // added_at, which is the trade's own date and may be backdated. Falls back
+  // to added_at only for rows with no journal entry behind them.
+  const REMOVAL_WINDOW_MS = 60 * 1000;
+  const isRemovable = (stock: any) =>
+    Date.now() - new Date(stock.recorded_at || stock.added_at).getTime() <
+    REMOVAL_WINDOW_MS;
+
+  // The window is short enough that a row rendered as removable goes stale
+  // while the user is looking at it, so re-render on a timer and let the
+  // button disappear on its own rather than failing on click.
+  const [, setNow] = useState(Date.now());
+  useEffect(() => {
+    const tick = setInterval(() => setNow(Date.now()), 5000);
+    return () => clearInterval(tick);
+  }, []);
   // The holding currently being sold, if the note window is open
   const [selling, setSelling] = useState<any | null>(null);
 
@@ -57,6 +84,7 @@ const Watchlist = () => {
         );
         setWatchlist(response.data.watchlist); // Update watchlist state with fetched data
         setTotal(response.data.total); // Update total state with fetched total portfolio value
+        if (typeof response.data.cash === "number") setCash(response.data.cash);
       } catch (err: any) {
         console.error(
           "Error fetching watchlist:",
@@ -156,85 +184,46 @@ const Watchlist = () => {
     }));
   };
 
-  // Handler function to start editing a watchlist item
-  const handleEdit = (item: any) => {
-    setEditingItemId(item.id); // Set the id of the item being edited
-    setEditingItemData({
-      quantity: item.quantity, // Set current quantity
-      price_at_time: item.price_at_time, // Set current price
-      added_at: item.added_at, // Set current added date/time
-    });
-  };
-
-  // Handler to update editing data when input values change
-  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target; // Destructure name and value from the input event
-    setEditingItemData((prev: any) => ({ ...prev, [name]: value })); // Update editing data state
-  };
-
-  // Handler to save the edited watchlist item
-  const handleSaveEdit = async (id: number) => {
-    try {
-      // Make a PUT request to update the watchlist item
-      await axiosInstance.put(
-        `${import.meta.env.VITE_BACKEND_API_URL}/watchlist/${id}`,
-        editingItemData, // Send the updated data
-        {
-          headers: { Authorization: `Bearer ${accessToken}` }, // Include access token in headers
-        }
-      );
-      // Update the local watchlist state with the edited data
-      const updatedWatchlist = watchlist.map((item) =>
-        item.id === id ? { ...item, ...editingItemData } : item
-      );
-      setWatchlist(updatedWatchlist); // Update watchlist state
-      // Recalculate total portfolio value
-      const newTotal = updatedWatchlist.reduce((sum, item) => {
-        return sum + parseFloat(item.price_at_time) * Number(item.quantity);
-      }, 0);
-      setTotal(newTotal); // Update total state
-      setEditingItemId(null); // Clear editing item id
-      setEditingItemData({}); // Clear editing data state
-      toast.success("Your changes have been saved.", "Holding updated");
-    } catch (err: any) {
-      toast.error(
-        err.response?.data?.error || "Could not save your correction.",
-        err.response?.data?.code === "CORRECTION_WINDOW_CLOSED" ? "Record is locked" : undefined
-      );
-    }
-  };
-
-  // Handler to cancel the editing process
-  const handleCancelEdit = () => {
-    setEditingItemId(null); // Clear editing item id
-    setEditingItemData({}); // Clear editing data state
-  };
+  // There is no edit handler. A trade, once recorded, is part of the public
+  // record: the only ways to change a position are to buy more or to sell,
+  // both of which are logged with their date, time and reasoning.
 
   // Selling opens the note window; the backend records the trade and its
   // thesis in one transaction, then we refresh from the server rather than
   // guessing at the new quantity locally.
   const handleSell = async ({ note, quantity, price }: TradeSubmission) => {
     if (!selling) return;
-    await axiosInstance.post(
+    const res = await axiosInstance.post(
       `${import.meta.env.VITE_BACKEND_API_URL}/watchlist/${selling.id}/sell`,
       { quantity, price, note }
     );
     const symbol = selling.stock_symbol;
     setSelling(null);
     setReloadKey((k) => k + 1);
-    toast.success(`Sold ${quantity} ${symbol} at $${price.toFixed(2)}, with your note.`, "Sale recorded");
+    if (typeof res.data?.cash_remaining === "number") setCash(res.data.cash_remaining);
+    onTraded?.(); // the sale moved the cash; let the switcher re-read it
+    toast.success(
+      `Sold ${quantity} ${symbol} at $${price.toFixed(2)}. ${money(
+        res.data?.proceeds ?? quantity * price
+      )} back in cash.`,
+      "Sale recorded"
+    );
   };
 
-  // Handler to remove an item from the watchlist
+  // Takes back a buy made in the last 60 seconds, deleting the trade and its
+  // feed post along with the holding. After that the server refuses and the
+  // position can only be closed by selling.
   const handleRemoveFromWatchlist = async (id: number) => {
     try {
       // Make a DELETE request to remove the item
-      await axiosInstance.delete(
+      const res = await axiosInstance.delete(
         `${import.meta.env.VITE_BACKEND_API_URL}/watchlist/${id}`,
         {
           headers: { Authorization: `Bearer ${accessToken}` }, // Include access token in headers
         }
       );
+      if (typeof res.data?.cash_remaining === "number") setCash(res.data.cash_remaining);
+      onTraded?.(); // the refund moved the cash back
       // Update local watchlist state by filtering out the removed item
       const updatedWatchlist = watchlist.filter((item) => item.id !== id);
       setWatchlist(updatedWatchlist); // Update state
@@ -243,14 +232,76 @@ const Watchlist = () => {
         return sum + parseFloat(item.price_at_time) * Number(item.quantity);
       }, 0);
       setTotal(newTotal); // Update total state
-      toast.success("The holding has been removed from your portfolio.", "Holding removed");
+      toast.success(
+        `The purchase has been taken back, and ${money(res.data?.refund ?? 0)} returned to cash.`,
+        "Buy undone"
+      );
     } catch (err: any) {
       toast.error(
-        err.response?.data?.error || "Could not delete this entry.",
-        err.response?.data?.code === "CORRECTION_WINDOW_CLOSED" ? "Record is locked" : undefined
+        err.response?.data?.error || "Could not undo this purchase.",
+        err.response?.data?.code === "REMOVAL_WINDOW_CLOSED" ? "Record is locked" : undefined
       );
     }
   };
+
+  // Performance of the open positions: what they cost, what they are worth
+  // now, and the two sides of the difference kept apart - a book that is up
+  // 300 on one name and down 250 on another is a different story from one
+  // quietly up 50.
+  const { positionsValue, unrealisedGain, unrealisedLoss } = useMemo(() => {
+    let value = 0;
+    let gain = 0;
+    let loss = 0;
+    for (const item of watchlist) {
+      const paid = parseFloat(item.price_at_time);
+      const qty = Number(item.quantity);
+      // No cached quote yet: value it at cost, which scores it flat rather
+      // than counting the position as worthless.
+      const latest = latestPrices[item.stock_symbol] ?? paid;
+      const move = (latest - paid) * qty;
+      value += latest * qty;
+      if (move >= 0) gain += move;
+      else loss += move;
+    }
+    return { positionsValue: value, unrealisedGain: gain, unrealisedLoss: Math.abs(loss) };
+  }, [watchlist, latestPrices]);
+
+  // One holding. Single positions and the rows inside an expanded group are
+  // the same thing and now render through the same function, so the two can
+  // no longer drift apart.
+  //
+  // These are your own numbers, so the price you paid is shown in full - it is
+  // only other people's prices that stay private.
+  const renderRow = (stock: any, indented = false) => (
+    <div
+      key={stock.id}
+      className="watchlist-row"
+      style={indented ? { paddingLeft: "1rem" } : undefined}
+    >
+      <div className="ticker">
+        <Link className="ticker-link" to={`/stock/${stock.stock_symbol}`}>
+          {stock.stock_symbol}
+        </Link>
+      </div>
+      <div className="price">${parseFloat(stock.price_at_time).toFixed(2)}</div>
+      <div className="quantity">{stock.quantity}</div>
+      {/* Date AND time of the purchase, which is what the log and the feed
+          show everyone else too. */}
+      <div className="added">{new Date(stock.added_at).toLocaleString()}</div>
+      <div className="actions">
+        <button onClick={() => setSelling(stock)}>Sell…</button>
+        {isRemovable(stock) ? (
+          <button
+            className="undo-btn"
+            onClick={() => handleRemoveFromWatchlist(stock.id)}
+            title="Bought this by mistake? You have 60 seconds to take it back."
+          >
+            Undo buy
+          </button>
+        ) : null}
+      </div>
+    </div>
+  );
 
   // Return the Watchlist UI
   return (
@@ -270,15 +321,74 @@ const Watchlist = () => {
           onSubmit={handleSell}
         />
       )}
-      {/* Container with inline padding */}
-      <h4>Total Portfolio Value: ${total.toFixed(2)}</h4>{" "}
-      {/* Display total portfolio value */}
-      <StockDistributionPieChart watchlist={watchlist} />{" "}
-      {/* Render pie chart component */}
+      {/* What this book is made of: what was deployed, what is left, and what
+          it all adds up to against the balance it opened with. */}
+      <div className="cash-bar">
+        <div className="cash-figure">
+          <span className="summary-label">Invested</span>
+          <span className="summary-value">{money(total)}</span>
+        </div>
+        <div className="cash-figure">
+          <span className="summary-label">Cash available</span>
+          <span className="summary-value">{money(cash)}</span>
+        </div>
+        <div className="cash-figure">
+          <span className="summary-label">Opened with</span>
+          <span className="summary-value">{money(portfolio.starting_balance)}</span>
+        </div>
+        {/* How much of the book is still uninvested, drawn as a bar. */}
+        <div className="cash-meter" title={`${money(cash)} of ${money(total + cash)} uninvested`}>
+          <span
+            className="cash-meter-fill"
+            style={{
+              width: `${total + cash > 0 ? Math.min((total / (total + cash)) * 100, 100) : 0}%`,
+            }}
+          />
+        </div>
+      </div>{" "}
+      {/* The whole book: positions at today's prices, plus the cash left. */}
+      <StockDistributionPieChart
+        watchlist={watchlist}
+        cash={cash}
+        latestPrices={latestPrices}
+      />{" "}
       <PortfolioPerformanceChart
         watchlist={watchlist} // Pass watchlist data to the performance chart
         latestPrices={latestPrices} // Pass latest prices to the performance chart
       />
+      {/* Performance, directly beneath the over-time chart. This used to be its
+          own tab in the header; it lives here now because it is about the book
+          you have open, and it reads the same watchlist and prices this
+          component already holds rather than fetching them again. */}
+      {watchlist.length > 0 && (
+        <section className="dashboard-performance">
+          <h3>{portfolio.name} · performance</h3>
+
+          <div className="summary-cards">
+            <div className="summary-card">
+              <span className="summary-label">Cost of holdings</span>
+              <span className="summary-value">{money(total)}</span>
+            </div>
+            <div className="summary-card">
+              <span className="summary-label">Worth today</span>
+              <span className="summary-value">{money(positionsValue)}</span>
+            </div>
+            <div className="summary-card">
+              <span className="summary-label">Unrealised gain</span>
+              <span className="summary-value gain">{money(unrealisedGain)}</span>
+            </div>
+            <div className="summary-card">
+              <span className="summary-label">Unrealised loss</span>
+              <span className="summary-value loss">{money(unrealisedLoss)}</span>
+            </div>
+          </div>
+
+          <p className="compare-note">
+            Sort by ticker, quantity or profit and loss.
+          </p>
+          <PortfolioPerformance watchlist={watchlist} latestPrices={latestPrices} />
+        </section>
+      )}
       <div className="watchlist">
         {" "}
         {/* Container for watchlist table */}
@@ -305,246 +415,29 @@ const Watchlist = () => {
           <div className="actions">Actions</div>{" "}
           {/* Column header for actions */}
         </div>
-        {groupedStocks.map(({ symbol, items }) => {
-          // Map over each grouped stock
-          if (items.length === 1) {
-            // If only one item in group, render it directly
-            const stock = items[0];
-            // Define an inline handler for removing this stock from the watchlist
-            const handleRemoveFromWatchlist = async (id: number) => {
-              try {
-                await axiosInstance.delete(
-                  `${import.meta.env.VITE_BACKEND_API_URL}/watchlist/${id}`,
-                  {
-                    headers: { Authorization: `Bearer ${accessToken}` },
-                  }
-                );
-                const updatedWatchlist = watchlist.filter(
-                  (item) => item.id !== id
-                );
-                setWatchlist(updatedWatchlist);
-                const newTotal = updatedWatchlist.reduce((sum, item) => {
-                  return (
-                    sum + parseFloat(item.price_at_time) * Number(item.quantity)
-                  );
-                }, 0);
-                setTotal(newTotal);
-                toast.success("The holding has been removed from your portfolio.", "Holding removed");
-              } catch (err: any) {
-                toast.error(
-                  err.response?.data?.error || "Could not delete this entry.",
-                  err.response?.data?.code === "CORRECTION_WINDOW_CLOSED" ? "Record is locked" : undefined
-                );
-              }
-            };
-            return (
+        {groupedStocks.map(({ symbol, items }) =>
+          // A single position renders as a row; several purchases of the same
+          // ticker collapse behind a header that expands into the same rows.
+          items.length === 1 ? (
+            renderRow(items[0])
+          ) : (
+            <div key={symbol} className="watchlist-group">
               <div
-                key={stock.id}
-                className={`watchlist-row ${
-                  editingItemId === stock.id ? "editing" : ""
-                }`} // Add editing class if this row is being edited
+                className="group-header"
+                onClick={() => toggleGroup(symbol)} // Toggle group expansion on click
               >
-                <div className="ticker">
-                  <Link className="ticker-link" to={`/stock/${stock.stock_symbol}`}>
-                    {stock.stock_symbol}
-                  </Link>
-                </div>{" "}
-                {/* Display stock symbol */}
-                <div className="price">
-                  {editingItemId === stock.id ? ( // If editing, render an input field
-                    <input
-                      type="number"
-                      name="price_at_time"
-                      value={editingItemData.price_at_time}
-                      onChange={handleEditChange}
-                      step="0.01"
-                      required
-                    />
-                  ) : (
-                    `$${parseFloat(stock.price_at_time).toFixed(2)}` // Otherwise, display formatted price
-                  )}
-                </div>
-                <div className="quantity">
-                  {editingItemId === stock.id ? ( // If editing, render an input field
-                    <input
-                      type="number"
-                      name="quantity"
-                      value={editingItemData.quantity}
-                      onChange={handleEditChange}
-                      min="1"
-                      required
-                    />
-                  ) : (
-                    stock.quantity // Otherwise, display quantity
-                  )}
-                </div>
-                <div className="added">
-                  {editingItemId === stock.id ? ( // If editing, render an input field for date/time
-                    <input
-                      type="datetime-local"
-                      name="added_at"
-                      value={new Date(editingItemData.added_at)
-                        .toISOString()
-                        .slice(0, 16)}
-                      onChange={handleEditChange}
-                    />
-                  ) : (
-                    new Date(stock.added_at).toLocaleString() // Otherwise, display formatted date/time
-                  )}
-                </div>
-                <div className="actions">
-                  {editingItemId === stock.id ? ( // If editing, show Save and Cancel buttons
-                    <>
-                      <button onClick={() => handleSaveEdit(stock.id)}>
-                        Save
-                      </button>
-                      <button onClick={handleCancelEdit}>Cancel</button>
-                    </>
-                  ) : (
-                    // Otherwise, show Edit and Remove buttons
-                    <>
-                      <button onClick={() => setSelling(stock)}>Sell…</button>
-                      {isCorrectable(stock.added_at) ? (
-                        <>
-                          <button onClick={() => handleEdit(stock)}>Edit</button>
-                          <button
-                            onClick={() => handleRemoveFromWatchlist(stock.id)}
-                          >
-                            Remove
-                          </button>
-                        </>
-                      ) : (
-                        <span
-                          className="locked-hint"
-                          title="Trades can be corrected for one hour. After that the record stands and the only way out is a sale."
-                        >
-                          locked
-                        </span>
-                      )}
-                    </>
-                  )}
-                </div>
+                <span>{symbol}</span>{" "}
+                {/* Display the stock symbol for the group */}
+                <span style={{ float: "right" }}>
+                  {expandedSymbols[symbol] ? "▲" : "▼"}{" "}
+                  {/* Display arrow based on expansion state */}
+                </span>
               </div>
-            );
-          } else {
-            // For groups with multiple stocks, show a group header that can be expanded/collapsed
-            return (
-              <div key={symbol} className="watchlist-group">
-                <div
-                  className="group-header"
-                  onClick={() => toggleGroup(symbol)} // Toggle group expansion on click
-                >
-                  <span>{symbol}</span>{" "}
-                  {/* Display the stock symbol for the group */}
-                  <span style={{ float: "right" }}>
-                    {expandedSymbols[symbol] ? "▲" : "▼"}{" "}
-                    {/* Display arrow based on expansion state */}
-                  </span>
-                </div>
-                {expandedSymbols[symbol] &&
-                  items.map(
-                    (
-                      stock // If expanded, map over each stock in the group
-                    ) => (
-                      <div
-                        key={stock.id}
-                        className={`watchlist-row ${
-                          editingItemId === stock.id ? "editing" : ""
-                        }`}
-                        style={{ paddingLeft: "1rem" }} // Indent rows in the expanded group
-                      >
-                        <div className="ticker">
-                  <Link className="ticker-link" to={`/stock/${stock.stock_symbol}`}>
-                    {stock.stock_symbol}
-                  </Link>
-                </div>{" "}
-                        {/* Display stock symbol */}
-                        <div className="price">
-                          {editingItemId === stock.id ? (
-                            <input
-                              type="number"
-                              name="price_at_time"
-                              value={editingItemData.price_at_time}
-                              onChange={handleEditChange}
-                              step="0.01"
-                              required
-                            />
-                          ) : (
-                            `$${parseFloat(stock.price_at_time).toFixed(2)}`
-                          )}
-                        </div>
-                        <div className="quantity">
-                          {editingItemId === stock.id ? (
-                            <input
-                              type="number"
-                              name="quantity"
-                              value={editingItemData.quantity}
-                              onChange={handleEditChange}
-                              min="1"
-                              required
-                            />
-                          ) : (
-                            stock.quantity
-                          )}
-                        </div>
-                        <div className="added">
-                          {editingItemId === stock.id ? (
-                            <input
-                              type="datetime-local"
-                              name="added_at"
-                              value={new Date(editingItemData.added_at)
-                                .toISOString()
-                                .slice(0, 16)}
-                              onChange={handleEditChange}
-                            />
-                          ) : (
-                            new Date(stock.added_at).toLocaleString()
-                          )}
-                        </div>
-                        <div className="actions">
-                          {editingItemId === stock.id ? (
-                            <>
-                              <button onClick={() => handleSaveEdit(stock.id)}>
-                                Save
-                              </button>
-                              <button onClick={handleCancelEdit}>Cancel</button>
-                            </>
-                          ) : (
-                            <>
-                              <button onClick={() => setSelling(stock)}>
-                                Sell…
-                              </button>
-                              {isCorrectable(stock.added_at) ? (
-                                <>
-                                  <button onClick={() => handleEdit(stock)}>
-                                    Edit
-                                  </button>
-                                  <button
-                                    onClick={() =>
-                                      handleRemoveFromWatchlist(stock.id)
-                                    }
-                                  >
-                                    Remove
-                                  </button>
-                                </>
-                              ) : (
-                                <span
-                          className="locked-hint"
-                          title="Trades can be corrected for one hour. After that the record stands and the only way out is a sale."
-                        >
-                          locked
-                        </span>
-                              )}
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    )
-                  )}
-              </div>
-            );
-          }
-        })}
+              {expandedSymbols[symbol] &&
+                items.map((stock) => renderRow(stock, true))}
+            </div>
+          )
+        )}
       </div>
       <button
         className="manual-add-btn"

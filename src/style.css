@@ -650,7 +650,9 @@ tbody tr:hover { background: var(--gold-wash); }
 
 .leaderboard-row {
   display: grid;
-  grid-template-columns: 3rem 1fr 6rem 9rem 9.5rem 11rem;
+  /* rank | investor | holdings | return | actions.
+     There is no value column: the leaderboard carries percentages only. */
+  grid-template-columns: 3rem 1fr 6rem 9.5rem 11rem;
   align-items: center;
   gap: 0.6rem;
   padding: 0.85rem 1.1rem;
@@ -678,7 +680,7 @@ tbody tr:hover { background: var(--gold-wash); }
 .lb-rank { font-family: var(--font-num); font-weight: 700; color: var(--text-faint); }
 .leaderboard-row:nth-child(2) .lb-rank { color: var(--gold); font-size: 1.05rem; }
 .lb-name { font-weight: 600; }
-.lb-holdings, .lb-value { font-family: var(--font-num); color: var(--text-muted); }
+.lb-holdings { font-family: var(--font-num); color: var(--text-muted); }
 
 .lb-you {
   margin-left: 0.5rem;
@@ -695,7 +697,6 @@ tbody tr:hover { background: var(--gold-wash); }
 }
 
 .lb-return { display: flex; flex-direction: column; font-family: var(--font-num); font-weight: 700; }
-.lb-profit { font-size: 0.76rem; font-weight: 400; color: var(--text-faint); }
 .lb-actions { display: flex; gap: 0.4rem; }
 .lb-actions button { padding: 0.4rem 0.8rem; font-size: 0.76rem; }
 

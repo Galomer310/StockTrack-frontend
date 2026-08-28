@@ -439,13 +439,13 @@ const Watchlist = ({ portfolio, onTraded }: Props) => {
           )
         )}
       </div>
-      <button
-        className="manual-add-btn"
-        onClick={() => navigate("/manual-add")}
-      >
-        Add Stock Manually
-      </button>
-      {/* Button to navigate to the manual add stock page */}
+      {/* No "Add Stock Manually" button here.
+          A position on this dashboard is meant to be opened by buying at a
+          real quoted price, which is what makes a weight on the leaderboard
+          comparable between two people. Typing in your own entry price from
+          the dashboard undercut that, so the shortcut is gone from the book
+          itself. The manual entry screen still exists on its own route for
+          backfilling a holding that predates the account. */}
     </div>
   );
 };

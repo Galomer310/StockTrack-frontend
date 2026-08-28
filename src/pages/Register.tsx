@@ -64,13 +64,22 @@ const Register = () => {
               required // Mark input as required
             />
             <input
-              type="password" // Input field for password
-              placeholder="Password" // Placeholder text
-              value={password} // Bind value to password state
-              onChange={(e) => setPassword(e.target.value)} // Update password state on change
-              required // Mark input as required
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={12}
+              autoComplete="new-password"
             />
-            <button type="submit">Register</button> {/* Submit button */}
+            {/* The server rejects short and common passwords. Stating the rule
+                here means finding out before submitting rather than after: the
+                same requirement, but as guidance instead of a refusal. */}
+            <p className="field-hint">
+              At least 12 characters. A phrase you can remember is stronger
+              than a short jumble.
+            </p>
+            <button type="submit">Register</button>
           </form>
           <button onClick={() => navigate("/login")}>
             Already have an account? Login

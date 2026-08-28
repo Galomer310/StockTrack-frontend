@@ -1,85 +1,91 @@
-// Import routing components from react-router-dom
+import { lazy, Suspense } from "react";
 import {
-  BrowserRouter as Router, // Router component for handling routing
-  Routes, // Component to wrap route definitions
-  Route, // Individual route definition component
-  Navigate, // Component for redirection
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
 } from "react-router-dom";
-import { useSelector } from "react-redux"; // Import useSelector to access Redux state
-import { RootState } from "./store"; // Import RootState for type definitions
-import Home from "./pages/Home"; // Import Home page component
-import Login from "./pages/Login"; // Import Login page component
-import Register from "./pages/Register"; // Import Register page component
-import UserPage from "./pages/UserPage"; // Import UserPage component
-import StockSearch from "./pages/StockSearch"; // Import StockSearch page component
-import ManualAddStock from "./pages/ManualAddStock"; // Import ManualAddStock page component
-import Navbar from "./components/layout/Navbar"; // Import Navbar component
-import Leaderboard from "./pages/Leaderboard"; // Public ranking of all investors
-import Feed from "./pages/Feed"; // Shared timeline of everyone's trades
-import Market from "./pages/Market"; // Outbound links to research sites
-import InvestorPortfolio from "./pages/InvestorPortfolio"; // Another investor's portfolio
-import ComparePortfolios from "./pages/ComparePortfolios"; // Side-by-side comparison
-import StockPage from "./pages/StockPage"; // Full detail view for one ticker
+import { useSelector } from "react-redux";
+import { RootState } from "./store";
+import Navbar from "./components/layout/Navbar";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
 
-// Define the main App functional component
+/* ===========================================================================
+   Routing, and what is in the first download.
+   ---------------------------------------------------------------------------
+   Every page used to be a static import, so the browser fetched the entire
+   application before it could paint anything - including Chart.js, which is
+   the single heaviest dependency here and is needed by four screens out of
+   thirteen. Someone opening the login page waited for the charting library
+   they would not see until after they had signed in.
+
+   Only the three things a first-time visitor actually reaches are eager now:
+   the navbar, the landing page and the login form. Everything else is a
+   separate chunk fetched on navigation, which is also why the chart-bearing
+   pages no longer pull their weight into the initial load.
+
+   Register stays lazy despite sitting next to Login: whoever is registering
+   has time to spare, and the two screens do not share enough to be worth
+   pinning both.
+   =========================================================================== */
+
+const Register = lazy(() => import("./pages/Register"));
+const UserPage = lazy(() => import("./pages/UserPage"));
+const StockSearch = lazy(() => import("./pages/StockSearch"));
+const ManualAddStock = lazy(() => import("./pages/ManualAddStock"));
+const Leaderboard = lazy(() => import("./pages/Leaderboard"));
+const Feed = lazy(() => import("./pages/Feed"));
+const Market = lazy(() => import("./pages/Market"));
+const InvestorPortfolio = lazy(() => import("./pages/InvestorPortfolio"));
+const StockPage = lazy(() => import("./pages/StockPage"));
+const ComparePortfolios = lazy(() => import("./pages/ComparePortfolios"));
+
+// Shown while a route chunk is in flight. Deliberately quiet: on a fast
+// connection the chunk arrives in a few frames, and a spinner that appears
+// and vanishes that quickly reads as a flicker rather than as progress.
+const RouteFallback = () => (
+  <div className="route-loading" role="status" aria-live="polite">
+    Loading...
+  </div>
+);
+
 const App = () => {
-  const user = useSelector((state: RootState) => state.auth.user); // Get the current user from Redux state
+  const user = useSelector((state: RootState) => state.auth.user);
+
+  // Every authenticated route repeats the same "signed in, or go to login"
+  // check. Writing it once keeps the table below readable and makes it
+  // impossible to add a route that forgets the guard.
+  const guarded = (element: React.ReactNode) =>
+    user ? element : <Navigate to="/login" />;
 
   return (
     <Router>
-      {" "}
-      {/* Wrap the app with Router */}
-      <Navbar /> {/* Render the Navbar at the top */}
-      <Routes>
-        {" "}
-        {/* Define all application routes */}
-        <Route path="/" element={<Home />} /> {/* Home page route */}
-        <Route path="/login" element={<Login />} /> {/* Login page route */}
-        <Route path="/register" element={<Register />} />{" "}
-        {/* Register page route */}
-        <Route
-          path="/user"
-          element={user ? <UserPage /> : <Navigate to="/login" />} // Render UserPage if logged in, otherwise redirect to login
-        />
-        <Route
-          path="/search"
-          element={user ? <StockSearch /> : <Navigate to="/login" />} // Render StockSearch if logged in, otherwise redirect to login
-        />
-        <Route
-          path="/manual-add"
-          element={user ? <ManualAddStock /> : <Navigate to="/login" />} // Render ManualAddStock if logged in, otherwise redirect to login
-        />
-        {/* Performance moved onto the dashboard, under the over-time chart.
-            The route is kept as a redirect so an old bookmark still lands
-            somewhere useful instead of on a blank 404. */}
-        <Route path="/performance" element={<Navigate to="/user" replace />} />
-        <Route
-          path="/leaderboard"
-          element={user ? <Leaderboard /> : <Navigate to="/login" />} // Ranked list of all investors
-        />
-        <Route
-          path="/feed"
-          element={user ? <Feed /> : <Navigate to="/login" />} // Everyone's trades as they happen
-        />
-        <Route
-          path="/market"
-          element={user ? <Market /> : <Navigate to="/login" />} // Research links, outbound
-        />
-        <Route
-          path="/investor/:id"
-          element={user ? <InvestorPortfolio /> : <Navigate to="/login" />} // View one investor's portfolio
-        />
-        <Route
-          path="/stock/:ticker"
-          element={user ? <StockPage /> : <Navigate to="/login" />} // One stock in full
-        />
-        <Route
-          path="/compare/:id"
-          element={user ? <ComparePortfolios /> : <Navigate to="/login" />} // Compare yours against theirs
-        />
-      </Routes>
+      <Navbar />
+      <Suspense fallback={<RouteFallback />}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+
+          <Route path="/user" element={guarded(<UserPage />)} />
+          <Route path="/search" element={guarded(<StockSearch />)} />
+          <Route path="/manual-add" element={guarded(<ManualAddStock />)} />
+          <Route path="/leaderboard" element={guarded(<Leaderboard />)} />
+          <Route path="/feed" element={guarded(<Feed />)} />
+          <Route path="/market" element={guarded(<Market />)} />
+          <Route path="/investor/:id" element={guarded(<InvestorPortfolio />)} />
+          <Route path="/stock/:ticker" element={guarded(<StockPage />)} />
+          <Route path="/compare/:id" element={guarded(<ComparePortfolios />)} />
+
+          {/* Performance moved onto the dashboard, under the over-time chart.
+              The route is kept as a redirect so an old bookmark still lands
+              somewhere useful instead of on a blank 404. */}
+          <Route path="/performance" element={<Navigate to="/user" replace />} />
+        </Routes>
+      </Suspense>
     </Router>
   );
 };
 
-export default App; // Export the App component as default
+export default App;

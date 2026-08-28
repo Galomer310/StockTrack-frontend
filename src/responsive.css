@@ -279,7 +279,13 @@ body.nav-locked { overflow: hidden; }
   .summary-card { padding: 0.9rem; }
   .summary-value { font-size: 1.15rem; }
 
-  .home-container { min-height: 82vh; background-position: 62% center; }
+  /* dvh for the same reason as the desktop rule: on a phone the URL bar is
+     a much larger share of the viewport, so the vh/dvh gap is widest here. */
+  .home-container {
+    min-height: 82vh;
+    min-height: 82dvh;
+    background-position: 62% center;
+  }
   .hero { padding: 3rem 1.25rem; }
   .hero-overlay::before { font-size: 0.6rem; letter-spacing: 0.24em; }
   .hero-buttons { flex-direction: column; align-items: stretch; }
@@ -319,7 +325,23 @@ body.nav-locked { overflow: hidden; }
   .leaderboard-row:not(.leaderboard-head):hover { background: transparent; }
   .leaderboard-row.is-me { background: var(--gold-wash); }
   .watchlist-row:hover { background: transparent; }
-  button { min-height: 42px; }
+
+  /* 44px is the floor both Apple and Google publish for a touch target, and
+     the number a fingertip actually needs. This was 42px, which is close
+     enough to look right in a screenshot and still miss under a thumb.
+     Buttons were the only control raised: a select, a text input and a link
+     styled as a button are all tapped the same way and were all left at
+     whatever height their font and padding happened to produce. */
+  button,
+  select,
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  .btn,
+  .link-btn,
+  .range-chip { min-height: 44px; }
 }
 
 /* ---------- Reduced motion ----------

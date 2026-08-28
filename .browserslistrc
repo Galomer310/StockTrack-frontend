@@ -1,0 +1,15 @@
+# Which browsers autoprefixer targets, and what `npm run build` compiles for.
+#
+# The floor is set by iOS Safari, not by the desktop browsers: this is a
+# dashboard people open on a phone, and iOS Safari is both the most common
+# mobile engine and the slowest to gain features. 15.4 (March 2022) is the
+# release that added the dynamic viewport units the layout relies on, so
+# anything older would fall back to the 100vh behaviour those units exist to
+# avoid.
+#
+# Run `npx browserslist` to see exactly which versions this resolves to.
+
+defaults
+iOS >= 15.4
+Safari >= 15.4
+not dead

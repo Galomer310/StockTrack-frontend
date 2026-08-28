@@ -112,7 +112,14 @@
 .nav-scrim {
   position: fixed;
   inset: 0;
-  z-index: 110;
+  /* Below the navbar's 100, not above it.
+     The drawer lives inside .navbar, which is a stacking context (sticky plus
+     a z-index), so the drawer's own z-index is resolved within it and the
+     whole subtree is capped at the navbar's 100. At 110 this scrim therefore
+     painted over the open drawer instead of behind it - the menu was there,
+     under an almost opaque black sheet. Sitting below the navbar also keeps
+     the close button visible and tappable while the menu is open. */
+  z-index: 90;
   background: rgba(4, 6, 10, 0.62);
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
@@ -140,6 +147,20 @@ body.nav-locked { overflow: hidden; }
 /* ---------- Tablet and below: header collapses into a drawer ---------- */
 @media (max-width: 900px) {
   .nav-toggle { display: flex; }
+
+  /* No backdrop blur on the bar itself at this width.
+     backdrop-filter makes an element a containing block for its fixed-position
+     descendants, and the drawer below is one of them - so `position: fixed;
+     top: 0; bottom: 0` was resolving against this ~60px bar rather than the
+     viewport, collapsing a full-height panel into a sliver. The blur is worth
+     little here anyway: on a phone the bar is a thin strip, and an opaque
+     background reads the same. Desktop keeps the blur. */
+  .navbar {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(8, 11, 17, 0.98);
+  }
+  body.light-mode .navbar { background: rgba(255, 255, 255, 0.98); }
 
   .navbar-links {
     position: fixed;

@@ -160,13 +160,15 @@ const TradeNoteModal: React.FC<Props> = ({
               <span className="summary-label">
                 {mode === "buy" ? "Price paid" : "Sale price"}
               </span>
+              {/* Read-only both ways: the server executes every trade at its
+                  own market quote, so this is the price shown, not chosen. */}
               <input
                 type="number"
                 step="0.01"
                 min="0.01"
                 value={price}
                 onChange={(e) => setPrice(Number(e.target.value))}
-                disabled={mode === "buy"}
+                disabled
                 required
               />
             </label>

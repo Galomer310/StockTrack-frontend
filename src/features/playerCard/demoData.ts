@@ -10,8 +10,9 @@
    the figures are not the reference image's sample values hard-coded into
    components.
 
-   Two players: an established one, and a new one whose card shows the
-   locked and empty states. Open /player?demo=new to see the second.
+   Two players: an established one (/player?demo=1) and a new one whose card
+   shows the locked and empty states (/player?demo=new). Without ?demo the
+   page shows the signed-in player's real card.
    =========================================================================== */
 
 import type { Award, PlayerCardData } from "../../api/playerCard";
@@ -35,12 +36,10 @@ const established: PlayerCardData = {
     first_name: "Roee",
     avatar_url: null,
     bio: "משקיע צמיחה עם חשיבה אנליטית. מתמקד בטכנולוגיה, ביצועים עקביים וניהול סיכון.",
-    level: 27,
-    title: "Elite Investor",
-    xp: 8420,
-    next_level_xp: 10000,
-    next_level: 28,
-    next_title: "Master Strategist",
+  },
+  progression: {
+    state: "available",
+    value: { level: 27, title: "Elite Investor", xp: 8420, next_level_xp: 10000, next_level: 28, next_title: "Master Strategist" },
   },
   social: { followers: 2430, subscribers: 618 },
   stats: {
@@ -153,12 +152,10 @@ const newcomer: PlayerCardData = {
     first_name: null,
     avatar_url: null,
     bio: "Learning the ropes, one trade at a time.",
-    level: 3,
-    title: "Rookie",
-    xp: 340,
-    next_level_xp: 500,
-    next_level: 4,
-    next_title: "Apprentice",
+  },
+  progression: {
+    state: "available",
+    value: { level: 3, title: "Rookie", xp: 340, next_level_xp: 500, next_level: 4, next_title: "Apprentice" },
   },
   social: { followers: 14, subscribers: 0 },
   stats: {

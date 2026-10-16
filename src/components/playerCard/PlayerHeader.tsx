@@ -3,6 +3,7 @@ import { BIO_MAX_LENGTH, bioLength, PlayerCardData, saveBio } from "../../api/pl
 import { useLanguage } from "../../i18n/LanguageContext";
 import { formatNumber } from "./format";
 import { Icon } from "./icons";
+import { reasonKey } from "./reasons";
 
 /* ===========================================================================
    Area 1 - the player header (spec 3).
@@ -14,18 +15,21 @@ import { Icon } from "./icons";
    it. The image shows a full name above the nickname instead; the spec's
    text decides, and it makes the nickname the player's primary identity.
 
-   Level and title are shown, never edited: the system sets them. The bio is
-   the one thing here the owner can change.
+   Level and title are shown, never edited: the system sets them. While the
+   XP rules are undefined the server withholds them, and the badge says so
+   in place of a number. The bio is the one thing here the owner can change.
    =========================================================================== */
 
 type Player = PlayerCardData["player"];
 
 export const PlayerHeader = ({
   player,
+  progression,
   canEdit,
   onBioSaved,
 }: {
   player: Player;
+  progression: PlayerCardData["progression"];
   canEdit: boolean;
   onBioSaved: (bio: string) => void;
 }) => {
@@ -108,31 +112,55 @@ export const PlayerHeader = ({
       <div className="pc-divider" aria-hidden="true" />
 
       <div className="pc-identity">
-        <p className="pc-nickname">
-          <bdi dir="ltr">@{player.nickname}</bdi>
-        </p>
+        {player.nickname ? (
+          <p className="pc-nickname">
+            <bdi dir="ltr">@{player.nickname}</bdi>
+          </p>
+        ) : (
+          <p className="pc-nickname is-missing">{t("nickname_missing")}</p>
+        )}
         {player.first_name && <span className="pc-first-name">{player.first_name}</span>}
         <div className="pc-badges">
-          <span className="pc-badge">
-            <Icon name="star" />
-            <bdi dir="ltr">
-              {t("level")} {formatNumber(player.level, locale)}
-            </bdi>
-          </span>
-          <span className="pc-badge">
-            <Icon name="crown" />
-            <bdi dir="ltr">{player.title}</bdi>
-          </span>
+          {progression.state === "available" ? (
+            <>
+              <span className="pc-badge">
+                <Icon name="star" />
+                <bdi dir="ltr">
+                  {t("level")} {formatNumber(progression.value.level, locale)}
+                </bdi>
+              </span>
+              <span className="pc-badge">
+                <Icon name="crown" />
+                <bdi dir="ltr">{progression.value.title}</bdi>
+              </span>
+            </>
+          ) : (
+            <span className="pc-badge is-muted">
+              <Icon name="star" />
+              <span>
+                <bdi dir="ltr">{t("level")}</bdi>: {t(reasonKey(progression) ?? "unavailable_missing")}
+              </span>
+            </span>
+          )}
         </div>
       </div>
 
-      <div className="pc-avatar" role="img" aria-label={`${t("avatar_label")}: @${player.nickname}`}>
+      <div
+        className="pc-avatar"
+        role="img"
+        aria-label={player.nickname ? `${t("avatar_label")}: @${player.nickname}` : t("avatar_label")}
+      >
         {player.avatar_url ? (
           <img src={player.avatar_url} alt="" />
         ) : (
-          // The default picture for a player who has not chosen one (spec 3.1).
+          // The default picture for a player who has not chosen one (spec 3.1):
+          // the nickname's initial, or a silhouette before there is a nickname.
           <span className="pc-avatar-default">
-            <span className="pc-gold-text">{player.nickname.charAt(0).toUpperCase()}</span>
+            {player.nickname ? (
+              <span className="pc-gold-text">{player.nickname.charAt(0).toUpperCase()}</span>
+            ) : (
+              <Icon name="person" className="pc-avatar-silhouette" />
+            )}
           </span>
         )}
       </div>

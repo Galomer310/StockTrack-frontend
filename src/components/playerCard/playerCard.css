@@ -142,6 +142,7 @@
   margin: 0; font-family: var(--pc-display-en); font-weight: 700; line-height: 1.05;
   font-size: clamp(2rem, 4.2vw, 3.1rem); color: var(--pc-cream); overflow-wrap: anywhere;
 }
+.pc-nickname.is-missing { font-family: var(--pc-body); font-size: 1.15rem; font-weight: 500; color: var(--pc-muted); }
 .pc-first-name { color: var(--pc-muted); font-size: 1.05rem; }
 .pc-badges { display: flex; flex-wrap: wrap; gap: 10px; margin-block-start: 6px; }
 .pc-badge {
@@ -149,6 +150,9 @@
   border: 1px solid var(--pc-line); background: rgba(217, 169, 78, 0.06); font-weight: 500;
 }
 .pc-badge svg { width: 18px; height: 18px; color: var(--pc-gold); }
+.pc-badge.is-muted { color: var(--pc-muted); border-color: var(--pc-line-soft); background: none; }
+.pc-badge.is-muted svg { color: var(--pc-gold-deep); }
+.pc-avatar-silhouette { width: 55%; height: 55%; color: var(--pc-gold-deep); }
 
 .pc-avatar {
   width: clamp(96px, 13vw, 150px); max-width: 100%; aspect-ratio: 1; padding: 4px; border-radius: 50%;

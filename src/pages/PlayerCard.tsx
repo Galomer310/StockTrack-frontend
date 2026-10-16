@@ -18,14 +18,20 @@ import "../components/playerCard/playerCard.css";
    left exactly as the image does and in English it is the mirror image;
    the rest of the app is not yet right-to-left ready (see LanguageProvider).
 
-   It is the signed-in player's own card for now, so the bio is editable.
-   Other players' cards come with the player endpoints.
+   It is the signed-in player's own card, from GET /players/me/card. Adding
+   ?demo=1 or ?demo=new shows demo data instead (see demoData.ts). Other
+   players' cards come with the subscription rules.
+
+   The bio can be edited only on demo data for now: there is no endpoint to
+   save it yet, and offering an edit that silently vanishes on reload would
+   be worse than not offering one.
    =========================================================================== */
 
 const PlayerCard = () => {
   const { t, dir, lang } = useLanguage();
   const [params] = useSearchParams();
-  const scenario = params.get("demo") === "new" ? "newcomer" : "established";
+  const demoParam = params.get("demo");
+  const scenario = demoParam === null ? undefined : demoParam === "new" ? "newcomer" : "established";
 
   const [result, setResult] = useState<PlayerCardResult | null>(null);
   const [failed, setFailed] = useState(false);
@@ -65,7 +71,12 @@ const PlayerCard = () => {
         {result && (
           <>
             {result.demo && <p className="pc-demo-note">{t("demo_notice")}</p>}
-            <PlayerHeader player={result.data.player} canEdit onBioSaved={setBio} />
+            <PlayerHeader
+              player={result.data.player}
+              progression={result.data.progression}
+              canEdit={result.demo}
+              onBioSaved={setBio}
+            />
             <StatsRow data={result.data} />
             <div className="pc-row3">
               <CompetitionsPanel competitions={result.data.competitions} />
@@ -81,7 +92,7 @@ const PlayerCard = () => {
               />
             </div>
             <div className="pc-row2">
-              <ProgressionPanel player={result.data.player} />
+              <ProgressionPanel progression={result.data.progression} />
               <PerformancePanel stats={result.data.stats} />
             </div>
           </>

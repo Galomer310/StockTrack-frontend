@@ -1,22 +1,27 @@
 /* ===========================================================================
    Player Card data.
    ---------------------------------------------------------------------------
-   The shape below is what the backend will return: every figure already
-   calculated by the metric engine (src/metrics/player.ts in the backend),
-   with locked and unavailable states decided there. The screen only
-   displays it. Return and XP calculations must not be repeated in the
-   browser - the spec forbids duplicating them, and two implementations
-   would eventually disagree.
+   GET /players/me/card returns every figure already calculated by the
+   backend's metric engine, with locked and unavailable states decided
+   there. The screen only displays it. Return and XP calculations must not be
+   repeated in the browser - the spec forbids duplicating them, and two
+   implementations would eventually disagree.
 
-   No player endpoints exist yet, so these functions serve demo data with
-   the same shape. Replacing their bodies with API calls is the whole of the
-   switch; nothing that renders the card needs to change.
+   The types below mirror the backend's response (src/services/playerCard.ts
+   in StockTracker-backend). Demo data in the same shape remains available
+   with ?demo=1 (an established player) or ?demo=new (a new one), for
+   working on the design without an account full of trades.
    =========================================================================== */
 
+import axiosInstance from "./axiosInstance";
 import { DEMO_PLAYER_CARDS, DemoScenario } from "../features/playerCard/demoData";
 
+const BASE = `${import.meta.env.VITE_BACKEND_API_URL}/players`;
+
 export type LockReason = "requires_min_active_portfolios" | "no_active_portfolio_above_threshold";
-export type UnavailableReason = "missing_data" | "no_active_portfolios";
+// not_defined: the rules behind the figure are deliberately unwritten yet
+// (XP, levels and titles), so the server withholds it rather than invent it.
+export type UnavailableReason = "missing_data" | "no_active_portfolios" | "not_defined";
 
 // Mirrors CardValue in the backend metric engine.
 export type CardValue<T> =
@@ -60,19 +65,25 @@ export interface TopPortfolio {
   cumulative_return: number;
 }
 
+export interface Progression {
+  level: number;
+  title: string;
+  xp: number;
+  next_level_xp: number;
+  next_level: number;
+  next_title: string;
+}
+
 export interface PlayerCardData {
   player: {
-    nickname: string;
+    /** null until the player has chosen one. */
+    nickname: string | null;
     first_name: string | null;
     avatar_url: string | null;
     bio: string;
-    level: number;
-    title: string;
-    xp: number;
-    next_level_xp: number;
-    next_level: number;
-    next_title: string;
   };
+  /** Level, title and XP: one value, so the header and the progress panel always agree. */
+  progression: CardValue<Progression>;
   social: { followers: number; subscribers: number };
   stats: {
     portfolios_total: number;
@@ -94,23 +105,25 @@ export interface PlayerCardResult {
   demo: boolean;
 }
 
-// Bio limit, from the Player Card spec (3.5).
+// Bio limit, from the Player Card spec (3.5). The database enforces it too.
 export const BIO_MAX_LENGTH = 100;
 
 // Counts characters as a person does, so a Hebrew letter or an emoji is one.
 export const bioLength = (text: string): number => [...text].length;
 
-export const fetchPlayerCard = async (scenario: DemoScenario = "established"): Promise<PlayerCardResult> => {
-  // TODO: GET /players/me/card once the backend serves it.
-  return { data: structuredClone(DEMO_PLAYER_CARDS[scenario]), demo: true };
+// The signed-in player's card, or demo data when a scenario is given.
+export const fetchPlayerCard = async (demo?: DemoScenario): Promise<PlayerCardResult> => {
+  if (demo) return { data: structuredClone(DEMO_PLAYER_CARDS[demo]), demo: true };
+  const res = await axiosInstance.get<PlayerCardData>(`${BASE}/me/card`);
+  return { data: res.data, demo: false };
 };
 
+// Demo only for now: there is no profile-editing endpoint yet, so the page
+// offers editing only on demo data, where the edit lasts until reload.
 export const saveBio = async (bio: string): Promise<string> => {
   const trimmed = bio.trim();
   if (bioLength(trimmed) > BIO_MAX_LENGTH) {
     throw new RangeError(`Bio must be ${BIO_MAX_LENGTH} characters or fewer`);
   }
-  // TODO: PATCH /players/me { bio } once the backend serves it. Until then
-  // the edit lasts until the page is reloaded.
   return trimmed;
 };

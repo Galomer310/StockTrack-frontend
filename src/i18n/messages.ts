@@ -55,6 +55,8 @@ const en = {
   lock_top_threshold: "Unlocks when an active portfolio passes 20%",
   unavailable_missing: "Not available yet",
   unavailable_none: "No active portfolios",
+  unavailable_not_defined: "Not defined yet",
+  nickname_missing: "No nickname yet",
 
   // Awards
   medals_title: "Professional Medals",
@@ -139,6 +141,8 @@ const he: Messages = {
   lock_top_threshold: "נפתח כשתיק פעיל עובר 20%",
   unavailable_missing: "עדיין לא זמין",
   unavailable_none: "אין תיקים פעילים",
+  unavailable_not_defined: "עדיין לא הוגדר",
+  nickname_missing: "עדיין אין כינוי",
 
   medals_title: "מדליות מקצועיות",
   achievements_title: "הישגים במשחק",

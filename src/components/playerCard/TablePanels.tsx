@@ -6,7 +6,7 @@ import { LevelEmblem } from "./art";
 import { formatNumber } from "./format";
 import { Icon, IconName } from "./icons";
 import { InfoTip } from "./InfoTip";
-import { Gated, Percent } from "./values";
+import { Gated, NotShown, Percent } from "./values";
 
 /* ===========================================================================
    Areas 5, 6 and 7 - competitions, player performance, game progress.
@@ -81,10 +81,13 @@ export const PerformancePanel = ({ stats }: { stats: PlayerCardData["stats"] }) 
   );
 };
 
-// Spec 10. The level here and in the header come from the same field.
-export const ProgressionPanel = ({ player }: { player: PlayerCardData["player"] }) => {
+// Spec 10. The level here and in the header come from the same value. While
+// the server withholds progression (the XP rules are not written yet), every
+// part of the panel stays in place and says why instead of showing a number.
+export const ProgressionPanel = ({ progression }: { progression: PlayerCardData["progression"] }) => {
   const { t, locale } = useLanguage();
-  const pct = Math.max(0, Math.min(100, (player.xp / player.next_level_xp) * 100));
+  const p = progression.state === "available" ? progression.value : null;
+  const pct = p ? Math.max(0, Math.min(100, (p.xp / p.next_level_xp) * 100)) : 0;
   return (
     <section className="pc-card pc-panel">
       <h2 className="pc-panel-title">
@@ -93,30 +96,36 @@ export const ProgressionPanel = ({ player }: { player: PlayerCardData["player"] 
         <InfoTip text={t("t_progress")} inline />
       </h2>
       <div className="pc-progress">
-        <LevelEmblem level={formatNumber(player.level, locale)} />
+        <LevelEmblem level={p ? formatNumber(p.level, locale) : "—"} />
         <div className="pc-progress-main">
           <p className="pc-xp">
-            <bdi dir="ltr">
-              <span className="pc-xp-label">XP</span> <span className="pc-xp-now">{formatNumber(player.xp, locale)}</span>{" "}
-              <span className="pc-xp-of">/ {formatNumber(player.next_level_xp, locale)}</span>
-            </bdi>
+            {p ? (
+              <bdi dir="ltr">
+                <span className="pc-xp-label">XP</span> <span className="pc-xp-now">{formatNumber(p.xp, locale)}</span>{" "}
+                <span className="pc-xp-of">/ {formatNumber(p.next_level_xp, locale)}</span>
+              </bdi>
+            ) : (
+              <>
+                <span className="pc-xp-label">XP</span> <NotShown value={progression} compact />
+              </>
+            )}
           </p>
           <div
             className="pc-bar"
             role="progressbar"
             aria-label="XP"
             aria-valuemin={0}
-            aria-valuemax={player.next_level_xp}
-            aria-valuenow={player.xp}
+            aria-valuemax={p?.next_level_xp ?? 0}
+            aria-valuenow={p?.xp}
           >
             <div style={{ inlineSize: `${pct.toFixed(1)}%` }} />
           </div>
           <div className="pc-table">
             <Row icon="crown" label="next_goal">
-              <bdi dir="ltr">{t("level")} {formatNumber(player.next_level, locale)}</bdi>
+              <Gated value={progression} compact render={(v) => <bdi dir="ltr">{t("level")} {formatNumber(v.next_level, locale)}</bdi>} />
             </Row>
             <Row icon="gem" label="next_title">
-              <bdi dir="ltr">{player.next_title}</bdi>
+              <Gated value={progression} compact render={(v) => <bdi dir="ltr">{v.next_title}</bdi>} />
             </Row>
           </div>
         </div>

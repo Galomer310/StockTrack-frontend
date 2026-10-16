@@ -33,7 +33,6 @@ import Login from "./pages/Login";
 const Register = lazy(() => import("./pages/Register"));
 const UserPage = lazy(() => import("./pages/UserPage"));
 const StockSearch = lazy(() => import("./pages/StockSearch"));
-const ManualAddStock = lazy(() => import("./pages/ManualAddStock"));
 const Leaderboard = lazy(() => import("./pages/Leaderboard"));
 const Feed = lazy(() => import("./pages/Feed"));
 const Market = lazy(() => import("./pages/Market"));
@@ -72,7 +71,6 @@ const App = () => {
           <Route path="/user" element={guarded(<UserPage />)} />
           <Route path="/player" element={guarded(<PlayerCard />)} />
           <Route path="/search" element={guarded(<StockSearch />)} />
-          <Route path="/manual-add" element={guarded(<ManualAddStock />)} />
           <Route path="/leaderboard" element={guarded(<Leaderboard />)} />
           <Route path="/feed" element={guarded(<Feed />)} />
           <Route path="/market" element={guarded(<Market />)} />
@@ -84,6 +82,10 @@ const App = () => {
               The route is kept as a redirect so an old bookmark still lands
               somewhere useful instead of on a blank 404. */}
           <Route path="/performance" element={<Navigate to="/user" replace />} />
+
+          {/* Manual entry is gone: every position opens at the market price.
+              Search is where a buy starts now, so an old link lands there. */}
+          <Route path="/manual-add" element={<Navigate to="/search" replace />} />
         </Routes>
       </Suspense>
     </Router>

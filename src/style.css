@@ -159,15 +159,13 @@ button:disabled {
 }
 
 button[type="submit"],
-.compare-btn,
-.manual-add-btn {
+.compare-btn {
   background: linear-gradient(180deg, var(--gold-bright), var(--gold));
   border-color: var(--gold-deep);
   color: #17130A;
 }
 button[type="submit"]:hover,
-.compare-btn:hover,
-.manual-add-btn:hover {
+.compare-btn:hover {
   background: linear-gradient(180deg, #F6CE7B, var(--gold-bright));
   color: #17130A;
   box-shadow: var(--glow-gold);
@@ -442,7 +440,6 @@ body.light-mode .register-container { background: rgba(255, 255, 255, 0.92); }
 /* ---------- Page shells ---------- */
 .user-page-container,
 .stock-search,
-.manual-add-stock,
 .leaderboard-page,
 .investor-page,
 .compare-page {
@@ -487,18 +484,6 @@ body.light-mode .register-container { background: rgba(255, 255, 255, 0.92); }
   border-radius: 2px;
 }
 
-
-.manual-add-stock form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  max-width: 420px;
-  margin-top: 1.25rem;
-  padding: 1.5rem;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-}
 
 /* ---------- Cards & tables ---------- */
 .summary-cards {
@@ -630,7 +615,6 @@ tbody tr:hover { background: var(--gold-wash); }
 }
 .group-header:hover { background: var(--gold-wash); color: var(--gold-bright); }
 
-.manual-add-btn { margin-top: 1.25rem; }
 
 /* ---------- Leaderboard ---------- */
 .leaderboard-page h2 { margin-bottom: 0.25rem; }

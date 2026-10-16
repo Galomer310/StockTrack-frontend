@@ -191,12 +191,15 @@ const Watchlist = ({ portfolio, onTraded }: Props) => {
   // Selling opens the note window; the backend records the trade and its
   // thesis in one transaction, then we refresh from the server rather than
   // guessing at the new quantity locally.
-  const handleSell = async ({ note, quantity, price }: TradeSubmission) => {
+  // The price shown in the window is only an estimate: the server sells at its
+  // own market quote, so the toast reports the price it actually used.
+  const handleSell = async ({ note, quantity, price: estimate }: TradeSubmission) => {
     if (!selling) return;
     const res = await axiosInstance.post(
       `${import.meta.env.VITE_BACKEND_API_URL}/watchlist/${selling.id}/sell`,
-      { quantity, price, note }
+      { quantity, note }
     );
+    const price: number = typeof res.data?.price === "number" ? res.data.price : estimate;
     const symbol = selling.stock_symbol;
     setSelling(null);
     setReloadKey((k) => k + 1);
@@ -439,13 +442,11 @@ const Watchlist = ({ portfolio, onTraded }: Props) => {
           )
         )}
       </div>
-      {/* No "Add Stock Manually" button here.
-          A position on this dashboard is meant to be opened by buying at a
-          real quoted price, which is what makes a weight on the leaderboard
-          comparable between two people. Typing in your own entry price from
-          the dashboard undercut that, so the shortcut is gone from the book
-          itself. The manual entry screen still exists on its own route for
-          backfilling a holding that predates the account. */}
+      {/* No "Add Stock Manually" button here, nor anywhere else.
+          A position is opened by buying at a real quoted price, which is what
+          makes a weight on the leaderboard comparable between two people.
+          Typing in your own entry price undercut that, so manual entry is
+          gone, and the server refuses it. */}
     </div>
   );
 };

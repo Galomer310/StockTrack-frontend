@@ -257,7 +257,7 @@ body.light-mode .navbar { background: rgba(255, 255, 255, 0.82); }
 .navbar-links li a:hover,
 .navbar-links li > span:hover { color: var(--text); background: var(--gold-wash); }
 
-.toggle-dark-mode, .logout-btn {
+.toggle-lang, .toggle-dark-mode, .logout-btn {
   font-size: 0.75rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;

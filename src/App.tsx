@@ -40,6 +40,7 @@ const Market = lazy(() => import("./pages/Market"));
 const InvestorPortfolio = lazy(() => import("./pages/InvestorPortfolio"));
 const StockPage = lazy(() => import("./pages/StockPage"));
 const ComparePortfolios = lazy(() => import("./pages/ComparePortfolios"));
+const PlayerCard = lazy(() => import("./pages/PlayerCard"));
 
 // Shown while a route chunk is in flight. Deliberately quiet: on a fast
 // connection the chunk arrives in a few frames, and a spinner that appears
@@ -69,6 +70,7 @@ const App = () => {
           <Route path="/register" element={<Register />} />
 
           <Route path="/user" element={guarded(<UserPage />)} />
+          <Route path="/player" element={guarded(<PlayerCard />)} />
           <Route path="/search" element={guarded(<StockSearch />)} />
           <Route path="/manual-add" element={guarded(<ManualAddStock />)} />
           <Route path="/leaderboard" element={guarded(<Leaderboard />)} />

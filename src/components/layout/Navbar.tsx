@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../store";
 import { clearUser } from "../../features/authSlice";
 import { clearActivePortfolio } from "../../features/portfolioSlice";
+import { useLanguage } from "../../i18n/LanguageContext";
 import "../../style.css";
 
 const Navbar = () => {
@@ -14,6 +15,10 @@ const Navbar = () => {
 
   // Current user from Redux; drives whether the Logout button is shown
   const user = useSelector((state: RootState) => state.auth.user);
+
+  // Interface language. The navbar itself stays English until it is ported;
+  // only the toggle speaks the language it switches to.
+  const { lang, setLang, t } = useLanguage();
 
   // State to track if the Search Stocks link is disabled
   const [searchDisabled, setSearchDisabled] = useState(false);
@@ -129,6 +134,9 @@ const Navbar = () => {
             <Link to="/user">Dashboard</Link>
           </li>
           <li>
+            <Link to="/player">Player Card</Link>
+          </li>
+          <li>
             {searchDisabled ? (
               <span className="nav-disabled">Search Stocks ({countdown})</span>
             ) : (
@@ -150,6 +158,15 @@ const Navbar = () => {
             <Link to="/leaderboard">Leaderboard</Link>
           </li>
           <li className="nav-controls">
+            {/* Language toggle, labelled in the language it switches to */}
+            <button
+              onClick={() => setLang(lang === "he" ? "en" : "he")}
+              className="toggle-lang"
+              lang={lang === "he" ? "en" : "he"}
+              aria-label={t("nav_switch_language_label")}
+            >
+              {t("nav_switch_language")}
+            </button>
             {/* Theme toggle */}
             <button onClick={toggleDarkMode} className="toggle-dark-mode">
               {lightMode ? "Dark Mode" : "Light Mode"}

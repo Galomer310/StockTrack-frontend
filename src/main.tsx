@@ -3,6 +3,7 @@ import App from "./App";
 import { Provider } from "react-redux";
 import store from "./store";
 import { ToastProvider } from "./components/ui/ToastProvider";
+import { LanguageProvider } from "./i18n/LanguageProvider";
 import "./style.css";
 import "./responsive.css"; // Motion + breakpoints; imported last so it wins the cascade
 
@@ -17,8 +18,10 @@ import "./responsive.css"; // Motion + breakpoints; imported last so it wins the
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <Provider store={store}>
-    <ToastProvider>
-      <App />
-    </ToastProvider>
+    <LanguageProvider>
+      <ToastProvider>
+        <App />
+      </ToastProvider>
+    </LanguageProvider>
   </Provider>
 );

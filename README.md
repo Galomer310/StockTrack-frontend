@@ -1,157 +1,122 @@
-# StockTrack
+# Investments — frontend
 
-**StockTrack** is a web-based platform that allows users to track stock market performance, view real-time stock data, and manage their watchlist. Users can create accounts, log in securely, and store their preferred stocks for easy access. The app is built with a full-stack setup using Node.js, React, PostgreSQL, and Redux.
+The web app for **Investments** (formerly StockTrack): a social investing game
+where every player runs virtual model portfolios that start with $10,000,
+trades at real quoted prices, explains each trade, and is ranked against
+everyone else.
 
----
+The API lives in
+[StockTracker-backend](https://github.com/Galomer310/StockTracker-backend),
+which also holds the product spec and roadmap in
+[`docs/PRODUCT-SPEC-AND-GAP.md`](https://github.com/Galomer310/StockTracker-backend/blob/main/docs/PRODUCT-SPEC-AND-GAP.md).
 
-## Features
-
-- **User Authentication:** Secure account registration and login using JWT authentication.
-- **Watchlist Management:** Add, view, and remove stocks from a personalized watchlist.
-- **Real-Time Stock Data:** Fetch live stock data using the Polygon.io API.
-- **Responsive Design:** Optimized for both desktop and mobile viewing.
-- **State Management:** Redux is used to manage global state.
-
----
-
-## Tech Stack
-
-### Frontend:
-
-- React (Vite setup)
-- TypeScript
-- Redux (for state management)
-- CSS (custom styling)
-
-### Backend:
-
-- Node.js (Express)
-- TypeScript
-- PostgreSQL (hosted on NeonDB)
-- JWT for authentication
-- API integration with Polygon.io
-
-### Database:
-
-- PostgreSQL with NeonDB
-- Tables for users, watchlists, and stocks
+Illustrative video: https://youtu.be/XTYVHmeUiLY
 
 ---
 
-## Project Structure
+## Screens
+
+| Path | Screen |
+|---|---|
+| `/` | Landing page. |
+| `/login`, `/register` | Sign in and create an account. |
+| `/user` | Dashboard: portfolio switcher, holdings, cash, buy and sell with a required note, allocation and performance charts, trade journal. |
+| `/player` | Player Card: the player's profile, six headline figures, medals, achievements, competitions, game progress and performance. |
+| `/search` | Find a stock and buy it at the market price. |
+| `/stock/:ticker` | One stock: quote, chart, fundamentals and news. |
+| `/market` | Links out to outside research sites, with a ticker box that opens a stock on the chosen site. |
+| `/feed` | Everyone's trades, with reactions and replies. |
+| `/leaderboard` | Every portfolio ranked by percentage return. |
+| `/investor/:id` | Another player's portfolio, percentages only, and their journal. |
+| `/compare/:id` | Your portfolio against another, side by side. |
+
+Every screen except the landing, login and registration pages needs a
+signed-in session.
+
+## Languages
+
+The interface is switchable between Hebrew (right to left) and English from
+the toggle in the navbar, and the choice is remembered per browser. So far
+only the Player Card is translated; the other screens are moving over one
+at a time. Copy lives in `src/i18n/messages.ts`, where the Hebrew table is
+typed against the English one, so a missing translation fails the build.
+
+## Player Card
+
+Built from the reference design and the Player Card spec (Parts 3 and 4 of
+the backend's spec document). It shows the signed-in player's real card from
+the backend's `GET /players/me/card`, where every figure is calculated. Figures
+whose data or rules do not exist yet, such as XP and levels, show as locked
+or unavailable with the reason, rather than invented.
+
+Demo data, kept apart from the components in
+`src/features/playerCard/demoData.ts`, is available for design work:
+`/player?demo=1` for an established player, `/player?demo=new` for a new one.
+
+`prototypes/player-card.html` is the standalone prototype the page was
+ported from. It is not part of the build.
+
+## Tech stack
+
+- React 18, TypeScript, Vite 6
+- Redux Toolkit for session and portfolio state
+- React Router 7
+- Chart.js through react-chartjs-2
+- Plain CSS with design tokens (`src/style.css`, `src/responsive.css`, and
+  `src/components/playerCard/playerCard.css` for the Player Card)
+
+## Getting started
+
+Prerequisites: Node.js 22, and the backend running.
+
+```bash
+npm install
+```
+
+Create a `.env` file pointing at the backend:
+
+```env
+VITE_BACKEND_API_URL=http://localhost:3000
+```
+
+Then:
+
+```bash
+npm run dev
+```
+
+The app opens at `http://localhost:5173`, which is the origin the backend
+allows by default.
+
+### Scripts
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | Development server with hot reload. |
+| `npm run build` | Type-check and build to `dist/`. |
+| `npm run preview` | Serve the built app locally. |
+| `npm run lint` | ESLint. |
+
+## Project structure
 
 ```
-StockTrack/
-├── backend/
-│   └── src/
-│        └── server.ts
-├── frontend/
-│   └── src/
-│        ├── App.tsx
-│        └── main.tsx
-├── types/
-└── .gitignore
+src/
+  App.tsx           routes; every page except the first three loads on demand
+  api/              one module per backend area, through axiosInstance
+  pages/            one component per screen
+  components/       charts, layout, trades, stock detail, toasts, Player Card
+  features/         Redux slices and Player Card demo data
+  i18n/             languages: copy, provider, hook
+  charts/           shared Chart.js theme
+prototypes/         standalone design prototypes, not built
 ```
 
----
+## Deployment
 
-## Installation
-
-### Prerequisites:
-
-- Node.js (v16 or higher)
-- PostgreSQL (or access to NeonDB)
-
-### Backend Setup
-
-1. Navigate to the backend folder:
-   ```bash
-   cd StockTrack/backend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Create a `.env` file in the `backend` directory with the following variables:
-   ```env
-   DATABASE_URL=your_database_url
-   JWT_SECRET=your_jwt_secret
-   POLYGON_API_KEY=your_polygon_api_key
-   ```
-4. Start the server:
-   ```bash
-   npm run dev
-   ```
-
-### Frontend Setup
-
-1. Navigate to the frontend folder:
-   ```bash
-   cd StockTrack/frontend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
-
-The frontend will be available at `http://localhost:5173`, and the backend at `http://localhost:3000`.
-
----
-
-## API Endpoints
-
-### Authentication
-
-- `POST /auth/register` - Register a new user
-- `POST /auth/login` - Login and receive a JWT token
-
-### Watchlist
-
-- `GET /watchlist` - Fetch the user's watchlist (requires authentication)
-- `POST /watchlist` - Add a new stock to the watchlist (requires authentication)
-- `DELETE /watchlist/:ticker` - Remove a stock from the watchlist (requires authentication)
-
----
-
-## Development Workflow
-
-1. Use `Redux Dev Tools` for testing and debugging global state.
-2. Ensure the frontend is synchronized with backend API endpoints.
-3. Use `ES6` or `ES2016` standards for JavaScript development.
-
----
-
-## Contributing
-
-1. Fork the repository.
-2. Create a new branch:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-3. Make your changes and commit them:
-   ```bash
-   git commit -m "Add your message here"
-   ```
-4. Push the changes:
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-5. Open a pull request.
-
----
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
-
-Illustrative video : https://youtu.be/XTYVHmeUiLY
----
+Prepared for Render as a static site: `npm ci && npm run build`, serving
+`dist/`. Set `VITE_BACKEND_API_URL` to the backend's address at build time,
+and add this site's address to the backend's `CORS_ORIGINS`.
 
 ## Contact
 
-For questions or feedback, please contact [[galomer6708@gmail.com](mailto\:galomer6708@gmail.com)].
-
+For questions or feedback: [galomer6708@gmail.com](mailto:galomer6708@gmail.com)

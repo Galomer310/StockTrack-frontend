@@ -195,17 +195,23 @@
 .pc-tip > svg { width: 16px; height: 16px; }
 .pc .pc-tip--inline { position: relative; inset: auto; width: 26px; height: 26px; flex-shrink: 0; }
 .pc-tip--inline > svg { width: 14px; height: 14px; }
+/* The wrapper is not positioned, so the bubble is placed against the
+   element it explains (see the hosts below) and spans its width. */
+.pc-tipwrap--inline { display: inline-flex; }
 .pc-bubble {
-  position: absolute; z-index: 20; inset-block-start: calc(100% + 6px); inset-inline-end: -6px;
-  width: max-content; max-width: min(240px, 70vw); padding: 10px 12px; border-radius: 10px;
+  position: absolute; z-index: 20; inset-inline: 8px; inset-block-start: calc(100% + 6px);
+  padding: 10px 12px; border-radius: 10px;
   background: #1C1B1F; border: 1px solid var(--pc-line); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
   color: var(--pc-cream); font-size: 0.82rem; font-weight: 400; line-height: 1.5; text-align: start; text-transform: none;
   opacity: 0; visibility: hidden; transform: translateY(-4px);
   transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
 }
-.pc-tip:hover .pc-bubble,
-.pc-tip:focus-visible .pc-bubble,
-.pc-tip[aria-expanded="true"] .pc-bubble { opacity: 1; visibility: visible; transform: none; }
+.pc-tip:hover + .pc-bubble,
+.pc-tip:focus-visible + .pc-bubble,
+.pc-tip[aria-expanded="true"] + .pc-bubble { opacity: 1; visibility: visible; transform: none; }
+/* Bubble hosts. In a stat card it drops in just below the ⓘ row. */
+.pc-row, .pc-panel-title { position: relative; }
+.pc-stat .pc-bubble { inset-block-start: 38px; }
 
 /* ---------- Rows of panels ---------- */
 .pc-row3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
@@ -255,7 +261,10 @@
 }
 
 /* ---------- Award details ---------- */
+/* margin: auto restores the browser's centring of a modal dialog, which the
+   app's global `* { margin: 0 }` reset removes. */
 .pc-dialog {
+  margin: auto; max-height: calc(100dvh - 32px); overflow-y: auto;
   width: min(420px, calc(100vw - 32px)); padding: 0; border: 1px solid var(--pc-line); border-radius: 16px;
   background: linear-gradient(180deg, #1A191D, #101013); color: var(--pc-cream);
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);

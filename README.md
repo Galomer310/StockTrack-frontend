@@ -44,11 +44,14 @@ typed against the English one, so a missing translation fails the build.
 ## Player Card
 
 Built from the reference design and the Player Card spec (Parts 3 and 4 of
-the backend's spec document). On `main` it shows demo data, kept apart from
-the components in `src/features/playerCard/demoData.ts`; `/player?demo=new`
-shows a new player's locked and empty states. Figures that depend on rules
-not yet defined, such as XP and levels, are designed to show as locked or
-unavailable rather than invented.
+the backend's spec document). It shows the signed-in player's real card from
+the backend's `GET /players/me/card`, where every figure is calculated. Figures
+whose data or rules do not exist yet, such as XP and levels, show as locked
+or unavailable with the reason, rather than invented.
+
+Demo data, kept apart from the components in
+`src/features/playerCard/demoData.ts`, is available for design work:
+`/player?demo=1` for an established player, `/player?demo=new` for a new one.
 
 `prototypes/player-card.html` is the standalone prototype the page was
 ported from. It is not part of the build.

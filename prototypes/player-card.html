@@ -1,0 +1,900 @@
+<title>Investments Player Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Frank+Ruhl+Libre:wght@500;700;900&family=Heebo:wght@400;500;700;800&display=swap">
+<style>
+/* Layout: the reference image's five rows - title, profile card, six stats,
+   three panels, two panels - built on logical properties so Hebrew (RTL)
+   matches the image exactly and English (LTR) is its mirror. Deliberately
+   one dark look, per the spec's dark luxury direction. */
+:root {
+  color-scheme: dark;
+  --bg: #08090B;
+  --surface: #111114;
+  --surface-hi: #17171B;
+  --line: rgba(214, 170, 88, 0.55);
+  --line-soft: rgba(214, 170, 88, 0.22);
+  --gold: #D9A94E;
+  --gold-bright: #F4D58C;
+  --gold-deep: #8E6426;
+  --cream: #E8DEC8;
+  --muted: #A39D90;
+  --pos: #4CC764;
+  --neg: #E5544B;
+  --xp: #A77BFF;
+  --glow: 0 0 22px rgba(217, 169, 78, 0.10);
+  --glow-hi: 0 0 28px rgba(217, 169, 78, 0.22);
+
+  --f-display-he: "Frank Ruhl Libre", "David", serif;
+  --f-display-en: "Cormorant Garamond", "Georgia", serif;
+  --f-body: "Heebo", "Arial Hebrew", "Segoe UI", system-ui, sans-serif;
+
+  --r-card: 14px;
+  --r-pill: 10px;
+}
+
+* { box-sizing: border-box; }
+body {
+  background:
+    radial-gradient(1200px 600px at 85% -10%, rgba(217,169,78,0.10), transparent 60%),
+    radial-gradient(900px 700px at -10% 110%, rgba(217,169,78,0.06), transparent 60%),
+    var(--bg);
+  color: var(--cream);
+  font-family: var(--f-body);
+  font-size: 15px;
+  line-height: 1.5;
+  padding-inline: 16px;
+  padding-block: 0 48px;
+  overflow-wrap: anywhere;
+}
+#veins { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+.wrap { position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; overflow-x: clip; }
+
+/* ---------- Prototype controls (not part of the product) ---------- */
+.proto-bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px;
+  padding-block: 12px; margin-block-end: 6px;
+  border-block-end: 1px dashed var(--line-soft);
+  font-size: 12.5px; color: var(--muted);
+}
+.proto-bar .tag {
+  letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; font-size: 11px;
+  color: var(--bg); background: var(--muted); border-radius: 4px; padding: 2px 7px;
+}
+.seg { display: inline-flex; border: 1px solid var(--line-soft); border-radius: 8px; overflow: hidden; }
+.seg button {
+  font: inherit; color: var(--muted); background: transparent; border: 0; padding: 6px 12px; cursor: pointer;
+}
+.seg button[aria-pressed="true"] { background: rgba(217,169,78,0.16); color: var(--gold-bright); }
+.seg button:focus-visible, button:focus-visible, .tip:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
+.proto-note { flex-basis: 100%; }
+
+/* ---------- Page title ---------- */
+.page-head { position: relative; text-align: center; padding-block: 18px 22px; }
+.page-title {
+  margin: 0; display: inline-flex; align-items: center; gap: 18px;
+  font-weight: 900; font-size: clamp(2.2rem, 5.6vw, 3.6rem); line-height: 1.05;
+  text-wrap: balance;
+}
+:lang(he) .page-title { font-family: var(--f-display-he); }
+:lang(en) .page-title { font-family: var(--f-display-en); font-weight: 700; letter-spacing: 0.02em; }
+.gold-text {
+  background: linear-gradient(180deg, #FFF0C4 0%, var(--gold-bright) 30%, var(--gold) 62%, var(--gold-deep) 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.ornament { width: clamp(40px, 9vw, 96px); height: 14px; color: var(--gold); flex-shrink: 0; }
+.corner-chart {
+  position: absolute; inset-block-start: 0; inset-inline-start: -8px;
+  width: clamp(90px, 14vw, 150px); height: auto; opacity: 0.9; pointer-events: none;
+}
+
+/* ---------- Cards ---------- */
+.card {
+  position: relative;
+  background: linear-gradient(180deg, var(--surface-hi), var(--surface));
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  box-shadow: inset 0 1px 0 rgba(255, 230, 170, 0.06), var(--glow);
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+  min-width: 0;
+}
+.card:hover { box-shadow: inset 0 1px 0 rgba(255, 230, 170, 0.08), var(--glow-hi); border-color: rgba(230, 190, 110, 0.75); }
+.panel-title {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  margin: 0; padding-block: 14px 10px;
+  font-weight: 700; font-size: 1.12rem; color: var(--gold-bright);
+}
+:lang(he) .panel-title { font-family: var(--f-display-he); }
+:lang(en) .panel-title { font-family: var(--f-display-en); font-size: 1.28rem; letter-spacing: 0.02em; }
+.panel-title svg { width: 20px; height: 20px; color: var(--gold); flex-shrink: 0; }
+
+/* ---------- Profile ---------- */
+.profile {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1.25fr) auto;
+  align-items: center; gap: 0 26px; padding: 22px 30px;
+}
+/* DOM order: bio, divider, identity, avatar. In RTL that puts the bio on the
+   right and the picture on the left, as in the image. */
+.bio h2 {
+  display: flex; align-items: center; gap: 8px; margin: 0 0 8px;
+  font-size: 1.08rem; font-weight: 700; color: var(--gold-bright);
+}
+.bio h2 svg { width: 18px; height: 18px; color: var(--gold); }
+.bio p { margin: 0; color: var(--cream); font-size: 0.96rem; line-height: 1.7; }
+.bio-actions { display: flex; align-items: center; gap: 10px; margin-block-start: 10px; }
+.link-btn {
+  font: inherit; font-size: 0.82rem; color: var(--gold); background: none; border: 1px solid var(--line-soft);
+  border-radius: 8px; padding: 6px 10px; min-height: 32px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+}
+.link-btn:hover { border-color: var(--line); color: var(--gold-bright); }
+.link-btn svg { width: 14px; height: 14px; }
+.bio textarea {
+  width: 100%; min-height: 84px; resize: vertical; font: inherit; font-size: 0.95rem; line-height: 1.6;
+  color: var(--cream); background: #0B0B0D; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px;
+}
+.counter { font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; margin-inline-start: auto; }
+.counter.full { color: var(--gold-bright); }
+.divider { width: 1px; align-self: stretch; background: linear-gradient(180deg, transparent, var(--gold), transparent); }
+
+.identity { display: grid; gap: 6px; justify-items: start; }
+.nickname {
+  margin: 0; font-family: var(--f-display-en); font-weight: 700; line-height: 1.05;
+  font-size: clamp(2rem, 4.2vw, 3.1rem); color: var(--cream);
+}
+.first-name { color: var(--muted); font-size: 1.05rem; }
+.badges { display: flex; flex-wrap: wrap; gap: 10px; margin-block-start: 6px; }
+.badge {
+  display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: var(--r-pill);
+  border: 1px solid var(--line); background: rgba(217,169,78,0.06); color: var(--cream); font-weight: 500;
+}
+.badge svg { width: 18px; height: 18px; color: var(--gold); }
+
+.avatar {
+  width: clamp(96px, 13vw, 150px); aspect-ratio: 1; max-width: 100%; border-radius: 50%; padding: 4px;
+  background: conic-gradient(from 200deg, var(--gold-deep), var(--gold-bright), var(--gold), var(--gold-deep), var(--gold-bright), var(--gold-deep));
+  box-shadow: 0 0 26px rgba(217,169,78,0.35), 0 0 4px rgba(255,220,150,0.6);
+}
+.avatar-inner {
+  width: 100%; height: 100%; border-radius: 50%; display: grid; place-items: center;
+  background: radial-gradient(circle at 35% 30%, #2A2418, #0C0B09 70%);
+  font-family: var(--f-display-en); font-weight: 700; font-size: clamp(2.6rem, 5vw, 4rem);
+}
+
+/* ---------- Six stats ---------- */
+.stats { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 14px; margin-block: 16px; }
+.stat { display: grid; justify-items: center; align-content: start; gap: 6px; padding: 14px 10px 16px; min-height: 148px; text-align: center; }
+.stat-title { font-size: 0.9rem; color: var(--cream); line-height: 1.3; min-height: 2.6em; display: grid; place-items: center; padding-inline: 18px; }
+.stat-icon { width: 34px; height: 34px; color: var(--gold); }
+.stat-icon.trend { color: var(--pos); }
+.stat-value { font-weight: 800; font-size: clamp(1.5rem, 2.6vw, 2.05rem); line-height: 1.1; color: var(--gold-bright); font-variant-numeric: tabular-nums; }
+.pos { color: var(--pos) !important; }
+.neg { color: var(--neg) !important; }
+.locked { display: grid; justify-items: center; gap: 4px; color: var(--muted); font-size: 0.8rem; line-height: 1.35; }
+.locked svg { width: 22px; height: 22px; color: var(--gold-deep); }
+.dim { opacity: 0.4; }
+
+/* Info tooltips: hover or keyboard focus on desktop, tap on touch. */
+.tip {
+  position: absolute; inset-block-start: 8px; inset-inline-end: 8px;
+  width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+  border: 0; background: none; color: var(--muted); cursor: help; padding: 0;
+}
+.tip svg { width: 16px; height: 16px; }
+.tip:hover { color: var(--gold-bright); }
+.bubble {
+  position: absolute; z-index: 20; inset-block-start: calc(100% + 6px); inset-inline-end: -6px;
+  width: max-content; max-width: 240px; padding: 10px 12px; border-radius: 10px;
+  background: #1C1B1F; border: 1px solid var(--line); box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  color: var(--cream); font-size: 0.82rem; line-height: 1.5; text-align: start; font-weight: 400;
+  opacity: 0; visibility: hidden; transform: translateY(-4px); transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+}
+.tip:hover .bubble, .tip:focus-visible .bubble, .tip[aria-expanded="true"] .bubble { opacity: 1; visibility: visible; transform: none; }
+.inline-tip { position: relative; inset: auto; width: 22px; height: 22px; flex-shrink: 0; }
+.inline-tip svg { width: 14px; height: 14px; }
+
+/* ---------- Three panels ---------- */
+.row3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.row2 { display: grid; grid-template-columns: minmax(0, 1.18fr) minmax(0, 1fr); gap: 14px; margin-block-start: 14px; }
+.panel { padding: 0 16px 18px; }
+
+.badge-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.award {
+  display: grid; justify-items: center; align-content: start; gap: 8px; text-align: center;
+  font: inherit; color: var(--cream); background: none; border: 1px solid transparent; border-radius: 12px;
+  padding: 8px 4px; cursor: pointer; transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+.award:hover { border-color: var(--line-soft); background: rgba(217,169,78,0.05); transform: translateY(-2px); }
+.award svg { width: 100%; max-width: 72px; height: auto; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.6)); }
+.award span { font-size: 0.82rem; line-height: 1.3; color: var(--cream); }
+.empty { color: var(--muted); text-align: center; font-size: 0.9rem; padding: 26px 8px; }
+
+.table { display: grid; border: 1px solid var(--line-soft); border-radius: 10px; background: rgba(0,0,0,0.25); }
+.trow {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px;
+  padding: 10px 12px; border-block-end: 1px solid var(--line-soft);
+}
+.trow:last-child { border-block-end: 0; }
+.trow > svg { width: 20px; height: 20px; color: var(--gold); }
+.tlabel { display: flex; align-items: center; gap: 4px; color: var(--cream); font-size: 0.92rem; min-width: 0; }
+.tvalue { font-weight: 700; color: var(--gold-bright); font-variant-numeric: tabular-nums; text-align: end; }
+.tvalue .locked { display: inline-flex; flex-direction: row; gap: 6px; font-weight: 400; }
+.tvalue .locked svg { width: 16px; height: 16px; }
+.perf .trow { grid-template-columns: auto minmax(0, 1.4fr) minmax(0, 1fr); }
+.perf .tvalue { border-inline-start: 1px solid var(--line-soft); padding-inline-start: 12px; text-align: center; }
+
+/* ---------- Progression ---------- */
+.progress { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px 22px; align-items: center; padding: 4px 22px 22px; }
+.emblem { width: clamp(96px, 11vw, 124px); max-width: 100%; height: auto; }
+.xp-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; font-variant-numeric: tabular-nums; }
+.xp-label { color: var(--xp); font-weight: 800; font-size: 1.25rem; }
+.xp-now { color: var(--gold-bright); font-weight: 800; font-size: 1.5rem; }
+.xp-of { color: var(--muted); font-size: 1.05rem; }
+.bar { height: 14px; border-radius: 999px; background: #0A0A0C; border: 1px solid var(--line); padding: 2px; margin-block: 10px 14px; }
+.bar > div {
+  height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, var(--gold-deep), var(--gold) 45%, var(--gold-bright) 80%, var(--xp));
+  box-shadow: 0 0 12px rgba(217,169,78,0.5);
+}
+[dir="rtl"] .bar > div { background: linear-gradient(270deg, var(--gold-deep), var(--gold) 45%, var(--gold-bright) 80%, var(--xp)); }
+
+/* ---------- Detail dialog ---------- */
+dialog {
+  width: min(420px, calc(100vw - 32px)); border: 1px solid var(--line); border-radius: 16px; padding: 0;
+  background: linear-gradient(180deg, #1A191D, #101013); color: var(--cream); box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+}
+dialog::backdrop { background: rgba(4, 4, 6, 0.72); backdrop-filter: blur(3px); }
+.dlg { display: grid; justify-items: center; gap: 10px; padding: 26px 24px 20px; text-align: center; }
+.dlg svg.art { width: 110px; height: auto; }
+.dlg h3 { margin: 0; font-size: 1.35rem; color: var(--gold-bright); }
+:lang(he) .dlg h3 { font-family: var(--f-display-he); }
+:lang(en) .dlg h3 { font-family: var(--f-display-en); font-size: 1.6rem; }
+.dlg p { margin: 0; color: var(--cream); }
+.facts { width: 100%; display: grid; gap: 0; margin: 6px 0 0; border: 1px solid var(--line-soft); border-radius: 10px; }
+.facts div { display: flex; justify-content: space-between; gap: 12px; padding: 9px 12px; border-block-end: 1px solid var(--line-soft); font-size: 0.9rem; }
+.facts div:last-child { border-block-end: 0; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; color: var(--gold-bright); font-weight: 600; text-align: end; }
+.demo-note { font-size: 0.78rem; color: var(--muted); }
+.close-btn { margin-block-start: 6px; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1080px) {
+  .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .row3 { grid-template-columns: minmax(0, 1fr); }
+  .row2 { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  .profile { grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "avatar identity" "bio bio"; gap: 18px; padding: 20px; }
+  .profile .bio { grid-area: bio; padding-block-start: 16px; border-block-start: 1px solid var(--line-soft); }
+  .profile .identity { grid-area: identity; }
+  .profile .avatar { grid-area: avatar; }
+  .divider { display: none; }
+  /* In the stacked layout the picture leads, in either direction. */
+  [dir="rtl"] .profile { grid-template-areas: "avatar identity" "bio bio"; }
+}
+@media (max-width: 560px) {
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .badge-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .progress { grid-template-columns: minmax(0, 1fr); justify-items: center; }
+  .progress > div { width: 100%; }
+  .profile { grid-template-columns: minmax(0, 1fr); grid-template-areas: "avatar" "identity" "bio"; justify-items: center; text-align: center; }
+  [dir="rtl"] .profile { grid-template-areas: "avatar" "identity" "bio"; }
+  .identity { justify-items: center; }
+  .badges { justify-content: center; }
+  .ornament { display: none; }
+  .corner-chart { opacity: 0.35; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+</style>
+
+<!-- Shared gradients for every badge drawing. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="gGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF0C2"/><stop offset=".35" stop-color="#F0C871"/><stop offset=".7" stop-color="#C08A33"/><stop offset="1" stop-color="#7A5420"/></linearGradient>
+    <linearGradient id="gGoldRim" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE7A8"/><stop offset=".5" stop-color="#B9832E"/><stop offset="1" stop-color="#F3D07D"/></linearGradient>
+    <linearGradient id="gGreen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A6F7B9"/><stop offset=".45" stop-color="#2DB25C"/><stop offset="1" stop-color="#0C5A2C"/></linearGradient>
+    <linearGradient id="gBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9FCBFF"/><stop offset=".5" stop-color="#2F6FCF"/><stop offset="1" stop-color="#16346F"/></linearGradient>
+    <linearGradient id="gPurple" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#DABCFF"/><stop offset=".5" stop-color="#8752DD"/><stop offset="1" stop-color="#3F1F7E"/></linearGradient>
+    <linearGradient id="gTeal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9DEBC8"/><stop offset=".5" stop-color="#2E9C6E"/><stop offset="1" stop-color="#124D37"/></linearGradient>
+    <linearGradient id="gSilver" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F4F6FA"/><stop offset=".5" stop-color="#8E97A6"/><stop offset="1" stop-color="#DCE2EA"/></linearGradient>
+    <radialGradient id="gDark" cx=".5" cy=".35" r=".7"><stop offset="0" stop-color="#2A2620"/><stop offset="1" stop-color="#0B0A09"/></radialGradient>
+  </defs>
+</svg>
+
+<canvas id="veins" aria-hidden="true"></canvas>
+<div class="wrap">
+  <div class="proto-bar" id="protoBar"></div>
+  <main id="app"></main>
+</div>
+<dialog id="detail" aria-labelledby="dlgTitle"></dialog>
+
+<script>
+/* =========================================================================
+   DEMO DATA - kept apart from everything below, and replaceable by the real
+   API. Values are illustrative; nothing here is the medal bank, the
+   achievement bank, the title bank or an XP table, none of which is defined.
+   ========================================================================= */
+const DEMO = {
+  established: {
+    player: {
+      nickname: "growthhunter",
+      firstName: "Roee",
+      avatar: null, // none chosen: the default monogram is shown
+      bio: "משקיע צמיחה עם חשיבה אנליטית. מתמקד בטכנולוגיה, ביצועים עקביים וניהול סיכון.",
+      level: 27, title: "Elite Investor",
+      xp: 8420, nextLevelXp: 10000, nextLevel: 28, nextTitle: "Master Strategist",
+    },
+    social: { followers: 2430, subscribers: 618 },
+    portfolios: [
+      { id: 1, name: "Growth Hunter Alpha", status: "active", openedAt: "2025-03-02", ret: 0.864, mtd: 0.041 },
+      { id: 2, name: "AI Infrastructure", status: "active", openedAt: "2025-09-14", ret: 0.121, mtd: 0.018 },
+      { id: 3, name: "Dividend Core", status: "active", openedAt: "2026-01-05", ret: 0.039, mtd: -0.006 },
+      { id: 4, name: "Small Cap Lab", status: "active", openedAt: "2026-06-20", ret: -0.032, mtd: 0.023 },
+      { id: 5, name: "Q4 Momentum", status: "closed", openedAt: "2024-10-01", ret: 0.18, mtd: null },
+      { id: 6, name: "Energy Rotation", status: "closed", openedAt: "2024-11-11", ret: -0.07, mtd: null },
+      { id: 7, name: "Biotech Swing", status: "closed", openedAt: "2025-01-20", ret: 0.33, mtd: null },
+      { id: 8, name: "Value Reset", status: "closed", openedAt: "2025-05-08", ret: 0.05, mtd: null },
+      { id: 9, name: "Earnings Season", status: "closed", openedAt: "2025-07-15", ret: 0.11, mtd: null },
+    ],
+    // [competition, results confirmed, final rank, won a prize]
+    competitions: [
+      ["sep-26", 1, 1, 1], ["aug-26", 1, 2, 1], ["q2-26", 1, 2, 0], ["jun-26", 1, 3, 0], ["may-26", 1, 3, 0],
+      ["apr-26", 1, 3, 0], ["q1-26", 1, 2, 0], ["mar-26", 1, 5, 1], ["feb-26", 1, 8, 0], ["jan-26", 1, 12, 0],
+      ["dec-25", 1, 15, 0], ["nov-25", 1, 21, 0], ["oct-25", 1, 9, 0], ["q4-25", 1, 30, 0], ["sep-25", 1, 14, 0],
+      ["aug-25", 1, 11, 0], ["jul-25", 1, 40, 0], ["oct-26", 0, null, 0],
+    ].map(([id, c, r, w]) => ({ id, confirmed: !!c, rank: r, prize: !!w })),
+    medals: [
+      { id: "sep-champion-2026", art: "laurelTrophy", prestige: 95, xp: 1500, earnedAt: "2026-10-01",
+        name: { he: "September Champion 2026", en: "September Champion 2026" },
+        desc: { he: "מקום ראשון בתחרות התשואה של ספטמבר 2026.", en: "First place in the September 2026 return competition." },
+        cond: { he: "לסיים במקום הראשון בתחרות חודשית.", en: "Finish first in a monthly competition." } },
+      { id: "beat-the-market", art: "gem", prestige: 88, xp: 1200, earnedAt: "2026-07-01",
+        name: { he: "Beat the Market", en: "Beat the Market" },
+        desc: { he: "תיק שהכה את מדד S&P 500 לאורך רבעון מלא.", en: "A portfolio that beat the S&P 500 over a full quarter." },
+        cond: { he: "תשואה רבעונית גבוהה ממדד הייחוס.", en: "A quarterly return above the benchmark." } },
+      { id: "top-1-percent", art: "shield1", prestige: 84, xp: 1000, earnedAt: "2026-04-02",
+        name: { he: "Top 1% Investor", en: "Top 1% Investor" },
+        desc: { he: "דירוג בין האחוז העליון של השחקנים.", en: "Ranked among the top 1% of players." },
+        cond: { he: "לסיים חודש באחוזון העליון בטבלת הדירוג.", en: "End a month in the top percentile of the leaderboard." } },
+      { id: "risk-master", art: "starShield", prestige: 76, xp: 800, earnedAt: "2026-02-15",
+        name: { he: "Risk Master", en: "Risk Master" },
+        desc: { he: "תשואה חיובית עם סיכון נמוך לאורך זמן.", en: "Positive returns with low risk, sustained over time." },
+        cond: { he: "שישה חודשים של תשואה חיובית בציון סיכון נמוך.", en: "Six months of positive return at a low risk score." } },
+      { id: "steady-hand", art: "gem", prestige: 40, xp: 300, earnedAt: "2025-12-01",
+        name: { he: "Steady Hand", en: "Steady Hand" },
+        desc: { he: "לא נמכרה אף אחזקה בהפסד במשך שלושה חודשים.", en: "No holding sold at a loss for three months." },
+        cond: { he: "שלושה חודשים ללא מכירה בהפסד.", en: "Three months without a losing sale." } },
+    ],
+    achievementsTotal: 12,
+    achievements: [
+      { id: "first-100-subs", art: "hexBlue", importance: 90, xp: 600, earnedAt: "2026-05-30",
+        name: { he: "First 100 Subscribers", en: "First 100 Subscribers" },
+        desc: { he: "הגעת ל־100 מנויים משלמים.", en: "You reached 100 paid subscribers." },
+        cond: { he: "100 מנויים משלמים פעילים.", en: "100 active paid subscribers." } },
+      { id: "community-builder", art: "hexGreen", importance: 80, xp: 400, earnedAt: "2026-03-12",
+        name: { he: "Community Builder", en: "Community Builder" },
+        desc: { he: "פעילות קהילתית עקבית בפיד.", en: "Consistent activity in the community feed." },
+        cond: { he: "50 תגובות שקיבלו תגובה חוזרת.", en: "50 comments that drew a reply." } },
+      { id: "veteran-player", art: "hexPurple", importance: 70, xp: 300, earnedAt: "2026-03-02",
+        name: { he: "Veteran Player", en: "Veteran Player" },
+        desc: { he: "שנה שלמה של פעילות בפלטפורמה.", en: "A full year of activity on the platform." },
+        cond: { he: "שנה מפתיחת התיק הראשון.", en: "One year since your first portfolio opened." } },
+      { id: "competition-explorer", art: "hexGold", importance: 60, xp: 250, earnedAt: "2025-11-30",
+        name: { he: "Competition Explorer", en: "Competition Explorer" },
+        desc: { he: "השתתפות בחמש תחרויות שונות.", en: "Entered five different competitions." },
+        cond: { he: "חמש השתתפויות בתחרויות.", en: "Five competition entries." } },
+      { id: "first-trade", art: "hexBlue", importance: 20, xp: 50, earnedAt: "2025-03-02",
+        name: { he: "First Trade", en: "First Trade" },
+        desc: { he: "הקנייה הראשונה שלך.", en: "Your first purchase." },
+        cond: { he: "לבצע קנייה ראשונה.", en: "Make a first purchase." } },
+    ],
+  },
+  newcomer: {
+    player: {
+      nickname: "newinvestor", firstName: null, avatar: null,
+      bio: "Learning the ropes, one trade at a time.",
+      level: 3, title: "Rookie", xp: 340, nextLevelXp: 500, nextLevel: 4, nextTitle: "Apprentice",
+    },
+    social: { followers: 14, subscribers: 0 },
+    portfolios: [
+      { id: 21, name: "My First Book", status: "active", openedAt: "2026-10-03", ret: 0.062, mtd: 0.062 },
+    ],
+    competitions: [],
+    medals: [],
+    achievementsTotal: 1,
+    achievements: [
+      { id: "first-trade", art: "hexBlue", importance: 20, xp: 50, earnedAt: "2026-10-03",
+        name: { he: "First Trade", en: "First Trade" },
+        desc: { he: "הקנייה הראשונה שלך.", en: "Your first purchase." },
+        cond: { he: "לבצע קנייה ראשונה.", en: "Make a first purchase." } },
+    ],
+  },
+};
+
+/* =========================================================================
+   COPY - every string the page shows, in both languages.
+   ========================================================================= */
+const T = {
+  he: {
+    proto: "אב טיפוס", protoNote: "נתוני הדגמה בלבד. הסרגל הזה אינו חלק מהמוצר.",
+    lang: "שפה", scenario: "שחקן לדוגמה", established: "שחקן ותיק", newcomer: "שחקן חדש",
+    title: "כרטיס שחקן",
+    bioTitle: "תיאור השחקן", editBio: "עריכה", save: "שמירה", cancel: "ביטול",
+    level: "Level",
+    s_avg: "תשואה ממוצעת של התיקים הפעילים", s_ach: "הישגים במשחק", s_med: "מדליות מקצועיות",
+    s_sub: "מנויים", s_fol: "עוקבים", s_best: "Best Portfolio Gain",
+    t_avg: "ממוצע פשוט של התשואה של כל תיק פעיל, ממועד פתיחתו ועד היום. לכל תיק משקל שווה; תיקים סגורים לא נכללים.",
+    t_ach: "מספר ההישגים שצברת במשחק: תחרויות, משימות, אתגרים ופעילות.",
+    t_med: "מדליות מקצועיות מוענקות על השגת יעדים בתחום ההשקעות, בנפרד מהישגי המשחק.",
+    t_sub: "מנויים משלמים פעילים ($3 לחודש). מנוי רואה את התיקים ואת מבנה האחזקות.",
+    t_fol: "משתמשים שעוקבים אחריך בחינם. מעקב אינו חושף את מבנה האחזקות.",
+    t_best: "התשואה המצטברת של התיק הפעיל המוביל שלך.",
+    lock2: "נפתח מ־2 תיקים פעילים", lock20: "נפתח כשתיק פעיל עובר 20%", noData: "אין נתון",
+    medals: "מדליות מקצועיות", achievements: "הישגים במשחק", competitions: "השתתפות בתחרויות",
+    noMedals: "עוד לא הוענקו מדליות מקצועיות", noAch: "עוד אין הישגים",
+    c_entered: "השתתפויות", c_prizes: "זכיות", c_top3: "Top 3", c_first: "מקום 1",
+    tc_entered: "מספר התחרויות שהשתתפת בהן. כל תחרות נספרת פעם אחת.",
+    tc_prizes: "תחרויות שבהן זכית בפרס. זכייה אינה בהכרח מקום בשלישייה הראשונה. נספר לאחר אישור התוצאות.",
+    tc_top3: "תחרויות שסיימת באחד משלושת המקומות הראשונים, כולל מקום ראשון. נספר לאחר אישור התוצאות.",
+    tc_first: "תחרויות שסיימת בהן במקום הראשון. נספר לאחר אישור התוצאות.",
+    performance: "ביצועי שחקן",
+    p_total: "סה״כ תיקים", p_active: "תיקים פעילים", p_avg: "תשואה ממוצעת", p_month: "תשואה חודשית ממוצעת",
+    p_topName: "תיק מצטיין", p_topRet: "תשואת תיק מצטיין",
+    tp_total: "כל התיקים שפתחת, כולל תיקים שנסגרו.", tp_active: "תיקים פעילים כרגע.",
+    tp_month: "ממוצע התשואה של התיקים הפעילים מתחילת החודש, לפי שעון ישראל.",
+    tp_top: "התיק הפעיל עם התשואה המצטברת הגבוהה ביותר, כשהיא מעל 20%.",
+    progress: "התקדמות במשחק", nextGoal: "היעד הבא", nextTitle: "התואר הבא",
+    t_prog: "הדרגה עולה עם XP שנצבר מביצועים, פעילות, מדליות והישגים.",
+    d_earned: "הושג", d_condition: "תנאי קבלה", d_prestige: "רמת יוקרה", d_importance: "רמת חשיבות",
+    d_medal: "מדליה מקצועית", d_ach: "הישג במשחק",
+    d_demo: "תוכן הדגמה. בנק המדליות וההישגים עדיין לא הוגדר.", close: "סגירה",
+    info: "מידע",
+  },
+  en: {
+    proto: "Prototype", protoNote: "Demo data only. This bar is not part of the product.",
+    lang: "Language", scenario: "Demo player", established: "Established", newcomer: "New player",
+    title: "Player Card",
+    bioTitle: "Player Description", editBio: "Edit", save: "Save", cancel: "Cancel",
+    level: "Level",
+    s_avg: "Avg. Return, Active Portfolios", s_ach: "Game Achievements", s_med: "Professional Medals",
+    s_sub: "Subscribers", s_fol: "Followers", s_best: "Best Portfolio Gain",
+    t_avg: "A simple average of each active portfolio's return since it opened. Every portfolio counts equally; closed ones are left out.",
+    t_ach: "Game achievements you have earned, from competitions, missions, challenges and activity.",
+    t_med: "Professional medals are awarded for investing milestones, separately from game achievements.",
+    t_sub: "Active paid subscribers ($3 a month). Subscribers can see your portfolios and holdings.",
+    t_fol: "People who follow you for free. Following does not reveal your holdings.",
+    t_best: "The cumulative return of your best-performing active portfolio.",
+    lock2: "Unlocks with 2 active portfolios", lock20: "Unlocks when an active portfolio passes 20%", noData: "No data",
+    medals: "Professional Medals", achievements: "Game Achievements", competitions: "Competitions",
+    noMedals: "No professional medals yet", noAch: "No achievements yet",
+    c_entered: "Entered", c_prizes: "Prize wins", c_top3: "Top 3", c_first: "1st place",
+    tc_entered: "Competitions you have entered. Each one counts once.",
+    tc_prizes: "Competitions where you won a prize, which is not always a top-3 finish. Counted once results are confirmed.",
+    tc_top3: "Competitions you finished in the top 3, first place included. Counted once results are confirmed.",
+    tc_first: "Competitions you finished first. Counted once results are confirmed.",
+    performance: "Player Performance",
+    p_total: "Total portfolios", p_active: "Active portfolios", p_avg: "Average return", p_month: "Avg. monthly return",
+    p_topName: "Top portfolio", p_topRet: "Top portfolio return",
+    tp_total: "Every portfolio you have opened, closed ones included.", tp_active: "Portfolios that are active right now.",
+    tp_month: "Average return of your active portfolios since the start of this month, Israel time.",
+    tp_top: "Your active portfolio with the highest cumulative return, once it is above 20%.",
+    progress: "Game Progress", nextGoal: "Next goal", nextTitle: "Next title",
+    t_prog: "Your level rises with XP earned from performance, activity, medals and achievements.",
+    d_earned: "Earned", d_condition: "How to earn it", d_prestige: "Prestige", d_importance: "Importance",
+    d_medal: "Professional medal", d_ach: "Game achievement",
+    d_demo: "Demo content. The medal and achievement banks are not defined yet.", close: "Close",
+    info: "Info",
+  },
+};
+
+/* =========================================================================
+   CALCULATIONS - mirrors of the backend metric engine (src/metrics/player.ts)
+   so the prototype follows the same rules. The real page uses the engine.
+   ========================================================================= */
+const MIN_ACTIVE = 2, TOP_MIN = 0.2;
+const ok = (value) => ({ state: "ok", value });
+const lock = (reason) => ({ state: "locked", reason });
+const mean = (xs) => xs.reduce((s, v) => s + v, 0) / xs.length;
+
+function playerStats(d) {
+  const active = d.portfolios.filter((p) => p.status === "active");
+  const ranked = [...active].sort((a, b) => b.ret - a.ret || a.openedAt.localeCompare(b.openedAt) || a.id - b.id);
+  const top = ranked[0];
+  const comp = { entered: new Set(), prizes: new Set(), top3: new Set(), first: new Set() };
+  for (const e of d.competitions) {
+    comp.entered.add(e.id);
+    if (!e.confirmed) continue;
+    if (e.prize) comp.prizes.add(e.id);
+    if (e.rank !== null && e.rank <= 3) comp.top3.add(e.id);
+    if (e.rank === 1) comp.first.add(e.id);
+  }
+  return {
+    total: d.portfolios.length,
+    active: active.length,
+    avg: active.length < MIN_ACTIVE ? lock("lock2") : ok(mean(active.map((p) => p.ret))),
+    best: active.length < MIN_ACTIVE ? lock("lock2") : ok(top.ret),
+    top: top && top.ret > TOP_MIN ? ok(top) : lock("lock20"),
+    month: active.length ? ok(mean(active.map((p) => p.mtd))) : { state: "none" },
+    comp: Object.fromEntries(Object.entries(comp).map(([k, s]) => [k, s.size])),
+    medals: [...d.medals].sort((a, b) => b.prestige - a.prestige),
+    achievements: [...d.achievements].sort((a, b) => b.importance - a.importance),
+  };
+}
+
+/* =========================================================================
+   DRAWINGS
+   ========================================================================= */
+const ICON = {
+  info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9.2"/><path d="M12 11v6" stroke-linecap="round"/><circle cx="12" cy="7.6" r="1.1" fill="currentColor" stroke="none"/></svg>',
+  lock: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 10V7.5a5 5 0 0 1 10 0V10h.6c.8 0 1.4.6 1.4 1.4v8.2c0 .8-.6 1.4-1.4 1.4H6.4C5.6 21 5 20.4 5 19.6v-8.2C5 10.6 5.6 10 6.4 10H7zm2 0h6V7.5a3 3 0 0 0-6 0V10z"/></svg>',
+  trend: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 24l8-8 5 5 12-12"/><path d="M20 9h8v8"/></svg>',
+  users: '<svg viewBox="0 0 32 32" fill="currentColor"><circle cx="16" cy="9.5" r="4.4"/><path d="M7.5 26c0-5 3.8-8.6 8.5-8.6s8.5 3.6 8.5 8.6z"/><circle cx="6.8" cy="12" r="3.2"/><path d="M1 24.5c0-3.7 2.6-6.3 5.9-6.3 1.3 0 2.5.4 3.4 1.1-1.8 1.6-3 3.6-3.3 5.2z"/><circle cx="25.2" cy="12" r="3.2"/><path d="M31 24.5c0-3.7-2.6-6.3-5.9-6.3-1.3 0-2.5.4-3.4 1.1 1.8 1.6 3 3.6 3.3 5.2z"/></svg>',
+  user: '<svg viewBox="0 0 32 32" fill="currentColor"><circle cx="16" cy="10" r="5.4"/><path d="M5.5 28c0-6.2 4.7-10.4 10.5-10.4S26.5 21.8 26.5 28z"/></svg>',
+  medal: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M9 2.5l4.5 9M23 2.5l-4.5 9"/><circle cx="16" cy="20" r="8.5"/><path d="M16 15.2l1.5 3 3.3.5-2.4 2.3.6 3.3-3-1.6-3 1.6.6-3.3-2.4-2.3 3.3-.5z" fill="currentColor" stroke="none"/></svg>',
+  trophy: '<svg viewBox="0 0 32 32" fill="currentColor"><path d="M9 3h14v3h5v3.5c0 4-3 6.8-6.6 7.3A7.6 7.6 0 0 1 17.5 21v3.5H22V28H10v-3.5h4.5V21a7.6 7.6 0 0 1-3.9-4.2C7 16.3 4 13.5 4 9.5V6h5zm14 6v5c1.6-.6 2.8-2.2 2.8-4.5V9zm-14 0H6.2v.5C6.2 11.8 7.4 13.4 9 14z"/></svg>',
+  cycleUp: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M27 16a11 11 0 1 1-4-8.5"/><path d="M23.5 3.5v4.5H28"/><path d="M10 20l4.5-4.5 3 3L23 13"/><path d="M19 13h4v4"/></svg>',
+  crown: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 7.5l4.5 4 4.5-6.5 4.5 6.5 4.5-4-1.8 10.5H4.8zM5 19.5h14V21H5z"/></svg>',
+  star: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>',
+  person: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.6 3.6-7.8 8-7.8s8 3.2 8 7.8z"/></svg>',
+  pencil: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 20l1-4.5L16 4.5l3.5 3.5L8.5 19z"/><path d="M14 7l3.5 3.5"/></svg>',
+  laurel: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 21c-3.5-2.5-5-6.5-4-11 .5 3 2 5.5 4.5 7.3zM5 9.5C4.4 7 5 4.5 6.8 2.5c0 2.4.4 4.6 1.6 6.6zM17 21c3.5-2.5 5-6.5 4-11-.5 3-2 5.5-4.5 7.3zm2-11.5c.6-2.5 0-5-1.8-7 0 2.4-.4 4.6-1.6 6.6z"/></svg>',
+  bars: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="14" width="4" height="7" rx="1"/><rect x="10" y="9" width="4" height="12" rx="1"/><rect x="17" y="4" width="4" height="17" rx="1"/></svg>',
+  folders: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3 7h6l2 2h10v10H3z"/><path d="M6 4h5l2 2"/></svg>',
+  folderCheck: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M3 6h6l2 2h10v11H3z"/><path d="M9 13.5l2.2 2.2L15.5 11"/></svg>',
+  calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4" stroke-linecap="round"/><path d="M8 15l2.5-2.5 2 2L16 11" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  gemSmall: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 3h12l4 6-10 12L2 9z" opacity=".9"/></svg>',
+  podium: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 9h6v12H9zM2 13h6v8H2zM16 15h6v6h-6z"/><path d="M12 2.5l1 2 2.2.3-1.6 1.6.4 2.2-2-1-2 1 .4-2.2-1.6-1.6 2.2-.3z"/></svg>',
+  first: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="13" r="7.5"/><path d="M8 2.5l2.5 4M16 2.5l-2.5 4"/><path d="M11 10.5l1.6-1V17" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+};
+
+const HEX = "40,4 74,23 74,61 40,80 6,61 6,23";
+const ART = {
+  laurelTrophy: () => `
+    <svg viewBox="0 0 80 88" aria-hidden="true">
+      <g fill="url(#gGold)">
+        ${[...Array(6)].map((_, i) => `<ellipse cx="${14 + i * 1.2}" cy="${66 - i * 9}" rx="4" ry="8" transform="rotate(${-35 + i * 8} ${14 + i * 1.2} ${66 - i * 9})"/>`).join("")}
+        ${[...Array(6)].map((_, i) => `<ellipse cx="${66 - i * 1.2}" cy="${66 - i * 9}" rx="4" ry="8" transform="rotate(${35 - i * 8} ${66 - i * 1.2} ${66 - i * 9})"/>`).join("")}
+      </g>
+      <circle cx="40" cy="42" r="23" fill="url(#gDark)" stroke="url(#gGoldRim)" stroke-width="3"/>
+      <path fill="url(#gGold)" d="M30 29h20v4h5v3c0 5-3.5 8.2-7.8 8.6-1 2.6-2.9 4.5-5.2 5.3V55h5v4H33v-4h5v-5.1c-2.3-.8-4.2-2.7-5.2-5.3C28.5 44.2 25 41 25 36v-3h5zm20 7v5.3c1.8-.7 2.9-2.5 2.9-4.6V36zm-20 0h-2.9v.7c0 2.1 1.1 3.9 2.9 4.6z"/>
+      <path fill="url(#gGold)" d="M28 76l12-8 12 8-4 8-8-4-8 4z" opacity=".95"/>
+    </svg>`,
+  gem: () => `
+    <svg viewBox="0 0 80 88" aria-hidden="true">
+      <polygon points="${HEX}" fill="url(#gDark)" stroke="url(#gGoldRim)" stroke-width="4" stroke-linejoin="round"/>
+      <polygon points="40,14 66,28 66,56 40,70 14,56 14,28" fill="none" stroke="url(#gGold)" stroke-width="1.2" opacity=".6"/>
+      <path fill="url(#gGreen)" d="M27 33h26l7 9-20 22-20-22z"/>
+      <path fill="#C9FFD8" opacity=".55" d="M27 33h26l-4 9H31zM20 42h40l-20 22z" fill-opacity=".35"/>
+      <path fill="none" stroke="#EFFFF3" stroke-width=".8" opacity=".7" d="M27 33l4 9 9 22 9-22 4-9M20 42h40M31 42l9-9 9 9"/>
+    </svg>`,
+  shield1: () => `
+    <svg viewBox="0 0 80 88" aria-hidden="true">
+      <path fill="url(#gGold)" d="M40 3l33 11v26c0 22-14 36-33 45C21 76 7 62 7 40V14z"/>
+      <path fill="url(#gDark)" d="M40 11l25 8.4V40c0 17-10.5 28-25 36-14.5-8-25-19-25-36V19.4z"/>
+      <text x="40" y="51" text-anchor="middle" font-family="Heebo, sans-serif" font-weight="800" font-size="24" fill="url(#gGold)">1%</text>
+    </svg>`,
+  starShield: () => `
+    <svg viewBox="0 0 80 88" aria-hidden="true">
+      <path fill="url(#gSilver)" d="M40 3l33 11v26c0 22-14 36-33 45C21 76 7 62 7 40V14z"/>
+      <path fill="url(#gBlue)" d="M40 10l26 8.7V40c0 17.5-11 29-26 37-15-8-26-19.5-26-37V18.7z"/>
+      ${[[40, 34, 6.5], [27, 44, 4.2], [53, 44, 4.2], [33, 56, 3.4], [47, 56, 3.4], [40, 22, 3]].map(([x, y, r]) => star(x, y, r, "#F4F6FF")).join("")}
+    </svg>`,
+  hexBlue: () => hexBadge("url(#gBlue)", glyphUsers("#E8F2FF")),
+  hexGreen: () => hexBadge("url(#gTeal)", glyphUsers("#E6FFF2")),
+  hexPurple: () => hexBadge("url(#gPurple)", star(40, 43, 15, "#F1E6FF")),
+  hexGold: () => hexBadge("url(#gGold)", glyphCompass()),
+};
+function star(cx, cy, r, fill) {
+  const pts = [...Array(10)].map((_, i) => {
+    const a = -Math.PI / 2 + (i * Math.PI) / 5, rr = i % 2 ? r * 0.45 : r;
+    return `${(cx + rr * Math.cos(a)).toFixed(2)},${(cy + rr * Math.sin(a)).toFixed(2)}`;
+  });
+  return `<polygon points="${pts.join(" ")}" fill="${fill}"/>`;
+}
+function hexBadge(fill, glyph) {
+  return `<svg viewBox="0 0 80 88" aria-hidden="true">
+    <polygon points="${HEX}" fill="url(#gGoldRim)" stroke="#5E431A" stroke-width="1" stroke-linejoin="round"/>
+    <polygon points="40,10 69,26.5 69,57.5 40,74 11,57.5 11,26.5" fill="${fill}"/>
+    <polygon points="40,10 69,26.5 69,40 11,40 11,26.5" fill="#fff" opacity=".12"/>
+    ${glyph}
+  </svg>`;
+}
+function glyphUsers(c) {
+  return `<g fill="${c}"><circle cx="40" cy="36" r="6"/><path d="M28 56c0-7 5.4-11.5 12-11.5S52 49 52 56z"/>
+    <circle cx="27" cy="39" r="4.3"/><path d="M18 55c0-5 3.5-8.3 8-8.3 1.6 0 3 .4 4.2 1.2-2 2-3.3 4.5-3.6 7.1z"/>
+    <circle cx="53" cy="39" r="4.3"/><path d="M62 55c0-5-3.5-8.3-8-8.3-1.6 0-3 .4-4.2 1.2 2 2 3.3 4.5 3.6 7.1z"/></g>`;
+}
+function glyphCompass() {
+  return `<circle cx="40" cy="42" r="17" fill="#2B1E0A" stroke="#FFF0C2" stroke-width="2"/>
+    <path d="M40 27l4.5 15L40 57l-4.5-15z" fill="#FFF0C2"/><path d="M25 42l15-4.5L55 42l-15 4.5z" fill="#E7B95B"/>
+    <circle cx="40" cy="42" r="2.6" fill="#2B1E0A"/>`;
+}
+function emblem(level) {
+  return `<svg class="emblem" viewBox="0 0 120 132" aria-hidden="true">
+    <polygon points="60,4 112,34 112,98 60,128 8,98 8,34" fill="url(#gGoldRim)"/>
+    <polygon points="60,13 104,38.5 104,93.5 60,119 16,93.5 16,38.5" fill="url(#gDark)"/>
+    <polygon points="60,20 98,42 98,90 60,112 22,90 22,42" fill="none" stroke="url(#gGold)" stroke-width="1.5" opacity=".7"/>
+    ${star(60, 56, 22, "url(#gGold)")}
+    <text x="60" y="100" text-anchor="middle" font-family="Heebo, sans-serif" font-weight="800" font-size="19" fill="#F4D58C">${level}</text>
+  </svg>`;
+}
+const ornament = '<svg class="ornament" viewBox="0 0 100 14" aria-hidden="true"><path d="M0 7h40M60 7h40" stroke="currentColor" stroke-width="1" opacity=".7"/><path d="M50 0l2.2 4.8L57 7l-4.8 2.2L50 14l-2.2-4.8L43 7l4.8-2.2z" fill="currentColor"/><circle cx="36" cy="7" r="1.6" fill="currentColor"/><circle cx="64" cy="7" r="1.6" fill="currentColor"/></svg>';
+const cornerChart = `<svg class="corner-chart" viewBox="0 0 150 110" aria-hidden="true">
+  ${[[18, 78, 14], [38, 64, 28], [58, 50, 42], [78, 38, 54], [98, 24, 68]].map(([x, y, h]) => `<rect x="${x}" y="${y + 22}" width="14" height="${88 - y}" rx="1.5" fill="url(#gGold)" opacity=".55"/>`).join("")}
+  <path d="M6 96 C40 80, 70 66, 96 40 S128 14, 138 8" fill="none" stroke="url(#gGold)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M126 6l14-2-3 14" fill="none" stroke="url(#gGold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  ${[[120, 30], [132, 46], [104, 18], [142, 26], [112, 52]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="${1 + (i % 3) * 0.6}" fill="#FFE7A8" opacity=".8"/>`).join("")}
+</svg>`;
+
+/* =========================================================================
+   RENDERING
+   ========================================================================= */
+const state = { lang: "he", scenario: "established", editingBio: false };
+try {
+  const saved = JSON.parse(localStorage.getItem("player-card-proto") || "{}");
+  if (saved.lang === "he" || saved.lang === "en") state.lang = saved.lang;
+  if (saved.scenario in DEMO) state.scenario = saved.scenario;
+} catch (_) { /* storage unavailable: defaults are fine */ }
+const persist = () => { try { localStorage.setItem("player-card-proto", JSON.stringify({ lang: state.lang, scenario: state.scenario })); } catch (_) {} };
+
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const num = (n) => new Intl.NumberFormat(state.lang === "he" ? "he-IL" : "en-US").format(n);
+// Numbers and percentages are isolated left-to-right so "+24.8%" reads
+// correctly inside Hebrew text.
+const pct = (v) => {
+  const cls = v > 0 ? "pos" : v < 0 ? "neg" : "";
+  const sign = v > 0 ? "+" : v < 0 ? "−" : "";
+  return `<bdi dir="ltr" class="${cls}">${sign}${Math.abs(v * 100).toFixed(1)}%</bdi>`;
+};
+const date = (iso) => new Intl.DateTimeFormat(state.lang === "he" ? "he-IL" : "en-GB", { day: "numeric", month: "long", year: "numeric" }).format(new Date(iso + "T12:00:00"));
+
+let tipSeq = 0;
+function tip(text, inline = false) {
+  const id = `tip${++tipSeq}`;
+  return `<button type="button" class="tip${inline ? " inline-tip" : ""}" aria-label="${esc(T[state.lang].info)}" aria-describedby="${id}" aria-expanded="false">${ICON.info}<span role="tooltip" id="${id}" class="bubble">${esc(text)}</span></button>`;
+}
+function lockedView(reasonKey) {
+  const t = T[state.lang];
+  return `<span class="locked">${ICON.lock}<span>${esc(t[reasonKey])}</span></span>`;
+}
+
+function statCard({ title, icon, iconClass = "", value, tipText }) {
+  const isLocked = value.state === "locked";
+  return `<article class="card stat">
+    ${tip(tipText)}
+    <div class="stat-title">${esc(title)}</div>
+    <div class="stat-icon ${iconClass} ${isLocked ? "dim" : ""}">${icon}</div>
+    <div class="stat-value">${isLocked ? lockedView(value.reason) : value.html}</div>
+  </article>`;
+}
+
+function render() {
+  tipSeq = 0;
+  const t = T[state.lang];
+  const d = DEMO[state.scenario];
+  const s = playerStats(d);
+  const p = d.player;
+  document.documentElement.lang = state.lang;
+  document.documentElement.dir = state.lang === "he" ? "rtl" : "ltr";
+
+  document.getElementById("protoBar").innerHTML = `
+    <span class="tag">${esc(t.proto)}</span>
+    <span>${esc(t.lang)}</span>
+    <span class="seg" role="group" aria-label="${esc(t.lang)}">
+      <button type="button" data-lang="he" aria-pressed="${state.lang === "he"}">עברית</button>
+      <button type="button" data-lang="en" aria-pressed="${state.lang === "en"}">English</button>
+    </span>
+    <span>${esc(t.scenario)}</span>
+    <span class="seg" role="group" aria-label="${esc(t.scenario)}">
+      <button type="button" data-scenario="established" aria-pressed="${state.scenario === "established"}">${esc(t.established)}</button>
+      <button type="button" data-scenario="newcomer" aria-pressed="${state.scenario === "newcomer"}">${esc(t.newcomer)}</button>
+    </span>
+    <span class="proto-note">${esc(t.protoNote)}</span>`;
+
+  const avg = s.avg.state === "ok" ? { state: "ok", html: pct(s.avg.value) } : s.avg;
+  const best = s.best.state === "ok" ? { state: "ok", html: pct(s.best.value) } : s.best;
+  const count = (n) => ({ state: "ok", html: `<bdi>${num(n)}</bdi>` });
+
+  const bio = state.editingBio
+    ? `<textarea id="bioInput" maxlength="100" dir="auto" aria-label="${esc(t.bioTitle)}">${esc(p.bio)}</textarea>
+       <div class="bio-actions">
+         <button type="button" class="link-btn" data-act="save-bio">${esc(t.save)}</button>
+         <button type="button" class="link-btn" data-act="cancel-bio">${esc(t.cancel)}</button>
+         <span class="counter" id="bioCount" aria-live="polite"></span>
+       </div>`
+    : `<p dir="auto">${esc(p.bio)}</p>
+       <div class="bio-actions"><button type="button" class="link-btn" data-act="edit-bio">${ICON.pencil}${esc(t.editBio)}</button></div>`;
+
+  const award = (a, kind) => `<button type="button" class="award" data-kind="${kind}" data-id="${esc(a.id)}">
+      ${ART[a.art]()}<span>${esc(a.name[state.lang])}</span></button>`;
+
+  const trow = (icon, label, tipText, valueHtml) => `<div class="trow">${icon}
+      <span class="tlabel">${esc(label)}${tip(tipText, true)}</span>
+      <span class="tvalue">${valueHtml}</span></div>`;
+  const lockedRow = (reason) => `<span class="locked">${ICON.lock}<span>${esc(t[reason])}</span></span>`;
+
+  const xpPct = Math.max(0, Math.min(100, (p.xp / p.nextLevelXp) * 100));
+
+  document.getElementById("app").innerHTML = `
+    <header class="page-head">
+      ${cornerChart}
+      <h1 class="page-title">${ornament}<span class="gold-text">${esc(t.title)}</span>${ornament}</h1>
+    </header>
+
+    <section class="card profile" aria-label="${esc(t.title)}">
+      <div class="bio">
+        <h2>${ICON.person}${esc(t.bioTitle)}</h2>
+        ${bio}
+      </div>
+      <div class="divider" aria-hidden="true"></div>
+      <div class="identity">
+        <p class="nickname"><bdi dir="ltr">@${esc(p.nickname)}</bdi></p>
+        ${p.firstName ? `<span class="first-name">${esc(p.firstName)}</span>` : ""}
+        <div class="badges">
+          <span class="badge">${ICON.star}<bdi dir="ltr">${esc(t.level)} ${num(p.level)}</bdi></span>
+          <span class="badge">${ICON.crown}<bdi dir="ltr">${esc(p.title)}</bdi></span>
+        </div>
+      </div>
+      <div class="avatar" role="img" aria-label="@${esc(p.nickname)}">
+        <div class="avatar-inner"><span class="gold-text">${esc(p.nickname[0].toUpperCase())}</span></div>
+      </div>
+    </section>
+
+    <section class="stats" aria-label="${esc(t.title)}">
+      ${statCard({ title: t.s_avg, icon: ICON.cycleUp, value: avg, tipText: t.t_avg })}
+      ${statCard({ title: t.s_ach, icon: ICON.trophy, value: count(d.achievementsTotal), tipText: t.t_ach })}
+      ${statCard({ title: t.s_med, icon: ICON.medal, value: count(d.medals.length), tipText: t.t_med })}
+      ${statCard({ title: t.s_sub, icon: ICON.user, value: count(d.social.subscribers), tipText: t.t_sub })}
+      ${statCard({ title: t.s_fol, icon: ICON.users, value: count(d.social.followers), tipText: t.t_fol })}
+      ${statCard({ title: t.s_best, icon: ICON.trend, iconClass: "trend", value: best, tipText: t.t_best })}
+    </section>
+
+    <div class="row3">
+      <section class="card panel">
+        <h2 class="panel-title">${ICON.trophy}${esc(t.competitions)}</h2>
+        <div class="table">
+          ${trow(ICON.crown, t.c_entered, t.tc_entered, num(s.comp.entered))}
+          ${trow(ICON.trophy, t.c_prizes, t.tc_prizes, num(s.comp.prizes))}
+          ${trow(ICON.podium, t.c_top3, t.tc_top3, num(s.comp.top3))}
+          ${trow(ICON.first, t.c_first, t.tc_first, num(s.comp.first))}
+        </div>
+      </section>
+      <section class="card panel">
+        <h2 class="panel-title">${ICON.trophy}${esc(t.achievements)}</h2>
+        ${s.achievements.length
+          ? `<div class="badge-row">${s.achievements.slice(0, 4).map((a) => award(a, "ach")).join("")}</div>`
+          : `<p class="empty">${esc(t.noAch)}</p>`}
+      </section>
+      <section class="card panel">
+        <h2 class="panel-title">${ICON.laurel}${esc(t.medals)}${ICON.laurel}</h2>
+        ${s.medals.length
+          ? `<div class="badge-row">${s.medals.slice(0, 4).map((m) => award(m, "medal")).join("")}</div>`
+          : `<p class="empty">${esc(t.noMedals)}</p>`}
+      </section>
+    </div>
+
+    <div class="row2">
+      <section class="card panel">
+        <h2 class="panel-title">${ICON.star}${esc(t.progress)}${tip(t.t_prog, true)}</h2>
+        <div class="progress">
+          ${emblem(num(p.level))}
+          <div>
+            <div class="xp-line"><bdi dir="ltr"><span class="xp-label">XP</span> <span class="xp-now">${num(p.xp)}</span> <span class="xp-of">/ ${num(p.nextLevelXp)}</span></bdi></div>
+            <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${p.nextLevelXp}" aria-valuenow="${p.xp}" aria-label="XP"><div style="width:${xpPct.toFixed(1)}%"></div></div>
+            <div class="table">
+              <div class="trow">${ICON.crown}<span class="tlabel">${esc(t.nextGoal)}</span><span class="tvalue"><bdi dir="ltr">${esc(t.level)} ${num(p.nextLevel)}</bdi></span></div>
+              <div class="trow">${ICON.gemSmall}<span class="tlabel">${esc(t.nextTitle)}</span><span class="tvalue"><bdi dir="ltr">${esc(p.nextTitle)}</bdi></span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="card panel perf">
+        <h2 class="panel-title">${ICON.bars}${esc(t.performance)}</h2>
+        <div class="table">
+          ${trow(ICON.folders, t.p_total, t.tp_total, num(s.total))}
+          ${trow(ICON.folderCheck, t.p_active, t.tp_active, num(s.active))}
+          ${trow(ICON.bars, t.p_avg, t.t_avg, s.avg.state === "ok" ? pct(s.avg.value) : lockedRow(s.avg.reason))}
+          ${trow(ICON.calendar, t.p_month, t.tp_month, s.month.state === "ok" ? pct(s.month.value) : esc(t.noData))}
+          ${trow(ICON.star, t.p_topName, t.tp_top, s.top.state === "ok" ? `<bdi>${esc(s.top.value.name)}</bdi>` : lockedRow(s.top.reason))}
+          ${trow(ICON.trend, t.p_topRet, t.tp_top, s.top.state === "ok" ? pct(s.top.value.ret) : lockedRow(s.top.reason))}
+        </div>
+      </section>
+    </div>`;
+
+  if (state.editingBio) {
+    const input = document.getElementById("bioInput");
+    const counter = document.getElementById("bioCount");
+    const update = () => {
+      const n = [...input.value].length;
+      counter.textContent = `${n}/100`;
+      counter.classList.toggle("full", n >= 100);
+    };
+    input.addEventListener("input", update);
+    update();
+    input.focus();
+  }
+}
+
+/* Detail dialog for a medal or an achievement. */
+function openDetail(kind, id) {
+  const t = T[state.lang];
+  const d = DEMO[state.scenario];
+  const item = (kind === "medal" ? d.medals : d.achievements).find((x) => x.id === id);
+  if (!item) return;
+  const dlg = document.getElementById("detail");
+  dlg.innerHTML = `<div class="dlg">
+      <span class="demo-note">${esc(kind === "medal" ? t.d_medal : t.d_ach)}</span>
+      ${ART[item.art]().replace("<svg ", '<svg class="art" ')}
+      <h3 id="dlgTitle"><bdi>${esc(item.name[state.lang])}</bdi></h3>
+      <p>${esc(item.desc[state.lang])}</p>
+      <dl class="facts">
+        <div><dt>${esc(t.d_condition)}</dt><dd>${esc(item.cond[state.lang])}</dd></div>
+        <div><dt>${esc(t.d_earned)}</dt><dd>${esc(date(item.earnedAt))}</dd></div>
+        <div><dt>${esc(kind === "medal" ? t.d_prestige : t.d_importance)}</dt><dd><bdi dir="ltr">${num(kind === "medal" ? item.prestige : item.importance)}</bdi></dd></div>
+        <div><dt>XP</dt><dd><bdi dir="ltr">+${num(item.xp)}</bdi></dd></div>
+      </dl>
+      <p class="demo-note">${esc(t.d_demo)}</p>
+      <button type="button" class="link-btn close-btn" data-act="close">${esc(t.close)}</button>
+    </div>`;
+  if (typeof dlg.showModal === "function") dlg.showModal(); else dlg.setAttribute("open", "");
+}
+
+document.addEventListener("click", (e) => {
+  const el = e.target.closest("button");
+  // Tapping an info icon toggles its explanation; tapping elsewhere closes it.
+  document.querySelectorAll('.tip[aria-expanded="true"]').forEach((b) => { if (b !== el) b.setAttribute("aria-expanded", "false"); });
+  if (!el) {
+    const dlg = document.getElementById("detail");
+    if (e.target === dlg) dlg.close();
+    return;
+  }
+  if (el.classList.contains("tip")) { el.setAttribute("aria-expanded", el.getAttribute("aria-expanded") === "true" ? "false" : "true"); return; }
+  if (el.dataset.lang) { state.lang = el.dataset.lang; state.editingBio = false; persist(); render(); return; }
+  if (el.dataset.scenario) { state.scenario = el.dataset.scenario; state.editingBio = false; persist(); render(); return; }
+  if (el.classList.contains("award")) { openDetail(el.dataset.kind, el.dataset.id); return; }
+  const act = el.dataset.act;
+  if (act === "edit-bio") { state.editingBio = true; render(); }
+  else if (act === "cancel-bio") { state.editingBio = false; render(); }
+  else if (act === "save-bio") {
+    const v = document.getElementById("bioInput").value.trim();
+    DEMO[state.scenario].player.bio = [...v].slice(0, 100).join("");
+    state.editingBio = false; render();
+  }
+  else if (act === "close") document.getElementById("detail").close();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") document.querySelectorAll('.tip[aria-expanded="true"]').forEach((b) => b.setAttribute("aria-expanded", "false"));
+});
+
+/* Background: faint gold veins, drawn once per resize. */
+function drawVeins() {
+  const c = document.getElementById("veins");
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = window.innerWidth, h = window.innerHeight;
+  c.width = w * dpr; c.height = h * dpr;
+  const g = c.getContext("2d");
+  g.scale(dpr, dpr);
+  let seed = 7;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  for (let i = 0; i < 26; i++) {
+    let x = rnd() * w, y = rnd() * h;
+    g.beginPath(); g.moveTo(x, y);
+    const len = 6 + Math.floor(rnd() * 10);
+    for (let k = 0; k < len; k++) {
+      const nx = x + (rnd() - 0.45) * 160, ny = y + (rnd() - 0.5) * 110;
+      g.quadraticCurveTo(x + (rnd() - 0.5) * 90, y + (rnd() - 0.5) * 90, nx, ny);
+      x = nx; y = ny;
+    }
+    g.strokeStyle = `rgba(214, 170, 88, ${0.025 + rnd() * 0.05})`;
+    g.lineWidth = 0.6 + rnd() * 0.9;
+    g.stroke();
+  }
+}
+let resizeTimer;
+window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(drawVeins, 150); });
+
+render();
+drawVeins();
+</script>

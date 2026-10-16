@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   fetchFeed,
@@ -37,6 +37,20 @@ const PostCard = ({
   const [sending, setSending] = useState(false);
   const [showAllComments, setShowAllComments] = useState(false);
   const toast = useToast();
+
+  // The reply box grows with what is typed, so a reply longer than one line
+  // can be read back before posting - on a phone a one-line input showed only
+  // the last few words. Measured before paint, so it never flickers. The CSS
+  // caps the height; past that the box scrolls inside itself.
+  const replyRef = useRef<HTMLTextAreaElement>(null);
+  useLayoutEffect(() => {
+    const box = replyRef.current;
+    if (!box) return;
+    box.style.height = "auto";
+    // scrollHeight leaves out the border, which border-box sizing counts.
+    const border = box.offsetHeight - box.clientHeight;
+    box.style.height = `${box.scrollHeight + border}px`;
+  }, [draft]);
 
   // Reacting is optimistic in neither direction: we send, then render whatever
   // tally comes back, so two people reacting at once cannot leave the count
@@ -182,12 +196,23 @@ const PostCard = ({
       )}
 
       <form className="feed-reply" onSubmit={handleComment}>
-        <input
-          type="text"
+        <textarea
+          ref={replyRef}
+          rows={1}
           value={draft}
           maxLength={500}
           placeholder="Write a reply…"
+          aria-label="Write a reply"
           onChange={(e) => setDraft(e.target.value)}
+          // Enter still posts, as it did when this was a one-line input;
+          // Shift+Enter starts a new line. Not while an input method is
+          // composing, where Enter confirms the composed text instead.
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
+              e.preventDefault();
+              e.currentTarget.form?.requestSubmit();
+            }
+          }}
         />
         <button type="submit" disabled={!draft.trim() || sending}>
           {sending ? "Posting…" : "Reply"}

@@ -1294,7 +1294,8 @@ body.nav-locked { overflow: hidden; }
 .feed-comment-author { font-weight: 600; margin-right: 0.4rem; }
 .feed-comment-author a { color: var(--text); text-decoration: none; }
 .feed-comment-author a:hover { color: var(--gold-bright); }
-.feed-comment-body { color: var(--text); overflow-wrap: anywhere; }
+/* pre-wrap keeps the line breaks a reply was written with (Shift+Enter). */
+.feed-comment-body { color: var(--text); overflow-wrap: anywhere; white-space: pre-wrap; }
 .feed-comment-meta {
   display: flex;
   gap: 0.5rem;
@@ -1303,15 +1304,46 @@ body.nav-locked { overflow: hidden; }
   color: var(--text-faint);
 }
 
-.feed-reply { display: flex; gap: 0.5rem; margin-top: 0.85rem; }
-.feed-reply input { flex: 1; min-width: 0; }
+.feed-reply { display: flex; align-items: flex-end; gap: 0.5rem; margin-top: 0.85rem; }
 .feed-reply button { flex: 0 0 auto; }
+
+/* The reply box: one line at rest, growing with the text (height is set from
+   Feed.tsx), up to about eight lines, then it scrolls inside itself. Styled
+   to match the app's inputs, which textareas do not inherit. */
+.feed-reply textarea {
+  flex: 1;
+  min-width: 0;
+  min-height: 2.65rem;
+  max-height: 14rem;
+  overflow-y: auto;
+  resize: none;
+  font-family: inherit;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.85rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.feed-reply textarea::placeholder { color: var(--text-faint); }
+.feed-reply textarea:focus {
+  outline: none;
+  border-color: var(--gold-line);
+  box-shadow: 0 0 0 3px var(--gold-wash);
+}
 
 .feed-more-btn { display: block; margin: 1.5rem auto 0; }
 
 @media (max-width: 720px) {
   .feed-post-head { flex-wrap: wrap; }
   .feed-move { margin-left: 0; flex-direction: row; align-items: baseline; gap: 0.35rem; }
-  .feed-reply { flex-direction: column; }
+  .feed-reply { flex-direction: column; align-items: stretch; }
   .feed-reply button { width: 100%; }
+  /* 16px, because iOS Safari zooms the page into any field smaller than
+     that on focus - and the reply box would then be the thing zoomed into. */
+  /* flex: none, because in this column layout flex: 1 would set the box's
+     height and override the height that grows with the text. */
+  .feed-reply textarea { flex: none; font-size: 16px; min-height: 44px; }
 }

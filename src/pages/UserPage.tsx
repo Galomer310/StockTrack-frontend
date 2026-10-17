@@ -8,6 +8,7 @@ import TokenRefreshAlert from "../components/alerts/TokenRefreshAlert";
 import TradeJournal from "../components/trades/TradeJournal";
 import PortfolioSwitcher from "../components/portfolio/PortfolioSwitcher";
 import { MyPortfolio } from "../api/portfolios";
+import { useLanguage } from "../i18n/LanguageContext";
 
 // Define the UserPage functional component
 
@@ -18,6 +19,9 @@ const UserPage = () => {
   const [showRefreshAlert, setShowRefreshAlert] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  // The dashboard is translated and sets its own direction (see
+  // LanguageProvider for why direction is set per screen).
+  const { t, dir, lang } = useLanguage();
 
   // The book currently open. Everything below it - holdings, cash, the trade
   // journal - is scoped to this one, and switching swaps all of them at once.
@@ -83,13 +87,13 @@ const UserPage = () => {
 
   // Return the user dashboard UI
   return (
-    <div className="user-page-container">
+    <div className="user-page-container" dir={dir} lang={lang}>
       {/* Container with CSS class for the user page */}
       {user ? ( // If user exists, render the dashboard
         <div>
           <section className="dashboard-info">
             {/* Section for dashboard descriptive text */}
-            <h1>My Investment Dashboard</h1> {/* Dashboard heading */}
+            <h1>{t("dash_title")}</h1>
           </section>
 
           {/* Pick the book to work in. Everything below follows it. */}
@@ -109,18 +113,18 @@ const UserPage = () => {
                 onTraded={() => setPortfolioRefresh((k) => k + 1)}
               />
               <section className="dashboard-journal">
-                <h3>{active.name} · trade journal</h3>
+                <h3>
+                  <bdi>{active.name}</bdi> · {t("dash_journal")}
+                </h3>
                 <TradeJournal key={active.id} portfolioId={active.id} />
               </section>
             </>
           ) : (
-            <p className="stock-empty">
-              Open a portfolio above to start trading.
-            </p>
+            <p className="stock-empty">{t("dash_open_portfolio")}</p>
           )}
         </div>
       ) : (
-        <p>Loading...</p> // Show loading text if user data is not yet available
+        <p>{t("loading")}</p> // Shown until the session is restored
       )}
       {showRefreshAlert && (
         <TokenRefreshAlert onUserResponse={handleUserResponse} />

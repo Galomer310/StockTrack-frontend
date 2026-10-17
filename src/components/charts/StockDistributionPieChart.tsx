@@ -8,6 +8,8 @@ import {
 } from "chart.js";
 import { CATEGORICAL, NEUTRAL, CHART_SURFACE } from "../../charts/chartTheme";
 import { money } from "../../api/social";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { fill } from "../../i18n/fill";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -75,6 +77,8 @@ const StockDistributionPieChart: React.FC<Props> = ({
   const palette = isLight ? CATEGORICAL.light : CATEGORICAL.dark;
   const neutral = isLight ? NEUTRAL.light : NEUTRAL.dark;
   const surface = isLight ? CHART_SURFACE.light : CHART_SURFACE.dark;
+  const { t, dir } = useLanguage();
+  const rtl = dir === "rtl";
 
   const slices = useMemo(() => {
     // Market value per ticker.
@@ -115,7 +119,7 @@ const StockDistributionPieChart: React.FC<Props> = ({
 
     if (folded.length > 0) {
       result.push({
-        label: `Other (${folded.length})`,
+        label: fill(t("chart_other"), { n: folded.length }),
         value: folded.reduce((sum, p) => sum + p.value, 0),
         color: palette[Math.min(shown.length, palette.length - 1)],
         detail: folded.map((p) => p.symbol).join(", "),
@@ -125,20 +129,17 @@ const StockDistributionPieChart: React.FC<Props> = ({
     // Cash last, so the eye lands on the positions first, and only when there
     // is some - a 0% slice is noise.
     if (cash > 0) {
-      result.push({ label: "Cash", value: cash, color: neutral });
+      result.push({ label: t("chart_cash"), value: cash, color: neutral });
     }
 
     return result;
-  }, [watchlist, latestPrices, cash, palette, neutral]);
+  }, [watchlist, latestPrices, cash, palette, neutral, t]);
 
   const total = slices.reduce((sum, s) => sum + s.value, 0);
 
   if (total <= 0) {
     return (
-      <p className="stock-empty">
-        Nothing to chart yet. Buy something and this will show how the portfolio
-        is split between your positions and the cash left over.
-      </p>
+      <p className="stock-empty">{t("chart_empty")}</p>
     );
   }
 
@@ -162,8 +163,11 @@ const StockDistributionPieChart: React.FC<Props> = ({
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
+      // Right-to-left legend and tooltip in Hebrew, so a swatch sits before
+      // its label in reading order.
       legend: {
         position: "bottom" as const,
+        rtl,
         labels: {
           usePointStyle: true,
           boxWidth: 8,
@@ -182,6 +186,7 @@ const StockDistributionPieChart: React.FC<Props> = ({
         },
       },
       tooltip: {
+        rtl,
         callbacks: {
           label: (ctx: any) => {
             const slice = slices[ctx.dataIndex];
@@ -195,11 +200,8 @@ const StockDistributionPieChart: React.FC<Props> = ({
 
   return (
     <div className="composition-chart">
-      <h4 className="composition-title">Portfolio composition</h4>
-      <p className="composition-note">
-        Everything you own plus the cash you have not spent, valued at today's
-        prices.
-      </p>
+      <h4 className="composition-title">{t("chart_composition")}</h4>
+      <p className="composition-note">{t("chart_composition_note")}</p>
 
       <div className="composition-body">
         <div className="composition-plot">
@@ -212,9 +214,9 @@ const StockDistributionPieChart: React.FC<Props> = ({
         <table className="composition-table">
           <thead>
             <tr>
-              <th>Holding</th>
-              <th>Share</th>
-              <th>Value</th>
+              <th>{t("chart_holding")}</th>
+              <th>{t("chart_share")}</th>
+              <th>{t("chart_value")}</th>
             </tr>
           </thead>
           <tbody>
@@ -236,7 +238,7 @@ const StockDistributionPieChart: React.FC<Props> = ({
           </tbody>
           <tfoot>
             <tr>
-              <td>Total</td>
+              <td>{t("chart_total")}</td>
               <td className="composition-share">100.0%</td>
               <td className="composition-value">{money(total)}</td>
             </tr>

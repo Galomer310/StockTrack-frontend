@@ -6,6 +6,8 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { MessageKey } from "../../i18n/messages";
 
 /* ===========================================================================
    Toasts
@@ -49,15 +51,18 @@ const ICONS: Record<ToastVariant, string> = {
   info: "i",
 };
 
-const DEFAULT_TITLES: Record<ToastVariant, string> = {
-  success: "Done",
-  error: "Something went wrong",
-  info: "Notice",
+const DEFAULT_TITLES: Record<ToastVariant, MessageKey> = {
+  success: "toast_done",
+  error: "toast_failed",
+  info: "toast_notice",
 };
 
 export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  // Toasts follow the interface language: in Hebrew the stack sits top-left
+  // and slides in from the left (logical CSS plus --toast-sweep).
+  const { t, dir, lang } = useLanguage();
   const [toasts, setToasts] = useState<Toast[]>([]);
   const nextId = useRef(1);
 
@@ -91,7 +96,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
   return (
     <ToastContext.Provider value={api}>
       {children}
-      <div className="toast-stack" role="status" aria-live="polite">
+      <div className="toast-stack" role="status" aria-live="polite" dir={dir} lang={lang}>
         {toasts.map((toast) => (
           <div key={toast.id} className={`toast toast-${toast.variant}`}>
             <span className="toast-icon" aria-hidden="true">
@@ -99,14 +104,14 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
             </span>
             <div className="toast-body">
               <span className="toast-title">
-                {toast.title ?? DEFAULT_TITLES[toast.variant]}
+                {toast.title ?? t(DEFAULT_TITLES[toast.variant])}
               </span>
-              <span className="toast-message">{toast.message}</span>
+              <span className="toast-message" dir="auto">{toast.message}</span>
             </div>
             <button
               className="toast-close"
               onClick={() => dismiss(toast.id)}
-              aria-label="Dismiss notification"
+              aria-label={t("toast_dismiss")}
             >
               ×
             </button>

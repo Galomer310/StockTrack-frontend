@@ -241,7 +241,7 @@ body.nav-locked { overflow: hidden; }
   }
   .lb-rank   { grid-column: 1; grid-row: 1; align-self: center; }
   .lb-name   { grid-column: 2; grid-row: 1; }
-  .lb-return { grid-column: 3; grid-row: 1; align-items: flex-end; text-align: right; }
+  .lb-return { grid-column: 3; grid-row: 1; align-items: flex-end; text-align: end; }
   .lb-holdings { display: none; }
   .lb-actions { grid-column: 1 / -1; grid-row: 2; }
   .lb-actions button { flex: 1; padding: 0.6rem; }
@@ -320,7 +320,7 @@ body.nav-locked { overflow: hidden; }
   .login-page, .register-page { min-height: auto; padding: 2.5rem 1rem 3rem; }
   .login-container, .register-container { padding: 1.5rem 1.25rem; }
 
-  .stock-search > input { width: 100%; margin-right: 0; }
+  .stock-search > input { width: 100%; margin-inline-end: 0; }
 
 
   .compare-verdict { display: block; }
@@ -332,7 +332,7 @@ body.nav-locked { overflow: hidden; }
   .summary-cards { grid-template-columns: 1fr; }
   .watchlist-row { grid-template-columns: 1fr; }
   .leaderboard-row { grid-template-columns: 1.9rem 1fr; }
-  .lb-return { grid-column: 1 / -1; grid-row: 2; align-items: flex-start; text-align: left; }
+  .lb-return { grid-column: 1 / -1; grid-row: 2; align-items: flex-start; text-align: start; }
   .lb-actions { grid-row: 3; flex-direction: column; }
   .hero-overlay::before { font-size: 0.55rem; }
   .navbar-brand { font-size: 0.82rem; }
@@ -461,7 +461,7 @@ body.nav-locked { overflow: hidden; }
   border-color: var(--gold-line);
   color: var(--gold-bright);
 }
-.range-loading { color: var(--text-faint); font-size: 0.78rem; margin-left: 0.4rem; }
+.range-loading { color: var(--text-faint); font-size: 0.78rem; margin-inline-start: 0.4rem; }
 
 .chart-tall { height: 340px; }
 .chart-tall canvas { max-height: 300px; }
@@ -500,7 +500,7 @@ body.nav-locked { overflow: hidden; }
   padding: 0.9rem 1.1rem;
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-left: 3px solid var(--border-strong);
+  border-inline-start: 3px solid var(--border-strong);
   border-radius: var(--radius);
 }
 .insight p { color: var(--text); font-size: 0.92rem; }
@@ -514,11 +514,11 @@ body.nav-locked { overflow: hidden; }
   padding-top: 0.15rem;
 }
 
-.insight-good { border-left-color: var(--gain); }
+.insight-good { border-inline-start-color: var(--gain); }
 .insight-good .insight-label { color: var(--gain); }
-.insight-bad { border-left-color: var(--loss); }
+.insight-bad { border-inline-start-color: var(--loss); }
 .insight-bad .insight-label { color: var(--loss); }
-.insight-neutral { border-left-color: var(--gold); }
+.insight-neutral { border-inline-start-color: var(--gold); }
 .insight-neutral .insight-label { color: var(--gold); }
 
 .search-row { display: flex; gap: 0.5rem; margin: 1rem 0; flex-wrap: wrap; }
@@ -633,8 +633,8 @@ body.nav-locked { overflow: hidden; }
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
-  padding-left: 0.9rem;
-  border-left: 1px solid var(--border);
+  padding-inline-start: 0.9rem;
+  border-inline-start: 1px solid var(--border);
 }
 .trade-total .summary-value { font-size: 1.15rem; }
 
@@ -701,7 +701,7 @@ body.nav-locked { overflow: hidden; }
 .journal-entry::before {
   content: "";
   position: absolute;
-  left: 0.65rem;
+  inset-inline-start: 0.65rem;
   top: 1.15rem;
   bottom: 0;
   width: 1px;
@@ -714,7 +714,7 @@ body.nav-locked { overflow: hidden; }
   width: 11px;
   height: 11px;
   margin-top: 0.45rem;
-  margin-left: 0.15rem;
+  margin-inline-start: 0.15rem;
   border-radius: 999px;
   background: var(--bg-base);
   border: 2px solid var(--gold);
@@ -738,12 +738,12 @@ body.nav-locked { overflow: hidden; }
 }
 
 .journal-figures {
-  margin-left: auto;
+  margin-inline-start: auto;
   font-family: var(--font-num);
   font-size: 0.85rem;
   color: var(--text-muted);
 }
-.journal-total { margin-left: 0.5rem; color: var(--text); font-weight: 600; }
+.journal-total { margin-inline-start: 0.5rem; color: var(--text); font-weight: 600; }
 
 .journal-note {
   color: var(--text);
@@ -779,20 +779,20 @@ body.nav-locked { overflow: hidden; }
     justify-content: space-between;
     align-items: center;
     padding: 0.6rem 0 0;
-    border-left: none;
+    border-inline-start: none;
     border-top: 1px solid var(--border);
   }
   .modal-actions { flex-direction: column-reverse; }
   .modal-actions button { width: 100%; }
-  .journal-figures { margin-left: 0; width: 100%; }
+  .journal-figures { margin-inline-start: 0; width: 100%; }
   .journal-entry { grid-template-columns: 1rem 1fr; gap: 0.7rem; }
-  .journal-entry::before { left: 0.45rem; }
+  .journal-entry::before { inset-inline-start: 0.45rem; }
 }
 
 /* The percentage move shown to readers who are not the owner, in place of the
    figures they are not allowed to see. */
 .journal-move {
-  margin-left: auto;
+  margin-inline-start: auto;
   display: flex;
   align-items: baseline;
   gap: 0.4rem;
@@ -822,7 +822,7 @@ body.nav-locked { overflow: hidden; }
 .privacy-note {
   margin: 0.4rem 0 1rem;
   padding: 0.6rem 0.85rem;
-  border-left: 2px solid var(--gold-line);
+  border-inline-start: 2px solid var(--gold-line);
   background: var(--gold-wash);
   border-radius: var(--radius-sm);
   color: var(--text-muted);
@@ -834,7 +834,7 @@ body.nav-locked { overflow: hidden; }
   display: inline-block;
   width: 3.5rem;
   height: 0.4rem;
-  margin-right: 0.5rem;
+  margin-inline-end: 0.5rem;
   border-radius: 999px;
   background: var(--bg-inset);
   border: 1px solid var(--border);
@@ -881,7 +881,7 @@ body.nav-locked { overflow: hidden; }
   align-items: flex-start;
   gap: 0.3rem;
   padding: 0.85rem 1rem;
-  text-align: left;
+  text-align: start;
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -959,7 +959,7 @@ body.nav-locked { overflow: hidden; }
   font-size: 0.86rem;
 }
 .composition-table th {
-  text-align: left;
+  text-align: start;
   padding: 0 0.6rem 0.45rem 0;
   font-size: 0.66rem;
   font-weight: 600;
@@ -982,7 +982,7 @@ body.nav-locked { overflow: hidden; }
 .composition-share,
 .composition-value {
   font-family: var(--font-num);
-  text-align: right;
+  text-align: end;
   font-variant-numeric: tabular-nums;
 }
 .composition-value { color: var(--text-muted); }
@@ -991,14 +991,14 @@ body.nav-locked { overflow: hidden; }
   display: inline-block;
   width: 0.6rem;
   height: 0.6rem;
-  margin-right: 0.5rem;
+  margin-inline-end: 0.5rem;
   border-radius: 999px;
   vertical-align: baseline;
 }
 /* The tickers folded into "Other", named rather than silently dropped. */
 .composition-detail {
   display: block;
-  margin-left: 1.1rem;
+  margin-inline-start: 1.1rem;
   font-size: 0.7rem;
   color: var(--text-faint);
 }
@@ -1035,7 +1035,7 @@ body.nav-locked { overflow: hidden; }
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
 }
-.buying-into-cash { display: flex; flex-direction: column; gap: 0.25rem; margin-left: auto; }
+.buying-into-cash { display: flex; flex-direction: column; gap: 0.25rem; margin-inline-start: auto; }
 .buying-into-cash .summary-value { font-size: 1.05rem; }
 
 .stock-add { display: flex; flex-direction: column; gap: 0.6rem; min-width: 14rem; }
@@ -1082,7 +1082,7 @@ body.nav-locked { overflow: hidden; }
 
 @media (max-width: 720px) {
   .buying-into { gap: 0.75rem; }
-  .buying-into-cash { margin-left: 0; }
+  .buying-into-cash { margin-inline-start: 0; }
   .stock-add { width: 100%; }
 }
 
@@ -1200,10 +1200,10 @@ body.nav-locked { overflow: hidden; }
   padding: 1rem 1.15rem;
   /* The action colours the left edge, so buys and sells are told apart
      before a word is read. */
-  border-left: 3px solid var(--border-strong);
+  border-inline-start: 3px solid var(--border-strong);
 }
-.feed-post.feed-buy  { border-left-color: var(--gain); }
-.feed-post.feed-sell { border-left-color: var(--gold); }
+.feed-post.feed-buy  { border-inline-start-color: var(--gain); }
+.feed-post.feed-sell { border-inline-start-color: var(--gold); }
 
 .feed-post-head { display: flex; align-items: flex-start; gap: 0.75rem; }
 
@@ -1236,7 +1236,7 @@ body.nav-locked { overflow: hidden; }
 .feed-time { color: var(--text-faint); }
 
 .feed-move {
-  margin-left: auto;
+  margin-inline-start: auto;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -1301,7 +1301,7 @@ body.nav-locked { overflow: hidden; }
   gap: 0.6rem;
 }
 .feed-comment { font-size: 0.86rem; line-height: 1.55; }
-.feed-comment-author { font-weight: 600; margin-right: 0.4rem; }
+.feed-comment-author { font-weight: 600; margin-inline-end: 0.4rem; }
 .feed-comment-author a { color: var(--text); text-decoration: none; }
 .feed-comment-author a:hover { color: var(--gold-bright); }
 /* pre-wrap keeps the line breaks a reply was written with (Shift+Enter). */
@@ -1348,7 +1348,7 @@ body.nav-locked { overflow: hidden; }
 
 @media (max-width: 720px) {
   .feed-post-head { flex-wrap: wrap; }
-  .feed-move { margin-left: 0; flex-direction: row; align-items: baseline; gap: 0.35rem; }
+  .feed-move { margin-inline-start: 0; flex-direction: row; align-items: baseline; gap: 0.35rem; }
   .feed-reply { flex-direction: column; align-items: stretch; }
   .feed-reply button { width: 100%; }
   /* 16px, because iOS Safari zooms the page into any field smaller than

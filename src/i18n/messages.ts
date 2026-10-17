@@ -6,7 +6,8 @@
    Hebrew table is typed against it, so a key added to one and not the other
    fails the build instead of rendering blank.
 
-   Translated so far: the navbar, the Dashboard and the Player Card. Other screens move here
+   Translated so far: the navbar, the sign-in pages (Home, Login, Register),
+   the Dashboard and the Player Card. Other screens move here
    as they are ported to right-to-left.
    =========================================================================== */
 
@@ -232,6 +233,40 @@ const en = {
   next_goal: "Next goal",
   next_title: "Next title",
   t_progress: "Level rises with XP earned from performance, activity, medals and achievements.",
+
+  // Sign-in pages: Home, Login, Register
+  auth_eyebrow_home: "PRIVATE MARKET INTELLIGENCE",
+  auth_eyebrow_login: "WELCOME BACK",
+  auth_eyebrow_register: "OPEN AN ACCOUNT",
+  auth_login: "Login",
+  auth_register: "Register",
+  auth_email: "Email",
+  auth_password: "Password",
+  auth_display_name: "Display name (shown on the leaderboard)",
+  auth_password_hint: "At least 12 characters. A phrase you can remember is stronger than a short jumble.",
+  auth_back_home: "Back to Home",
+  auth_have_account: "Already have an account? Login",
+  auth_login_failed: "Login failed",
+  auth_register_failed: "Registration failed",
+  auth_login_unexpected: "Login response did not contain expected data.",
+  auth_login_error_title: "Could not sign in",
+  auth_register_error_title: "Could not create account",
+  auth_network_error: "Could not reach the server. Check your connection and try again.",
+  // Server refusals, by error code. English shows the server's own wording;
+  // these are the Hebrew screen's equivalents.
+  auth_invalid_credentials: "Invalid credentials",
+  auth_credentials_required: "Email and password are required",
+  auth_too_many_logins: "Too many failed login attempts. Please try again later.",
+  auth_too_many_registrations: "Too many accounts created from this address. Please try again later.",
+  auth_email_taken: "Email already exists",
+  auth_email_invalid: "Please enter a valid email address.",
+  auth_email_too_long: "Email address is too long.",
+  auth_password_too_short: "Password must be at least 12 characters.",
+  auth_password_too_long: "Password is too long.",
+  auth_password_too_common: "That password appears in common breach lists. Please choose another.",
+  auth_password_too_simple: "Password must use at least 5 different characters.",
+  auth_display_name_required: "Display name is required",
+  auth_display_name_too_long: "Display name must be 40 characters or fewer",
 };
 
 export type MessageKey = keyof typeof en;
@@ -440,6 +475,39 @@ const he: Messages = {
   next_goal: "היעד הבא",
   next_title: "התואר הבא",
   t_progress: "הדרגה עולה עם XP שנצבר מביצועים, פעילות, מדליות והישגים.",
+
+  // Sign-in pages: Home, Login, Register
+  auth_eyebrow_home: "מודיעין שוק אישי",
+  auth_eyebrow_login: "ברוכים השבים",
+  auth_eyebrow_register: "פתיחת חשבון",
+  auth_login: "התחברות",
+  auth_register: "הרשמה",
+  auth_email: "אימייל",
+  auth_password: "סיסמה",
+  auth_display_name: "שם תצוגה (מוצג בטבלת הדירוג)",
+  auth_password_hint: "לפחות 12 תווים. משפט שקל לזכור חזק יותר מרצף קצר של תווים אקראיים.",
+  auth_back_home: "חזרה לדף הבית",
+  auth_have_account: "כבר יש לך חשבון? להתחברות",
+  auth_login_failed: "ההתחברות נכשלה",
+  auth_register_failed: "ההרשמה נכשלה",
+  auth_login_unexpected: "תשובת השרת להתחברות לא הייתה תקינה. נסו שוב.",
+  auth_login_error_title: "לא ניתן היה להתחבר",
+  auth_register_error_title: "לא ניתן היה ליצור חשבון",
+  auth_network_error: "לא ניתן היה להגיע לשרת. בדקו את החיבור לאינטרנט ונסו שוב.",
+  auth_invalid_credentials: "האימייל או הסיסמה שגויים.",
+  auth_credentials_required: "יש להזין אימייל וסיסמה.",
+  auth_too_many_logins: "יותר מדי ניסיונות התחברות כושלים. נסו שוב מאוחר יותר.",
+  auth_too_many_registrations: "נוצרו יותר מדי חשבונות מהכתובת הזו. נסו שוב מאוחר יותר.",
+  auth_email_taken: "כבר קיים חשבון עם האימייל הזה.",
+  auth_email_invalid: "הזינו כתובת אימייל תקינה.",
+  auth_email_too_long: "כתובת האימייל ארוכה מדי.",
+  auth_password_too_short: "הסיסמה חייבת להכיל לפחות 12 תווים.",
+  auth_password_too_long:
+    "הסיסמה ארוכה מדי. אותיות בעברית תופסות כפול מקום, ולכן סיסמה בעברית יכולה להיות באורך של כמחצית מסיסמה באנגלית.",
+  auth_password_too_common: "הסיסמה הזו מופיעה ברשימות של סיסמאות שדלפו. בחרו סיסמה אחרת.",
+  auth_password_too_simple: "הסיסמה חייבת להכיל לפחות 5 תווים שונים.",
+  auth_display_name_required: "יש להזין שם תצוגה.",
+  auth_display_name_too_long: "שם התצוגה יכול להכיל עד 40 תווים.",
 };
 
 export const MESSAGES: Record<Lang, Messages> = { en, he };

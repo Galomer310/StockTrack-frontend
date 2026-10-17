@@ -309,7 +309,7 @@ body.light-mode .navbar { background: rgba(255, 255, 255, 0.82); }
 
 /* Eyebrow rule above the buttons */
 .hero-overlay::before {
-  content: "PRIVATE MARKET INTELLIGENCE";
+  content: attr(data-eyebrow); /* translated text, set by Home */
   display: block;
   margin-bottom: 1.1rem;
   font-size: 0.7rem;
@@ -415,8 +415,18 @@ body.light-mode .register-container { background: rgba(255, 255, 255, 0.92); }
   color: var(--gold);
   margin-bottom: 0.4rem;
 }
-.login-container::before { content: "WELCOME BACK"; }
-.register-container::before { content: "OPEN AN ACCOUNT"; }
+/* The eyebrow text comes from data-eyebrow so it can be translated */
+.login-container::before, .register-container::before { content: attr(data-eyebrow); }
+
+/* Hebrew has no capitals, and wide letter-spacing breaks up its letterforms
+   (as in the navbar). The address and password fields stay left to right but
+   line up with the rest of the right-aligned form. */
+.hero-overlay:lang(he)::before,
+.hero-buttons:lang(he) .btn,
+.login-container:lang(he)::before,
+.register-container:lang(he)::before { letter-spacing: normal; }
+.login-container:lang(he) input[dir="ltr"],
+.register-container:lang(he) input[dir="ltr"] { text-align: right; }
 
 .login-container form, .register-container form {
   display: flex;
@@ -940,6 +950,8 @@ body.light-mode .leaderboard-page > h2 { background-image:
   text-transform: uppercase;
   color: var(--text-faint);
 }
+/* No tracking in Hebrew, as in the navbar */
+.toast-stack:lang(he) .toast-title { letter-spacing: normal; }
 
 .toast-message { font-size: 0.88rem; color: var(--text); overflow-wrap: anywhere; }
 

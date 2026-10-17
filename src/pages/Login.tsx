@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate for naviga
 import { useDispatch } from "react-redux"; // Import useDispatch for Redux actions
 import { setUser } from "../features/authSlice"; // Import setUser action from authSlice
 import { useToast } from "../components/ui/ToastProvider";
+import { useLanguage } from "../i18n/LanguageContext";
+import { errorBodyMessage } from "../i18n/fill";
 
 // Define the Login functional component
 const Login = () => {
@@ -11,6 +13,14 @@ const Login = () => {
   const dispatch = useDispatch(); // Initialize dispatch for Redux actions
   const navigate = useNavigate(); // Initialize navigate for redirection
   const toast = useToast();
+  const { t, dir, lang } = useLanguage();
+
+  // The server's refusals, by error code, for the Hebrew screen
+  const errorsByCode = {
+    INVALID_CREDENTIALS: t("auth_invalid_credentials"),
+    CREDENTIALS_REQUIRED: t("auth_credentials_required"),
+    TOO_MANY_LOGIN_ATTEMPTS: t("auth_too_many_logins"),
+  };
 
   // Handler function for the login form submission
   const handleLogin = async (e: React.FormEvent) => {
@@ -29,7 +39,7 @@ const Login = () => {
       if (!response.ok) {
         // Check if the response is not OK
         const errorData = await response.json(); // Parse error details
-        toast.error(errorData.error || "Login failed");
+        toast.error(errorBodyMessage(errorData, lang, errorsByCode, t("auth_login_failed")));
         return; // Exit the function
       }
       const data = await response.json(); // Parse the successful response data
@@ -46,40 +56,48 @@ const Login = () => {
         );
         navigate("/user"); // Redirect to the user dashboard
       } else {
-        toast.error("Login response did not contain expected data.");
+        toast.error(t("auth_login_unexpected"));
       }
     } catch (error) {
-      toast.error((error as Error).message, "Could not sign in");
+      // The browser's own wording ("Failed to fetch") is English, so the
+      // Hebrew screen says what it means instead.
+      toast.error(
+        lang === "en" ? (error as Error).message : t("auth_network_error"),
+        t("auth_login_error_title")
+      );
     }
   };
 
   // Return the login form UI
   return (
     <>
-      <div className="login-page">
-        <div className="login-container">
+      <div className="login-page" dir={dir} lang={lang}>
+        <div className="login-container" data-eyebrow={t("auth_eyebrow_login")}>
           {" "}
           {/* Container with CSS class for login */}
           <form onSubmit={handleLogin}>
             {" "}
             {/* Form submission triggers handleLogin */}
+            {/* An address and a password read left to right in either language */}
             <input
               type="email" // Input field for email
-              placeholder="Email" // Placeholder text
+              dir="ltr"
+              placeholder={t("auth_email")} // Placeholder text
               value={email} // Bind value to email state
               onChange={(e) => setEmail(e.target.value)} // Update email state on change
               required // Mark input as required
             />
             <input
               type="password" // Input field for password
-              placeholder="Password" // Placeholder text
+              dir="ltr"
+              placeholder={t("auth_password")} // Placeholder text
               value={password} // Bind value to password state
               onChange={(e) => setPassword(e.target.value)} // Update password state on change
               required // Mark input as required
             />
-            <button type="submit">Login</button> {/* Submit button */}
+            <button type="submit">{t("auth_login")}</button> {/* Submit button */}
           </form>
-          <button onClick={() => navigate("/")}>Back to Home</button>{" "}
+          <button onClick={() => navigate("/")}>{t("auth_back_home")}</button>{" "}
           {/* Button to navigate back to Home */}
         </div>
         <div></div> {/* An empty div (can be removed if not used) */}

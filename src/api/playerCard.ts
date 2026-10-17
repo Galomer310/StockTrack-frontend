@@ -105,11 +105,38 @@ export interface PlayerCardResult {
   demo: boolean;
 }
 
-// Bio limit, from the Player Card spec (3.5). The database enforces it too.
+// Bio limit, from the Player Card spec (3.5). The server enforces it too.
 export const BIO_MAX_LENGTH = 100;
+
+// The server's first-name limit. Not in the spec, which sets none; a
+// placeholder cap mirrored from the backend (src/services/playerProfile.ts).
+export const FIRST_NAME_MAX_LENGTH = 50;
 
 // Counts characters as a person does, so a Hebrew letter or an emoji is one.
 export const bioLength = (text: string): number => [...text].length;
+
+// What the player may change about themselves. The nickname and picture are
+// not editable yet: their rules and storage are still to be decided.
+export interface ProfileUpdate {
+  bio?: string;
+  /** null removes it; the first name is optional. */
+  first_name?: string | null;
+}
+
+// Reasons the server gives for refusing an edit, so the page can explain
+// them in the reader's language.
+export type ProfileErrorCode =
+  | "BIO_TOO_LONG"
+  | "FIRST_NAME_TOO_LONG"
+  | "INVALID_CHARACTERS"
+  | "NOT_EDITABLE"
+  | "UNKNOWN";
+
+export class ProfileSaveError extends Error {
+  constructor(public code: ProfileErrorCode) {
+    super(code);
+  }
+}
 
 // The signed-in player's card, or demo data when a scenario is given.
 export const fetchPlayerCard = async (demo?: DemoScenario): Promise<PlayerCardResult> => {
@@ -118,12 +145,32 @@ export const fetchPlayerCard = async (demo?: DemoScenario): Promise<PlayerCardRe
   return { data: res.data, demo: false };
 };
 
-// Demo only for now: there is no profile-editing endpoint yet, so the page
-// offers editing only on demo data, where the edit lasts until reload.
-export const saveBio = async (bio: string): Promise<string> => {
-  const trimmed = bio.trim();
-  if (bioLength(trimmed) > BIO_MAX_LENGTH) {
-    throw new RangeError(`Bio must be ${BIO_MAX_LENGTH} characters or fewer`);
+const KNOWN_CODES: ProfileErrorCode[] = ["BIO_TOO_LONG", "FIRST_NAME_TOO_LONG", "INVALID_CHARACTERS", "NOT_EDITABLE"];
+
+// Saves the player's own bio and/or first name with PATCH /players/me and
+// returns their identity as it now stands. On demo data nothing is sent: the
+// edit is applied locally and lasts until the page is reloaded.
+export const saveProfile = async (
+  update: ProfileUpdate,
+  current: PlayerCardData["player"],
+  demo: boolean
+): Promise<PlayerCardData["player"]> => {
+  if (demo) {
+    const bio = update.bio?.trim();
+    const firstName = update.first_name?.trim();
+    if (bio !== undefined && bioLength(bio) > BIO_MAX_LENGTH) throw new ProfileSaveError("BIO_TOO_LONG");
+    if (firstName && bioLength(firstName) > FIRST_NAME_MAX_LENGTH) throw new ProfileSaveError("FIRST_NAME_TOO_LONG");
+    return {
+      ...current,
+      ...(bio !== undefined ? { bio } : {}),
+      ...("first_name" in update ? { first_name: firstName || null } : {}),
+    };
   }
-  return trimmed;
+  try {
+    const res = await axiosInstance.patch<{ player: PlayerCardData["player"] }>(`${BASE}/me`, update);
+    return res.data.player;
+  } catch (err) {
+    const code = (err as { response?: { data?: { code?: string } } })?.response?.data?.code;
+    throw new ProfileSaveError(KNOWN_CODES.includes(code as ProfileErrorCode) ? (code as ProfileErrorCode) : "UNKNOWN");
+  }
 };

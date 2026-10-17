@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Award, fetchPlayerCard, PlayerCardResult } from "../api/playerCard";
+import { Award, fetchPlayerCard, PlayerCardResult, ProfileUpdate, saveProfile } from "../api/playerCard";
 import { ArtDefs, CornerChart, TitleOrnament } from "../components/playerCard/art";
 import { AwardDialog, AwardKind, AwardsPanel } from "../components/playerCard/AwardsPanel";
 import { PlayerHeader } from "../components/playerCard/PlayerHeader";
@@ -22,9 +22,9 @@ import "../components/playerCard/playerCard.css";
    ?demo=1 or ?demo=new shows demo data instead (see demoData.ts). Other
    players' cards come with the subscription rules.
 
-   The bio can be edited only on demo data for now: there is no endpoint to
-   save it yet, and offering an edit that silently vanishes on reload would
-   be worse than not offering one.
+   The player can edit their first name and bio, saved with PATCH
+   /players/me. On demo data the edit is applied locally and lasts until
+   reload.
    =========================================================================== */
 
 const PlayerCard = () => {
@@ -49,8 +49,13 @@ const PlayerCard = () => {
     };
   }, [scenario]);
 
-  const setBio = (bio: string) =>
-    setResult((r) => (r ? { ...r, data: { ...r.data, player: { ...r.data.player, bio } } } : r));
+  // Saves, then shows the identity the server answers with, so the card
+  // reflects what was stored (trimmed, cleared) rather than what was typed.
+  const saveEdit = async (update: ProfileUpdate) => {
+    if (!result) return;
+    const player = await saveProfile(update, result.data.player, result.demo);
+    setResult((r) => (r ? { ...r, data: { ...r.data, player } } : r));
+  };
 
   return (
     <div className="pc" dir={dir} lang={lang}>
@@ -74,8 +79,8 @@ const PlayerCard = () => {
             <PlayerHeader
               player={result.data.player}
               progression={result.data.progression}
-              canEdit={result.demo}
-              onBioSaved={setBio}
+              canEdit
+              onSave={saveEdit}
             />
             <StatsRow data={result.data} />
             <div className="pc-row3">

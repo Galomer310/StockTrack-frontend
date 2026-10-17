@@ -1,9 +1,30 @@
 import { useState } from "react";
-import { BIO_MAX_LENGTH, bioLength, PlayerCardData, saveBio } from "../../api/playerCard";
+import {
+  BIO_MAX_LENGTH,
+  bioLength,
+  FIRST_NAME_MAX_LENGTH,
+  PlayerCardData,
+  ProfileErrorCode,
+  ProfileSaveError,
+  ProfileUpdate,
+} from "../../api/playerCard";
 import { useLanguage } from "../../i18n/LanguageContext";
+import { MessageKey } from "../../i18n/messages";
 import { formatNumber } from "./format";
 import { Icon } from "./icons";
 import { reasonKey } from "./reasons";
+
+const ERROR_TEXT: Record<ProfileErrorCode, MessageKey> = {
+  BIO_TOO_LONG: "err_bio_too_long",
+  FIRST_NAME_TOO_LONG: "err_first_name_too_long",
+  INVALID_CHARACTERS: "err_invalid_characters",
+  NOT_EDITABLE: "err_not_editable",
+  UNKNOWN: "bio_save_failed",
+};
+
+// Both fields are single-line on the card, and the server refuses line
+// breaks, so a pasted one becomes a space as it is typed.
+const oneLine = (text: string): string => text.replace(/[\r\n]+/g, " ");
 
 /* ===========================================================================
    Area 1 - the player header (spec 3).
@@ -17,7 +38,8 @@ import { reasonKey } from "./reasons";
 
    Level and title are shown, never edited: the system sets them. While the
    XP rules are undefined the server withholds them, and the badge says so
-   in place of a number. The bio is the one thing here the owner can change.
+   in place of a number. The owner can edit the first name and the bio (spec
+   11); the nickname and picture follow once their rules and storage exist.
    =========================================================================== */
 
 type Player = PlayerCardData["player"];
@@ -26,39 +48,51 @@ export const PlayerHeader = ({
   player,
   progression,
   canEdit,
-  onBioSaved,
+  onSave,
 }: {
   player: Player;
   progression: PlayerCardData["progression"];
   canEdit: boolean;
-  onBioSaved: (bio: string) => void;
+  /** Saves the edit; rejects with ProfileSaveError when the server refuses it. */
+  onSave: (update: ProfileUpdate) => Promise<void>;
 }) => {
   const { t, locale } = useLanguage();
   const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(player.bio);
+  const [bioDraft, setBioDraft] = useState(player.bio);
+  const [nameDraft, setNameDraft] = useState(player.first_name ?? "");
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<MessageKey | null>(null);
 
   const startEditing = () => {
-    setDraft(player.bio);
-    setError(false);
+    setBioDraft(player.bio);
+    setNameDraft(player.first_name ?? "");
+    setError(null);
     setEditing(true);
   };
 
+  // Sends only what changed, so an untouched field is never rewritten.
   const submit = async () => {
-    setSaving(true);
-    setError(false);
-    try {
-      onBioSaved(await saveBio(draft));
+    const update: ProfileUpdate = {};
+    if (bioDraft.trim() !== player.bio) update.bio = bioDraft;
+    if ((nameDraft.trim() || null) !== player.first_name) update.first_name = nameDraft.trim() || null;
+    if (Object.keys(update).length === 0) {
       setEditing(false);
-    } catch {
-      setError(true);
+      return;
+    }
+    setSaving(true);
+    setError(null);
+    try {
+      await onSave(update);
+      setEditing(false);
+    } catch (err) {
+      setError(ERROR_TEXT[err instanceof ProfileSaveError ? err.code : "UNKNOWN"]);
     } finally {
       setSaving(false);
     }
   };
 
-  const length = bioLength(draft);
+  const length = bioLength(bioDraft);
+  const tooLong = length > BIO_MAX_LENGTH || bioLength(nameDraft) > FIRST_NAME_MAX_LENGTH;
 
   return (
     <section className="pc-card pc-profile" aria-label={t("pc_title")}>
@@ -69,18 +103,30 @@ export const PlayerHeader = ({
         </h2>
         {editing ? (
           <>
+            <label className="pc-field" htmlFor="pc-first-name-input">
+              <span>{t("first_name_label")}</span>
+              <input
+                id="pc-first-name-input"
+                type="text"
+                dir="auto"
+                value={nameDraft}
+                maxLength={FIRST_NAME_MAX_LENGTH}
+                autoComplete="given-name"
+                onChange={(e) => setNameDraft(oneLine(e.target.value))}
+                autoFocus
+              />
+            </label>
             <textarea
               id="pc-bio-input"
               dir="auto"
-              value={draft}
+              value={bioDraft}
               maxLength={BIO_MAX_LENGTH}
               aria-label={t("bio_title")}
               aria-describedby="pc-bio-count"
-              onChange={(e) => setDraft(e.target.value)}
-              autoFocus
+              onChange={(e) => setBioDraft(oneLine(e.target.value))}
             />
             <div className="pc-bio-actions">
-              <button type="button" className="pc-btn" onClick={submit} disabled={saving || length > BIO_MAX_LENGTH}>
+              <button type="button" className="pc-btn" onClick={submit} disabled={saving || tooLong}>
                 {t("save")}
               </button>
               <button type="button" className="pc-btn" onClick={() => setEditing(false)} disabled={saving}>
@@ -92,7 +138,7 @@ export const PlayerHeader = ({
                 </bdi>
               </span>
             </div>
-            {error && <p className="pc-error">{t("bio_save_failed")}</p>}
+            {error && <p className="pc-error" role="alert">{t(error)}</p>}
           </>
         ) : (
           <>

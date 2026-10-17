@@ -131,6 +131,12 @@
   font: inherit; font-size: 0.95rem; line-height: 1.6; color: var(--pc-cream);
   background: #0B0B0D; border: 1px solid var(--pc-line); border-radius: 10px;
 }
+.pc-field { display: grid; gap: 4px; margin-block-end: 10px; font-size: 0.85rem; color: var(--pc-muted); }
+.pc-field input {
+  width: 100%; min-height: 40px; padding: 8px 12px;
+  font: inherit; font-size: 0.95rem; color: var(--pc-cream);
+  background: #0B0B0D; border: 1px solid var(--pc-line); border-radius: 10px;
+}
 .pc-bio-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-block-start: 10px; }
 .pc-bio .pc-error { margin-block: 10px 0; text-align: start; }
 .pc-counter { margin-inline-start: auto; font-size: 0.8rem; color: var(--pc-muted); font-variant-numeric: tabular-nums; }
@@ -304,6 +310,8 @@
   .pc-divider { display: none; }
 }
 @media (max-width: 560px) {
+  /* 16px, because iOS Safari zooms into any field smaller than that on focus. */
+  .pc-field input, .pc-bio textarea { font-size: 16px; }
   .pc-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .pc-awards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .pc-progress { grid-template-columns: minmax(0, 1fr); justify-items: center; }

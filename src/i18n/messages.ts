@@ -33,7 +33,12 @@ const en = {
   // Header
   bio_title: "Player Description",
   bio_edit: "Edit",
-  bio_save_failed: "The description could not be saved. Try again.",
+  bio_save_failed: "Your changes could not be saved. Try again.",
+  first_name_label: "First name (optional)",
+  err_bio_too_long: "The description can be at most 100 characters.",
+  err_first_name_too_long: "The first name can be at most 50 characters.",
+  err_invalid_characters: "Remove line breaks and special control characters, then save again.",
+  err_not_editable: "That detail can't be changed here.",
   avatar_label: "Profile picture",
 
   // Six stats
@@ -121,7 +126,12 @@ const he: Messages = {
 
   bio_title: "תיאור השחקן",
   bio_edit: "עריכה",
-  bio_save_failed: "לא ניתן היה לשמור את התיאור. נסו שוב.",
+  bio_save_failed: "לא ניתן היה לשמור את השינויים. נסו שוב.",
+  first_name_label: "שם פרטי (לא חובה)",
+  err_bio_too_long: "התיאור יכול להכיל עד 100 תווים.",
+  err_first_name_too_long: "השם הפרטי יכול להכיל עד 50 תווים.",
+  err_invalid_characters: "הסירו ירידות שורה ותווים מיוחדים ושמרו שוב.",
+  err_not_editable: "לא ניתן לשנות את הפרט הזה כאן.",
   avatar_label: "תמונת פרופיל",
 
   s_avg: "תשואה ממוצעת של התיקים הפעילים",

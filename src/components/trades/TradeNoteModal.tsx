@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { fill, serverMessage } from "../../i18n/fill";
 
 /* ===========================================================================
    The note window shown for every buy and sell.
@@ -6,6 +8,9 @@ import React, { useEffect, useRef, useState } from "react";
    A note is required: the journal is public, and an entry with no reasoning
    behind it is worth little to anyone reading it. The backend enforces the
    same rule, so this is convenience rather than the actual guard.
+
+   Translated, and sets its own direction: it opens from the dashboard and
+   from the stock pages, which are not all ported yet.
    =========================================================================== */
 
 export interface TradeSubmission {
@@ -27,11 +32,6 @@ interface Props {
   onSubmit: (submission: TradeSubmission) => Promise<void>;
 }
 
-const PROMPTS: Record<"buy" | "sell", string> = {
-  buy: "Why are you buying? What has to go right for this to work?",
-  sell: "Why are you selling? Did the thesis play out, break, or change?",
-};
-
 const TradeNoteModal: React.FC<Props> = ({
   open,
   mode,
@@ -48,6 +48,7 @@ const TradeNoteModal: React.FC<Props> = ({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const noteRef = useRef<HTMLTextAreaElement>(null);
+  const { t, dir, lang } = useLanguage();
 
   // Reset each time it opens, so a previous thesis never leaks into a new trade
   useEffect(() => {
@@ -90,7 +91,14 @@ const TradeNoteModal: React.FC<Props> = ({
     try {
       await onSubmit({ note: trimmed, quantity, price });
     } catch (err: any) {
-      setError(err?.response?.data?.error || "Could not record this trade.");
+      setError(
+        serverMessage(
+          err,
+          lang,
+          { INSUFFICIENT_CASH: t("tm_insufficient_cash"), NO_PORTFOLIO: t("tm_no_portfolio") },
+          t("tm_failed")
+        )
+      );
       setSubmitting(false);
       return;
     }
@@ -104,6 +112,8 @@ const TradeNoteModal: React.FC<Props> = ({
       className="modal-backdrop"
       onClick={() => !submitting && onClose()}
       role="presentation"
+      dir={dir}
+      lang={lang}
     >
       <div
         className="modal trade-modal"
@@ -113,15 +123,15 @@ const TradeNoteModal: React.FC<Props> = ({
         aria-labelledby="trade-modal-title"
       >
         <div className="modal-head">
-          <span className={`trade-badge trade-${mode}`}>{mode}</span>
+          <span className={`trade-badge trade-${mode}`}>{t(mode === "buy" ? "trade_buy" : "trade_sell")}</span>
           <h3 id="trade-modal-title">
-            {mode === "buy" ? "Record purchase" : "Record sale"} · {symbol}
+            {t(mode === "buy" ? "tm_record_buy" : "tm_record_sell")} · <bdi>{symbol}</bdi>
           </h3>
           <button
             className="modal-close"
             onClick={onClose}
             disabled={submitting}
-            aria-label="Close"
+            aria-label={t("close")}
           >
             ×
           </button>
@@ -130,7 +140,7 @@ const TradeNoteModal: React.FC<Props> = ({
         <form onSubmit={handleSubmit}>
           <div className="trade-fields">
             <label>
-              <span className="summary-label">Quantity</span>
+              <span className="summary-label">{t("tm_quantity")}</span>
               <input
                 type="number"
                 min="1"
@@ -142,14 +152,14 @@ const TradeNoteModal: React.FC<Props> = ({
               />
               {mode === "sell" && maxQuantity !== undefined && (
                 <span className="field-hint">
-                  {maxQuantity} held
+                  {fill(t("tm_held"), { n: maxQuantity })}
                   {maxQuantity > 1 && (
                     <button
                       type="button"
                       className="link-btn"
                       onClick={() => setQuantity(maxQuantity)}
                     >
-                      sell all
+                      {t("tm_sell_all")}
                     </button>
                   )}
                 </span>
@@ -158,7 +168,7 @@ const TradeNoteModal: React.FC<Props> = ({
 
             <label>
               <span className="summary-label">
-                {mode === "buy" ? "Price paid" : "Sale price"}
+                {t(mode === "buy" ? "tm_price_paid" : "tm_sale_price")}
               </span>
               {/* Read-only both ways: the server executes every trade at its
                   own market quote, so this is the price shown, not chosen. */}
@@ -174,28 +184,29 @@ const TradeNoteModal: React.FC<Props> = ({
             </label>
 
             <div className="trade-total">
-              <span className="summary-label">Total</span>
-              <span className="summary-value">${total.toFixed(2)}</span>
+              <span className="summary-label">{t("tm_total")}</span>
+              <span className="summary-value" dir="ltr">${total.toFixed(2)}</span>
             </div>
           </div>
 
           {overQuantity && (
-            <p className="error">You only hold {maxQuantity} shares of {symbol}.</p>
+            <p className="error">{fill(t("tm_over_quantity"), { n: maxQuantity ?? 0, symbol })}</p>
           )}
 
           <label className="trade-note-field">
-            <span className="summary-label">Your thesis (required)</span>
+            <span className="summary-label">{t("tm_thesis")}</span>
             <textarea
               ref={noteRef}
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              placeholder={PROMPTS[mode]}
+              placeholder={t(mode === "buy" ? "tm_prompt_buy" : "tm_prompt_sell")}
+              dir="auto"
               rows={5}
               maxLength={2000}
               required
             />
             <span className="field-hint">
-              Visible to anyone who can view your portfolio · {note.length}/2000
+              {fill(t("tm_visibility"), { n: note.length })}
             </span>
           </label>
 
@@ -203,14 +214,10 @@ const TradeNoteModal: React.FC<Props> = ({
 
           <div className="modal-actions">
             <button type="button" onClick={onClose} disabled={submitting}>
-              Cancel
+              {t("cancel")}
             </button>
             <button type="submit" disabled={!canSubmit}>
-              {submitting
-                ? "Recording…"
-                : mode === "buy"
-                ? "Record purchase"
-                : "Record sale"}
+              {submitting ? t("tm_recording") : t(mode === "buy" ? "tm_record_buy" : "tm_record_sell")}
             </button>
           </div>
         </form>

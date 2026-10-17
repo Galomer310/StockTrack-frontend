@@ -1,8 +1,8 @@
 // Number and date formatting for the Player Card, in the reader's language.
 
-export const formatNumber = (n: number, locale: string): string => new Intl.NumberFormat(locale).format(n);
+export const formatNumber = (n: number, locale: string | undefined): string => new Intl.NumberFormat(locale).format(n);
 
-export const formatDate = (iso: string, locale: string): string =>
+export const formatDate = (iso: string, locale: string | undefined): string =>
   new Intl.DateTimeFormat(locale, { day: "numeric", month: "long", year: "numeric" }).format(
     // Noon, so the calendar date holds in every time zone.
     new Date(`${iso}T12:00:00`)

@@ -5,8 +5,8 @@ export interface LanguageValue {
   lang: Lang;
   /** Writing direction for a translated screen's root element. */
   dir: "rtl" | "ltr";
-  /** BCP 47 tag for Intl number and date formatting. */
-  locale: string;
+  /** BCP 47 tag for Intl number and date formatting; undefined means the browser's own. */
+  locale: string | undefined;
   setLang: (lang: Lang) => void;
   t: (key: MessageKey) => string;
 }

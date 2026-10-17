@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react"; // Import React and necessary hooks
 import axiosInstance from "../../api/axiosInstance"; // Shared axios instance (attaches auth token, handles refresh)
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js"; // Import Chart.js components
+import { useLanguage } from "../../i18n/LanguageContext";
 
 // Register Chart.js components (if using a pie chart, for example)
 ChartJS.register(ArcElement, Tooltip, Legend); // Register ArcElement, Tooltip, and Legend
@@ -34,6 +35,7 @@ const PortfolioPerformance: React.FC<PortfolioPerformanceProps> = ({
   watchlist, // Destructure watchlist from props
   latestPrices: providedPrices, // Prices from the caller, when it has them
 }) => {
+  const { t } = useLanguage();
   // State for storing the latest prices from the backend
   const [fetchedPrices, setFetchedPrices] = useState<{
     [symbol: string]: number;
@@ -122,7 +124,7 @@ const PortfolioPerformance: React.FC<PortfolioPerformanceProps> = ({
     <div className="portfolio-performance">
       {" "}
       {/* Container with CSS class */}
-      <h3>Portfolio Performance</h3> {/* Section title */}
+      <h3>{t("pt_title")}</h3>
       <div className="table-wrap">
       <table>
         {" "}
@@ -130,19 +132,19 @@ const PortfolioPerformance: React.FC<PortfolioPerformanceProps> = ({
         <thead>
           <tr>
             <th onClick={() => handleSort("stock_symbol")}>
-              Ticker{" "}
+              {t("col_ticker")}{" "}
               {sortBy === "stock_symbol" && (sortOrder === "asc" ? "↑" : "↓")}{" "}
               {/* Show sort arrow */}
             </th>
-            <th>Purchase Price</th> {/* Table header for purchase price */}
-            <th>Latest Price</th> {/* Table header for latest price */}
+            <th>{t("pt_purchase_price")}</th>
+            <th>{t("pt_latest_price")}</th>
             <th onClick={() => handleSort("quantity")}>
-              Quantity{" "}
+              {t("pt_quantity")}{" "}
               {sortBy === "quantity" && (sortOrder === "asc" ? "↑" : "↓")}{" "}
               {/* Show sort arrow */}
             </th>
             <th onClick={() => handleSort("profitLoss")}>
-              Profit / Loss{" "}
+              {t("pt_profit_loss")}{" "}
               {sortBy === "profitLoss" && (sortOrder === "asc" ? "↑" : "↓")}{" "}
               {/* Show sort arrow */}
             </th>

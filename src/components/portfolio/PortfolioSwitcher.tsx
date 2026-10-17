@@ -9,6 +9,8 @@ import {
 } from "../../api/portfolios";
 import { money, percent } from "../../api/social";
 import { useToast } from "../ui/ToastProvider";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { fill, serverMessage } from "../../i18n/fill";
 
 /* ===========================================================================
    Choosing which portfolio you are working in.
@@ -32,6 +34,7 @@ interface Props {
 const PortfolioSwitcher: React.FC<Props> = ({ refreshKey = 0, onPortfolioChange }) => {
   const dispatch = useDispatch();
   const toast = useToast();
+  const { t, lang } = useLanguage();
   const activeId = useSelector((state: RootState) => state.portfolio.activeId);
 
   const [portfolios, setPortfolios] = useState<MyPortfolio[]>([]);
@@ -63,7 +66,7 @@ const PortfolioSwitcher: React.FC<Props> = ({ refreshKey = 0, onPortfolioChange 
         }
         onPortfolioChange?.(chosen);
       } catch {
-        if (!cancelled) setError("Could not load your portfolios.");
+        if (!cancelled) setError(t("pf_load_failed"));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -96,17 +99,19 @@ const PortfolioSwitcher: React.FC<Props> = ({ refreshKey = 0, onPortfolioChange 
       setNewName("");
       setCreating(false);
       toast.success(
-        `${created.name} opened with ${money(created.cash)} to invest.`,
-        "Portfolio created"
+        fill(t("pf_created"), { name: created.name, cash: money(created.cash) }),
+        t("pf_created_title")
       );
     } catch (err: any) {
-      toast.error(err.response?.data?.error || "Could not create that portfolio.");
+      toast.error(
+        serverMessage(err, lang, { PORTFOLIO_LIMIT_REACHED: t("pf_limit_reached") }, t("pf_create_failed"))
+      );
     } finally {
       setSubmitting(false);
     }
   };
 
-  if (loading) return <p className="stock-panel-loading">Loading your portfolios…</p>;
+  if (loading) return <p className="stock-panel-loading">{t("pf_loading")}</p>;
   if (error) return <p className="error">{error}</p>;
 
   const atLimit = portfolios.length >= limit;
@@ -114,9 +119,9 @@ const PortfolioSwitcher: React.FC<Props> = ({ refreshKey = 0, onPortfolioChange 
   return (
     <section className="portfolio-switcher">
       <div className="switcher-head">
-        <h3>Your portfolios</h3>
+        <h3>{t("pf_heading")}</h3>
         <span className="switcher-count">
-          {portfolios.length} of {limit}
+          {fill(t("pf_count"), { n: portfolios.length, limit })}
         </span>
       </div>
 
@@ -130,17 +135,19 @@ const PortfolioSwitcher: React.FC<Props> = ({ refreshKey = 0, onPortfolioChange 
           >
             <span className="portfolio-card-name">
               {p.name}
-              {p.id === activeId && <span className="lb-you">open</span>}
+              {p.id === activeId && <span className="lb-you">{t("pf_open_badge")}</span>}
             </span>
             <span className="portfolio-card-equity">{money(p.equity)}</span>
             <span
               className={`portfolio-card-return ${p.return_pct >= 0 ? "gain" : "loss"}`}
             >
-              {percent(p.return_pct)}
+              <bdi dir="ltr">{percent(p.return_pct)}</bdi>
             </span>
             <span className="portfolio-card-cash">
-              {money(p.cash)} cash · {p.holdings_count} holding
-              {p.holdings_count === 1 ? "" : "s"}
+              {fill(t(p.holdings_count === 1 ? "pf_cash_one" : "pf_cash_other"), {
+                cash: money(p.cash),
+                n: p.holdings_count,
+              })}
             </span>
           </button>
         ))}
@@ -154,16 +161,16 @@ const PortfolioSwitcher: React.FC<Props> = ({ refreshKey = 0, onPortfolioChange 
                 autoFocus
                 value={newName}
                 maxLength={40}
-                placeholder="Portfolio name"
+                placeholder={t("pf_name_placeholder")}
                 onChange={(e) => setNewName(e.target.value)}
               />
-              <span className="field-hint">Opens with {money(startingCash)}</span>
+              <span className="field-hint">{fill(t("pf_opens_with"), { cash: money(startingCash) })}</span>
               <div className="modal-actions">
                 <button type="button" onClick={() => setCreating(false)} disabled={submitting}>
-                  Cancel
+                  {t("cancel")}
                 </button>
                 <button type="submit" disabled={!newName.trim() || submitting}>
-                  {submitting ? "Opening…" : "Open"}
+                  {submitting ? t("pf_opening") : t("pf_open")}
                 </button>
               </div>
             </form>
@@ -175,15 +182,15 @@ const PortfolioSwitcher: React.FC<Props> = ({ refreshKey = 0, onPortfolioChange 
               <span className="portfolio-add-plus" aria-hidden="true">
                 +
               </span>
-              <span>New portfolio</span>
-              <span className="field-hint">Starts with {money(startingCash)}</span>
+              <span>{t("pf_new")}</span>
+              <span className="field-hint">{fill(t("pf_starts_with"), { cash: money(startingCash) })}</span>
             </button>
           ))}
       </div>
 
       {atLimit && (
         <p className="field-hint switcher-limit">
-          You are running all {limit} of your portfolios. Higher tiers will allow more.
+          {fill(t("pf_at_limit"), { limit })}
         </p>
       )}
     </section>

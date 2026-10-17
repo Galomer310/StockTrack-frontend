@@ -11,6 +11,7 @@ import {
   Legend, // Import Legend plugin for chart legends
 } from "chart.js";
 import { SERIES } from "../../charts/chartTheme"; // Shared gold/steel series colours
+import { useLanguage } from "../../i18n/LanguageContext";
 
 // Register the necessary Chart.js modules for the line chart
 ChartJS.register(
@@ -34,6 +35,7 @@ const PortfolioPerformanceChart: FC<PortfolioPerformanceChartProps> = ({
   watchlist, // Destructure watchlist from props
   latestPrices, // Destructure latestPrices from props
 }) => {
+  const { t, dir, locale } = useLanguage();
   // useMemo hook to compute chart data only when watchlist or latestPrices change
   const chartData = useMemo(() => {
     if (watchlist.length === 0) return null; // Return null if watchlist is empty
@@ -62,7 +64,7 @@ const PortfolioPerformanceChart: FC<PortfolioPerformanceChartProps> = ({
           : parseFloat(item.price_at_time);
       cumulativeCurrent += effectivePrice * Number(item.quantity); // Update cumulative current value
 
-      labels.push(new Date(item.added_at).toLocaleDateString()); // Add formatted date to labels
+      labels.push(new Date(item.added_at).toLocaleDateString(locale)); // Dates in the reader's language
       investedData.push(cumulativeInvested); // Add current cumulative invested value
       currentData.push(cumulativeCurrent); // Add current cumulative portfolio value
     });
@@ -72,7 +74,7 @@ const PortfolioPerformanceChart: FC<PortfolioPerformanceChartProps> = ({
       labels, // X-axis labels (dates)
       datasets: [
         {
-          label: "Invested Value", // Label for the invested value line
+          label: t("chart_invested_value"),
           data: investedData, // Data points for invested value
           borderColor: SERIES.steel, // Steel blue, the secondary accent
           backgroundColor: SERIES.steelFill,
@@ -81,7 +83,7 @@ const PortfolioPerformanceChart: FC<PortfolioPerformanceChartProps> = ({
           pointRadius: 2,
         },
         {
-          label: "Current Value", // Label for the current value line
+          label: t("chart_current_value"),
           data: currentData, // Data points for current portfolio value
           borderColor: SERIES.gold, // Gold, the primary accent
           backgroundColor: SERIES.goldFill,
@@ -91,7 +93,7 @@ const PortfolioPerformanceChart: FC<PortfolioPerformanceChartProps> = ({
         },
       ],
     };
-  }, [watchlist, latestPrices]); // Recompute chartData if watchlist or latestPrices change
+  }, [watchlist, latestPrices, t, locale]); // Recompute when the data or the language changes
 
   // Define chart options for responsiveness and plugins
   const chartOptions = {
@@ -99,10 +101,12 @@ const PortfolioPerformanceChart: FC<PortfolioPerformanceChartProps> = ({
     plugins: {
       legend: {
         position: "top" as const, // Position the legend at the top
+        rtl: dir === "rtl",
       },
+      tooltip: { rtl: dir === "rtl" },
       title: {
         display: true, // Display the chart title
-        text: "Portfolio Performance Over Time", // Title text
+        text: t("chart_over_time"),
       },
     },
   };

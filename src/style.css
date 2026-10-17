@@ -212,7 +212,7 @@ body.light-mode .navbar { background: rgba(255, 255, 255, 0.82); }
 .navbar::after {
   content: "";
   position: absolute;
-  left: 0; right: 0; bottom: -1px;
+  inset-inline-start: 0; inset-inline-end: 0; bottom: -1px;
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--gold-line), transparent);
 }
@@ -514,7 +514,7 @@ body.light-mode .register-container { background: rgba(255, 255, 255, 0.92); }
 .summary-card::before {
   content: "";
   position: absolute;
-  top: 0; left: 0; right: 0;
+  top: 0; inset-inline-start: 0; inset-inline-end: 0;
   height: 2px;
   background: linear-gradient(90deg, var(--gold), transparent);
   opacity: 0.7;
@@ -545,7 +545,7 @@ table, .holdings-table, .compare-table, .portfolio-performance table {
 th {
   background: var(--bg-raised);
   color: var(--text-muted);
-  text-align: left;
+  text-align: start;
   padding: 0.8rem 0.9rem;
   font-size: 0.7rem;
   font-weight: 700;
@@ -619,6 +619,8 @@ tbody tr:hover { background: var(--gold-wash); }
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
+/* Expand arrow on a grouped holding, at the line's end in either direction. */
+.group-toggle { float: inline-end; }
 .group-header:hover { background: var(--gold-wash); color: var(--gold-bright); }
 
 
@@ -674,7 +676,7 @@ tbody tr:hover { background: var(--gold-wash); }
 .lb-holdings { font-family: var(--font-num); color: var(--text-muted); }
 
 .lb-you {
-  margin-left: 0.5rem;
+  margin-inline-start: 0.5rem;
   padding: 0.12rem 0.5rem;
   border-radius: 999px;
   background: var(--gold-wash);
@@ -709,7 +711,7 @@ tbody tr:hover { background: var(--gold-wash); }
   margin: 0.5rem 0 1.5rem;
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-left: 3px solid currentColor;
+  border-inline-start: 3px solid currentColor;
   border-radius: var(--radius-sm);
   font-weight: 600;
 }
@@ -719,7 +721,7 @@ tbody tr:hover { background: var(--gold-wash); }
 .compare-shared { background: rgba(91, 140, 184, 0.07); }
 
 .compare-badge {
-  margin-left: 0.5rem;
+  margin-inline-start: 0.5rem;
   padding: 0.1rem 0.45rem;
   border-radius: 999px;
   background: rgba(91, 140, 184, 0.18);
@@ -839,7 +841,7 @@ tbody tr:hover { background: var(--gold-wash); }
 .dashboard-info::after {
   content: "";
   position: absolute;
-  left: 0; right: 0; bottom: 0;
+  inset-inline-start: 0; inset-inline-end: 0; bottom: 0;
   height: 1px;
   background: linear-gradient(90deg, var(--gold-line), transparent 70%);
 }
@@ -879,11 +881,15 @@ body.light-mode .leaderboard-page > h2 { background-image:
     linear-gradient(100deg, rgba(8, 11, 17, 0.90) 0%, rgba(8, 11, 17, 0.72) 50%, rgba(8, 11, 17, 0.55) 100%),
     url('./images/trading-floor.jpg'); }
 
-/* ---------- Toasts ---------- */
+/* ---------- Toasts ----------
+   Logical offsets put the stack top-right in English and top-left in Hebrew
+   (the stack carries the interface's dir). translateX has no logical form,
+   so the slide-in direction flips through --toast-sweep. */
+.toast-stack[dir="rtl"] { --toast-sweep: -22px; }
 .toast-stack {
   position: fixed;
   top: 1rem;
-  right: 1rem;
+  inset-inline-end: 1rem;
   z-index: 9998;
   display: flex;
   flex-direction: column;
@@ -899,7 +905,7 @@ body.light-mode .leaderboard-page > h2 { background-image:
   padding: 0.85rem 0.95rem;
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-left: 3px solid var(--gold);
+  border-inline-start: 3px solid var(--gold);
   border-radius: var(--radius);
   box-shadow: var(--shadow-lg);
   pointer-events: auto;
@@ -907,7 +913,7 @@ body.light-mode .leaderboard-page > h2 { background-image:
 }
 
 @keyframes toast-in {
-  from { opacity: 0; transform: translateX(22px) scale(0.97); }
+  from { opacity: 0; transform: translateX(var(--toast-sweep, 22px)) scale(0.97); }
   to   { opacity: 1; transform: none; }
 }
 
@@ -950,14 +956,14 @@ body.light-mode .leaderboard-page > h2 { background-image:
 }
 .toast-close:hover { color: var(--gold-bright); background: transparent; }
 
-.toast-success { border-left-color: var(--gain); }
+.toast-success { border-inline-start-color: var(--gain); }
 .toast-success .toast-icon {
   background: rgba(70, 192, 138, 0.12);
   border-color: rgba(70, 192, 138, 0.4);
   color: var(--gain);
 }
 
-.toast-error { border-left-color: var(--loss); }
+.toast-error { border-inline-start-color: var(--loss); }
 .toast-error .toast-icon {
   background: rgba(224, 85, 97, 0.12);
   border-color: rgba(224, 85, 97, 0.4);
@@ -968,8 +974,8 @@ body.light-mode .leaderboard-page > h2 { background-image:
   .toast-stack {
     top: auto;
     bottom: 1rem;
-    left: 1rem;
-    right: 1rem;
+    inset-inline-start: 1rem;
+    inset-inline-end: 1rem;
     max-width: none;
   }
   @keyframes toast-in {

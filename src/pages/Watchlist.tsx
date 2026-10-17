@@ -10,6 +10,8 @@ import TradeNoteModal, { TradeSubmission } from "../components/trades/TradeNoteM
 import { MyPortfolio } from "../api/portfolios";
 import { money } from "../api/social";
 import PortfolioPerformance from "../components/performance/PortfolioPerformance";
+import { useLanguage } from "../i18n/LanguageContext";
+import { fill, ltr, serverMessage } from "../i18n/fill";
 
 interface Props {
   /** The portfolio being shown. Its cash is what limits what can be bought. */
@@ -39,6 +41,7 @@ const Watchlist = ({ portfolio, onTraded }: Props) => {
   const accessToken = useSelector((state: RootState) => state.auth.accessToken); // Get access token from Redux state
   const navigate = useNavigate(); // Initialize navigate for redirection
   const toast = useToast();
+  const { t, lang, locale } = useLanguage();
 
   // Mirrors REMOVAL_WINDOW_MS on the server. A buy can be taken back for 60
   // seconds; after that it is part of the public record and the only way out
@@ -206,10 +209,13 @@ const Watchlist = ({ portfolio, onTraded }: Props) => {
     if (typeof res.data?.cash_remaining === "number") setCash(res.data.cash_remaining);
     onTraded?.(); // the sale moved the cash; let the switcher re-read it
     toast.success(
-      `Sold ${quantity} ${symbol} at $${price.toFixed(2)}. ${money(
-        res.data?.proceeds ?? quantity * price
-      )} back in cash.`,
-      "Sale recorded"
+      fill(t("sold_toast"), {
+        qty: quantity,
+        symbol,
+        price: ltr(`$${price.toFixed(2)}`),
+        proceeds: ltr(money(res.data?.proceeds ?? quantity * price)),
+      }),
+      t("sold_title")
     );
   };
 
@@ -235,14 +241,11 @@ const Watchlist = ({ portfolio, onTraded }: Props) => {
         return sum + parseFloat(item.price_at_time) * Number(item.quantity);
       }, 0);
       setTotal(newTotal); // Update total state
-      toast.success(
-        `The purchase has been taken back, and ${money(res.data?.refund ?? 0)} returned to cash.`,
-        "Buy undone"
-      );
+      toast.success(fill(t("undone_toast"), { refund: money(res.data?.refund ?? 0) }), t("undone_title"));
     } catch (err: any) {
       toast.error(
-        err.response?.data?.error || "Could not undo this purchase.",
-        err.response?.data?.code === "REMOVAL_WINDOW_CLOSED" ? "Record is locked" : undefined
+        serverMessage(err, lang, { REMOVAL_WINDOW_CLOSED: t("undo_window_closed") }, t("undo_failed")),
+        err.response?.data?.code === "REMOVAL_WINDOW_CLOSED" ? t("record_locked") : undefined
       );
     }
   };
@@ -279,7 +282,7 @@ const Watchlist = ({ portfolio, onTraded }: Props) => {
     <div
       key={stock.id}
       className="watchlist-row"
-      style={indented ? { paddingLeft: "1rem" } : undefined}
+      style={indented ? { paddingInlineStart: "1rem" } : undefined}
     >
       <div className="ticker">
         <Link className="ticker-link" to={`/stock/${stock.stock_symbol}`}>
@@ -290,16 +293,16 @@ const Watchlist = ({ portfolio, onTraded }: Props) => {
       <div className="quantity">{stock.quantity}</div>
       {/* Date AND time of the purchase, which is what the log and the feed
           show everyone else too. */}
-      <div className="added">{new Date(stock.added_at).toLocaleString()}</div>
+      <div className="added">{new Date(stock.added_at).toLocaleString(locale)}</div>
       <div className="actions">
-        <button onClick={() => setSelling(stock)}>Sell…</button>
+        <button onClick={() => setSelling(stock)}>{t("sell_button")}</button>
         {isRemovable(stock) ? (
           <button
             className="undo-btn"
             onClick={() => handleRemoveFromWatchlist(stock.id)}
-            title="Bought this by mistake? You have 60 seconds to take it back."
+            title={t("undo_buy_hint")}
           >
-            Undo buy
+            {t("undo_buy")}
           </button>
         ) : null}
       </div>
@@ -328,19 +331,19 @@ const Watchlist = ({ portfolio, onTraded }: Props) => {
           it all adds up to against the balance it opened with. */}
       <div className="cash-bar">
         <div className="cash-figure">
-          <span className="summary-label">Invested</span>
+          <span className="summary-label">{t("cash_invested")}</span>
           <span className="summary-value">{money(total)}</span>
         </div>
         <div className="cash-figure">
-          <span className="summary-label">Cash available</span>
+          <span className="summary-label">{t("cash_available")}</span>
           <span className="summary-value">{money(cash)}</span>
         </div>
         <div className="cash-figure">
-          <span className="summary-label">Opened with</span>
+          <span className="summary-label">{t("cash_opened_with")}</span>
           <span className="summary-value">{money(portfolio.starting_balance)}</span>
         </div>
         {/* How much of the book is still uninvested, drawn as a bar. */}
-        <div className="cash-meter" title={`${money(cash)} of ${money(total + cash)} uninvested`}>
+        <div className="cash-meter" title={fill(t("cash_meter"), { cash: money(cash), total: money(total + cash) })}>
           <span
             className="cash-meter-fill"
             style={{
@@ -365,30 +368,30 @@ const Watchlist = ({ portfolio, onTraded }: Props) => {
           component already holds rather than fetching them again. */}
       {watchlist.length > 0 && (
         <section className="dashboard-performance">
-          <h3>{portfolio.name} · performance</h3>
+          <h3>
+            <bdi>{portfolio.name}</bdi> · {t("dash_performance")}
+          </h3>
 
           <div className="summary-cards">
             <div className="summary-card">
-              <span className="summary-label">Cost of holdings</span>
+              <span className="summary-label">{t("perf_cost")}</span>
               <span className="summary-value">{money(total)}</span>
             </div>
             <div className="summary-card">
-              <span className="summary-label">Worth today</span>
+              <span className="summary-label">{t("perf_worth")}</span>
               <span className="summary-value">{money(positionsValue)}</span>
             </div>
             <div className="summary-card">
-              <span className="summary-label">Unrealised gain</span>
+              <span className="summary-label">{t("perf_gain")}</span>
               <span className="summary-value gain">{money(unrealisedGain)}</span>
             </div>
             <div className="summary-card">
-              <span className="summary-label">Unrealised loss</span>
+              <span className="summary-label">{t("perf_loss")}</span>
               <span className="summary-value loss">{money(unrealisedLoss)}</span>
             </div>
           </div>
 
-          <p className="compare-note">
-            Sort by ticker, quantity or profit and loss.
-          </p>
+          <p className="compare-note">{t("perf_sort_note")}</p>
           <PortfolioPerformance watchlist={watchlist} latestPrices={latestPrices} />
         </section>
       )}
@@ -399,23 +402,23 @@ const Watchlist = ({ portfolio, onTraded }: Props) => {
           {" "}
           {/* Header row for the watchlist table */}
           <div className="ticker" onClick={() => handleSort("stock_symbol")}>
-            Ticker{" "}
+            {t("col_ticker")}{" "}
             {sortBy === "stock_symbol" && (sortOrder === "asc" ? "↑" : "↓")}{" "}
             {/* Show sort arrow */}
           </div>
           <div className="price" onClick={() => handleSort("price")}>
-            Price {sortBy === "price" && (sortOrder === "asc" ? "↑" : "↓")}{" "}
+            {t("col_price")} {sortBy === "price" && (sortOrder === "asc" ? "↑" : "↓")}{" "}
             {/* Show sort arrow */}
           </div>
           <div className="quantity" onClick={() => handleSort("quantity")}>
-            Qty {sortBy === "quantity" && (sortOrder === "asc" ? "↑" : "↓")}{" "}
+            {t("col_qty")} {sortBy === "quantity" && (sortOrder === "asc" ? "↑" : "↓")}{" "}
             {/* Show sort arrow */}
           </div>
           <div className="added" onClick={() => handleSort("added_at")}>
-            Added {sortBy === "added_at" && (sortOrder === "asc" ? "↑" : "↓")}{" "}
+            {t("col_added")} {sortBy === "added_at" && (sortOrder === "asc" ? "↑" : "↓")}{" "}
             {/* Show sort arrow */}
           </div>
-          <div className="actions">Actions</div>{" "}
+          <div className="actions">{t("col_actions")}</div>{" "}
           {/* Column header for actions */}
         </div>
         {groupedStocks.map(({ symbol, items }) =>
@@ -431,7 +434,7 @@ const Watchlist = ({ portfolio, onTraded }: Props) => {
               >
                 <span>{symbol}</span>{" "}
                 {/* Display the stock symbol for the group */}
-                <span style={{ float: "right" }}>
+                <span className="group-toggle">
                   {expandedSymbols[symbol] ? "▲" : "▼"}{" "}
                   {/* Display arrow based on expansion state */}
                 </span>

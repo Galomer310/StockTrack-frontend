@@ -113,9 +113,11 @@ export const percent = (n: number) => `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`;
 export const percentOrDash = (n: number | null | undefined) =>
   n === null || n === undefined ? "—" : percent(n);
 
-// Date and time an action was taken, to the minute.
-export const dateTime = (iso: string) =>
-  new Date(iso).toLocaleString(undefined, {
+// Date and time an action was taken, to the minute. `locale` follows the
+// interface language on translated screens; untranslated ones leave it to
+// the browser, as before.
+export const dateTime = (iso: string, locale?: string) =>
+  new Date(iso).toLocaleString(locale, {
     year: "numeric",
     month: "short",
     day: "numeric",

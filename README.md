@@ -47,7 +47,9 @@ Built from the reference design and the Player Card spec (Parts 3 and 4 of
 the backend's spec document). It shows the signed-in player's real card from
 the backend's `GET /players/me/card`, where every figure is calculated. Figures
 whose data or rules do not exist yet, such as XP and levels, show as locked
-or unavailable with the reason, rather than invented.
+or unavailable with the reason, rather than invented. Players can edit their
+first name and bio from the card; the nickname and picture follow once their
+rules and storage are decided.
 
 Demo data, kept apart from the components in
 `src/features/playerCard/demoData.ts`, is available for design work:

@@ -1,6 +1,8 @@
 import React, { useState } from "react"; // Import React and useState hook
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import { useToast } from "../components/ui/ToastProvider";
+import { useLanguage } from "../i18n/LanguageContext";
+import { errorBodyMessage } from "../i18n/fill";
 
 // Define the Register functional component
 const Register = () => {
@@ -9,6 +11,22 @@ const Register = () => {
   const [displayName, setDisplayName] = useState(""); // Public name shown on the leaderboard
   const navigate = useNavigate(); // Initialize navigate for redirection
   const toast = useToast();
+  const { t, dir, lang } = useLanguage();
+
+  // The server's refusals, by error code, for the Hebrew screen
+  const errorsByCode = {
+    EMAIL_TAKEN: t("auth_email_taken"),
+    EMAIL_NOT_TEXT: t("auth_email_invalid"),
+    EMAIL_INVALID: t("auth_email_invalid"),
+    EMAIL_TOO_LONG: t("auth_email_too_long"),
+    PASSWORD_TOO_SHORT: t("auth_password_too_short"),
+    PASSWORD_TOO_LONG: t("auth_password_too_long"),
+    PASSWORD_TOO_COMMON: t("auth_password_too_common"),
+    PASSWORD_TOO_SIMPLE: t("auth_password_too_simple"),
+    DISPLAY_NAME_REQUIRED: t("auth_display_name_required"),
+    DISPLAY_NAME_TOO_LONG: t("auth_display_name_too_long"),
+    TOO_MANY_REGISTRATIONS: t("auth_too_many_registrations"),
+  };
 
   // Handler function for registration form submission
   const handleRegister = async (e: React.FormEvent) => {
@@ -27,30 +45,38 @@ const Register = () => {
       if (!response.ok) {
         // Check if response is not OK
         const errorData = await response.json(); // Parse error details
-        toast.error(errorData.error || "Registration failed");
+        toast.error(errorBodyMessage(errorData, lang, errorsByCode, t("auth_register_failed")));
         return; // Exit the function
       }
       const data = await response.json(); // Parse the successful response data
       console.log("Registration successful:", data); // Log success to the console
       navigate("/login"); // Redirect to the Login page after successful registration
     } catch (error) {
-      toast.error((error as Error).message, "Could not create account");
+      // The browser's own wording is English; see Login
+      toast.error(
+        lang === "en" ? (error as Error).message : t("auth_network_error"),
+        t("auth_register_error_title")
+      );
     }
   };
 
   // Return the registration form UI
   return (
     <>
-      <div className="register-page">
-        <div className="register-container">
+      <div className="register-page" dir={dir} lang={lang}>
+        <div className="register-container" data-eyebrow={t("auth_eyebrow_register")}>
           {" "}
           {/* Container with CSS class for registration */}
           <form onSubmit={handleRegister}>
             {" "}
             {/* Form submission triggers handleRegister */}
+            {/* The name may be Hebrew or English, so it takes the direction
+                of whatever is typed; the address and password read left to
+                right in either language. */}
             <input
               type="text" // Public display name, shown to everyone on the leaderboard
-              placeholder="Display name (shown on the leaderboard)"
+              dir="auto"
+              placeholder={t("auth_display_name")}
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               maxLength={40}
@@ -58,14 +84,16 @@ const Register = () => {
             />
             <input
               type="email" // Input field for email
-              placeholder="Email" // Placeholder text
+              dir="ltr"
+              placeholder={t("auth_email")} // Placeholder text
               value={email} // Bind value to email state
               onChange={(e) => setEmail(e.target.value)} // Update email state on change
               required // Mark input as required
             />
             <input
               type="password"
-              placeholder="Password"
+              dir="ltr"
+              placeholder={t("auth_password")}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -75,14 +103,11 @@ const Register = () => {
             {/* The server rejects short and common passwords. Stating the rule
                 here means finding out before submitting rather than after: the
                 same requirement, but as guidance instead of a refusal. */}
-            <p className="field-hint">
-              At least 12 characters. A phrase you can remember is stronger
-              than a short jumble.
-            </p>
-            <button type="submit">Register</button>
+            <p className="field-hint">{t("auth_password_hint")}</p>
+            <button type="submit">{t("auth_register")}</button>
           </form>
           <button onClick={() => navigate("/login")}>
-            Already have an account? Login
+            {t("auth_have_account")}
           </button>{" "}
           {/* Button to navigate to Login page */}
         </div>

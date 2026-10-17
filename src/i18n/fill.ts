@@ -19,8 +19,27 @@ export const serverMessage = (
   lang: "he" | "en",
   byCode: Record<string, string>,
   fallback: string
+): string =>
+  errorBodyMessage(
+    (err as { response?: { data?: ErrorBody } })?.response?.data,
+    lang,
+    byCode,
+    fallback
+  );
+
+export interface ErrorBody {
+  error?: string;
+  code?: string;
+}
+
+// The same choice made from an error body already in hand, for the screens
+// that call the server with fetch rather than axios (sign-in and sign-up).
+export const errorBodyMessage = (
+  data: ErrorBody | undefined,
+  lang: "he" | "en",
+  byCode: Record<string, string>,
+  fallback: string
 ): string => {
-  const data = (err as { response?: { data?: { error?: string; code?: string } } })?.response?.data;
   if (lang === "en") return data?.error || fallback;
   return (data?.code && byCode[data.code]) || fallback;
 };

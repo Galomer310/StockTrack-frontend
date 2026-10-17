@@ -16,9 +16,10 @@ const Navbar = () => {
   // Current user from Redux; drives whether the Logout button is shown
   const user = useSelector((state: RootState) => state.auth.user);
 
-  // Interface language. The navbar itself stays English until it is ported;
-  // only the toggle speaks the language it switches to.
-  const { lang, setLang, t } = useLanguage();
+  // Interface language. The navbar is translated and sets its own `dir`, so
+  // in Hebrew it reads right to left - and its drawer opens from the left -
+  // even while the pages below are not yet ported (see LanguageProvider).
+  const { lang, dir, setLang, t } = useLanguage();
 
   // State to track if the Search Stocks link is disabled
   const [searchDisabled, setSearchDisabled] = useState(false);
@@ -106,7 +107,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="navbar">
+      <nav className="navbar" dir={dir} lang={lang}>
         <div className="navbar-brand">Investments</div>
 
         {/* Hamburger, shown only below the tablet breakpoint. The three bars
@@ -114,7 +115,7 @@ const Navbar = () => {
         <button
           className={`nav-toggle${menuOpen ? " is-open" : ""}`}
           onClick={() => setMenuOpen((prev) => !prev)}
-          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          aria-label={t(menuOpen ? "nav_close_menu" : "nav_open_menu")}
           aria-expanded={menuOpen}
           aria-controls="primary-navigation"
         >
@@ -128,20 +129,22 @@ const Navbar = () => {
           className={`navbar-links${menuOpen ? " is-open" : ""}`}
         >
           <li>
-            <Link to="/">Home</Link>
+            <Link to="/">{t("nav_home")}</Link>
           </li>
           <li>
-            <Link to="/user">Dashboard</Link>
+            <Link to="/user">{t("nav_dashboard")}</Link>
           </li>
           <li>
-            <Link to="/player">Player Card</Link>
+            <Link to="/player">{t("nav_player_card")}</Link>
           </li>
           <li>
             {searchDisabled ? (
-              <span className="nav-disabled">Search Stocks ({countdown})</span>
+              <span className="nav-disabled">
+                {t("nav_search")} (<bdi>{countdown}</bdi>)
+              </span>
             ) : (
               <span className="nav-action" onClick={handleSearchClick}>
-                Search Stocks
+                {t("nav_search")}
               </span>
             )}
           </li>
@@ -149,13 +152,13 @@ const Navbar = () => {
               over-time chart, because it describes whichever portfolio you
               have open rather than being a place of its own. */}
           <li>
-            <Link to="/market">Market</Link>
+            <Link to="/market">{t("nav_market")}</Link>
           </li>
           <li>
-            <Link to="/feed">Feed</Link>
+            <Link to="/feed">{t("nav_feed")}</Link>
           </li>
           <li>
-            <Link to="/leaderboard">Leaderboard</Link>
+            <Link to="/leaderboard">{t("nav_leaderboard")}</Link>
           </li>
           <li className="nav-controls">
             {/* Language toggle, labelled in the language it switches to */}
@@ -169,12 +172,12 @@ const Navbar = () => {
             </button>
             {/* Theme toggle */}
             <button onClick={toggleDarkMode} className="toggle-dark-mode">
-              {lightMode ? "Dark Mode" : "Light Mode"}
+              {t(lightMode ? "nav_dark_mode" : "nav_light_mode")}
             </button>
             {user && (
               /* Logout, only rendered while a session is active */
               <button onClick={handleLogout} className="logout-btn">
-                Logout
+                {t("nav_logout")}
               </button>
             )}
           </li>

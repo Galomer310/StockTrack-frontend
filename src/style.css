@@ -255,6 +255,12 @@ body.light-mode .navbar { background: rgba(255, 255, 255, 0.82); }
 .navbar-links li a:hover,
 .navbar-links li > span:hover { color: var(--text); background: var(--gold-wash); }
 
+/* Hebrew has no capitals, and wide letter-spacing breaks up its letterforms,
+   so the navbar's tracking is dropped in Hebrew. */
+.navbar:lang(he) .navbar-links li a,
+.navbar:lang(he) .navbar-links li > span,
+.navbar:lang(he) .nav-controls button { letter-spacing: normal; }
+
 .toggle-lang, .toggle-dark-mode, .logout-btn {
   font-size: 0.75rem;
   letter-spacing: 0.06em;

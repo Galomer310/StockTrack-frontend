@@ -6,14 +6,26 @@
    Hebrew table is typed against it, so a key added to one and not the other
    fails the build instead of rendering blank.
 
-   Only the Player Card and the language toggle are translated so far. Other
-   screens move here as they are ported to right-to-left.
+   Translated so far: the navbar and the Player Card. Other screens move here
+   as they are ported to right-to-left.
    =========================================================================== */
 
 export type Lang = "he" | "en";
 
 const en = {
   // Navbar
+  nav_home: "Home",
+  nav_dashboard: "Dashboard",
+  nav_player_card: "Player Card",
+  nav_search: "Search Stocks",
+  nav_market: "Market",
+  nav_feed: "Feed",
+  nav_leaderboard: "Leaderboard",
+  nav_light_mode: "Light Mode",
+  nav_dark_mode: "Dark Mode",
+  nav_logout: "Logout",
+  nav_open_menu: "Open menu",
+  nav_close_menu: "Close menu",
   nav_switch_language: "עברית",
   nav_switch_language_label: "Switch to Hebrew",
 
@@ -110,6 +122,18 @@ export type MessageKey = keyof typeof en;
 export type Messages = Record<MessageKey, string>;
 
 const he: Messages = {
+  nav_home: "בית",
+  nav_dashboard: "לוח בקרה",
+  nav_player_card: "כרטיס שחקן",
+  nav_search: "חיפוש מניות",
+  nav_market: "שוק",
+  nav_feed: "פיד",
+  nav_leaderboard: "טבלת דירוג",
+  nav_light_mode: "מצב בהיר",
+  nav_dark_mode: "מצב כהה",
+  nav_logout: "התנתקות",
+  nav_open_menu: "פתיחת תפריט",
+  nav_close_menu: "סגירת תפריט",
   nav_switch_language: "English",
   nav_switch_language_label: "מעבר לאנגלית",
 

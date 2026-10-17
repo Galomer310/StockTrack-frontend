@@ -132,8 +132,10 @@ body.nav-locked { overflow: hidden; }
 .nav-action { cursor: pointer; }
 .nav-disabled { color: var(--text-faint) !important; cursor: not-allowed; }
 
+/* Drawer items sweep in from the side the drawer opens on: from the right in
+   English, from the left in Hebrew (--nav-sweep is flipped for RTL below). */
 @keyframes nav-item-in {
-  from { opacity: 0; transform: translateX(18px); }
+  from { opacity: 0; transform: translateX(var(--nav-sweep, 18px)); }
   to   { opacity: 1; transform: none; }
 }
 
@@ -159,10 +161,12 @@ body.nav-locked { overflow: hidden; }
   }
   body.light-mode .navbar { background: rgba(255, 255, 255, 0.98); }
 
+  /* The drawer sits on the inline-end edge: the right in English, the left
+     in Hebrew, so it always opens from the side the reading ends on. */
   .navbar-links {
     position: fixed;
     top: 0;
-    right: 0;
+    inset-inline-end: 0;
     bottom: 0;
     z-index: 120;
     width: min(330px, 84vw);
@@ -174,7 +178,7 @@ body.nav-locked { overflow: hidden; }
     background: rgba(11, 15, 23, 0.97);
     backdrop-filter: blur(22px);
     -webkit-backdrop-filter: blur(22px);
-    border-left: 1px solid var(--border);
+    border-inline-start: 1px solid var(--border);
     box-shadow: var(--shadow-lg);
     overflow-y: auto;
     transform: translateX(104%);
@@ -183,12 +187,16 @@ body.nav-locked { overflow: hidden; }
   body.light-mode .navbar-links { background: rgba(255, 255, 255, 0.97); }
 
   .navbar-links.is-open { transform: none; }
+  /* Off-screen to the left, rather than the right, when the drawer is on the
+     left. translateX has no logical form, so the sign flips here. */
+  .navbar[dir="rtl"] .navbar-links:not(.is-open) { transform: translateX(-104%); }
+  .navbar[dir="rtl"] { --nav-sweep: -18px; }
 
   /* Gold hairline down the drawer edge, echoing the navbar underline */
   .navbar-links::before {
     content: "";
     position: absolute;
-    top: 0; bottom: 0; left: 0;
+    top: 0; bottom: 0; inset-inline-start: 0;
     width: 1px;
     background: linear-gradient(180deg, transparent, var(--gold-line), transparent);
   }
@@ -210,6 +218,8 @@ body.nav-locked { overflow: hidden; }
   .navbar-links.is-open li:nth-child(4) { animation-delay: 0.23s; }
   .navbar-links.is-open li:nth-child(5) { animation-delay: 0.28s; }
   .navbar-links.is-open li:nth-child(6) { animation-delay: 0.33s; }
+  .navbar-links.is-open li:nth-child(7) { animation-delay: 0.38s; }
+  .navbar-links.is-open li:nth-child(8) { animation-delay: 0.43s; }
 
   /* Theme and logout sit apart at the foot of the drawer */
   .nav-controls {

@@ -17,10 +17,12 @@ const StockPage = () => {
         ← Back
       </button>
 
-      {quotaLeft !== null && (
-        <p className={quotaLeft <= 5 ? "quota-warning" : "quota-note"}>
-          {quotaLeft} of today's market data requests remaining
-          {quotaLeft <= 5 && " — resets at midnight UTC"}
+      {/* The plan allows 5 requests a minute, so a running count would be
+          noise; speak up only when the minute's budget is nearly spent. */}
+      {quotaLeft !== null && quotaLeft <= 1 && (
+        <p className="quota-warning">
+          Market data is busy (5 requests a minute). If something doesn't load,
+          try again in a minute.
         </p>
       )}
 

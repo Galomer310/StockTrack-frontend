@@ -41,10 +41,9 @@ const API = import.meta.env.VITE_BACKEND_API_URL;
    two can never drift apart.
    =========================================================================== */
 
-// Daily bars only. A 1-day range would need TIME_SERIES_INTRADAY, which is a
-// premium Alpha Vantage endpoint - on the free plan it returns "This is a
-// premium endpoint". Re-add { key: "1d", label: "1D", days: 1 } here and set
-// ALPHA_VANTAGE_PREMIUM=true on the server after upgrading.
+// Daily bars only. A 1-day range needs intraday bars, which the free Massive
+// plan does not include. Re-add { key: "1d", label: "1D", days: 1 } here and
+// set MASSIVE_INTRADAY=true on the server after upgrading.
 export const RANGES = [
   { key: "5d", label: "5D", days: 5 },
   { key: "1w", label: "1W", days: 7 },

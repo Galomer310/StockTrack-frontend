@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <radialGradient id="bg-her" cx="50%" cy="35%" r="70%"><stop offset="0" stop-color="#5A2E22"/><stop offset="1" stop-color="#1A0C08"/></radialGradient>
+    <clipPath id="disc"><circle cx="60" cy="60" r="56"/></clipPath>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F1DCAE"/><stop offset=".5" stop-color="#B8995F"/><stop offset="1" stop-color="#E6CC97"/></linearGradient>
+  </defs>
+  <circle cx="60" cy="60" r="56" fill="url(#bg-her)"/>
+  <g clip-path="url(#disc)">
+    <path d="M34 56 C28 44 34 30 44 26 C50 17 70 17 76 26 C86 30 92 44 86 56 C92 66 88 80 80 87 L40 87 C32 80 28 66 34 56 Z" fill="#6A3E22"/>
+    <path d="M36 48 C34 42 37 36 41 34 M84 48 C86 42 83 36 79 34 M34 66 C33 72 35 78 38 81 M86 66 C87 72 85 78 82 81" stroke="#8A5532" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    <rect x="53" y="62" width="14" height="18" fill="#E6BC98"/>
+    <path d="M14 124 C14 94 34 80 60 80 C86 80 106 94 106 124 Z" fill="#15161C"/>
+    <path d="M50 82 L60 100 L70 82 Z" fill="#F2EADC"/>
+    <path d="M40 79 Q60 89 80 79 L82 87 Q60 97 38 87 Z" fill="#8E1B22"/>
+    <path d="M46 82 L45 90.5 M54 85 L53 93.5 M66 85 L67 93.5 M74 82 L75 90.5" stroke="#D9A94E" stroke-width="2.6"/>
+    <circle cx="60" cy="51" r="18" fill="#F0C8A6"/>
+    <path d="M41 50 C40 36 50 30 60 30 C70 30 80 36 79 50 C76 42 70 38 64 40 C58 36 50 40 46 44 C44 46 42 48 41 50 Z" fill="#7A4828"/>
+    <circle cx="53.5" cy="52" r="1.9" fill="#4A2A18"/><circle cx="66.5" cy="52" r="1.9" fill="#4A2A18"/>
+    <path d="M50.5 50 L52 49 M69.5 50 L68 49" stroke="#4A2A18" stroke-width="1.1" stroke-linecap="round"/>
+    <path d="M50.5 47 Q53.5 45.5 56.5 47 M63.5 47 Q66.5 45.5 69.5 47" stroke="#6A3E22" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+    <path d="M55 60.5 Q60 64 65 60.5" stroke="#A85A4A" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    <g transform="rotate(-12 84 106)">
+      <rect x="74" y="94" width="21" height="25" rx="1.5" fill="#6E1E22"/>
+      <rect x="74" y="94" width="3.2" height="25" fill="#4E1418"/>
+      <rect x="80" y="100" width="11" height="1.6" fill="#D9BE89"/><rect x="80" y="104" width="8" height="1.2" fill="#D9BE89"/>
+    </g>
+  </g>
+  <circle cx="60" cy="60" r="56" fill="none" stroke="url(#ring)" stroke-width="2.5"/>
+</svg>

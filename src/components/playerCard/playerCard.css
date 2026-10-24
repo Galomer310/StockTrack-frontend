@@ -369,7 +369,7 @@
   .pc-progress-main { width: 100%; }
   .pc-profile { grid-template-columns: minmax(0, 1fr); grid-template-areas: "avatar" "identity" "bio"; justify-items: center; text-align: center; }
   .pc-identity { justify-items: center; }
-  /* All six choices on one line at phone width. */
+  /* Smaller pictures at phone width, so more fit on each line. */
   .pc-avatar-options { justify-content: center; gap: 6px; }
   .pc-avatar-option-art { width: 42px; height: 42px; }
   .pc-ornament { display: none; }

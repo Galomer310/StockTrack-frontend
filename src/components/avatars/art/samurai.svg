@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <radialGradient id="bg-sam" cx="50%" cy="35%" r="70%"><stop offset="0" stop-color="#2E2E36"/><stop offset="1" stop-color="#0A0A0E"/></radialGradient>
+    <clipPath id="disc"><circle cx="60" cy="60" r="56"/></clipPath>
+    <linearGradient id="goldmetal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F1DCAE"/><stop offset=".55" stop-color="#D9BE89"/><stop offset="1" stop-color="#9C7F4A"/></linearGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F1DCAE"/><stop offset=".5" stop-color="#B8995F"/><stop offset="1" stop-color="#E6CC97"/></linearGradient>
+  </defs>
+  <circle cx="60" cy="60" r="56" fill="url(#bg-sam)"/>
+  <g clip-path="url(#disc)">
+    <circle cx="60" cy="46" r="34" fill="#B8282E" opacity=".85"/>
+    <rect x="53" y="62" width="14" height="18" fill="#C99470"/>
+    <path d="M14 124 C14 94 34 80 60 80 C86 80 106 94 106 124 Z" fill="#2A1A1A"/>
+    <path d="M22 104 Q60 95 98 104 M18 114 Q60 105 102 114" stroke="#B8282E" stroke-width="2" fill="none"/>
+    <path d="M12 92 L36 87 L38 112 L12 117 Z M108 92 L84 87 L82 112 L108 117 Z" fill="#3A1E1E" stroke="#B8282E" stroke-width="1.2"/>
+    <path d="M14 99 L36 95 M14 106 L37 102 M106 99 L84 95 M106 106 L83 102" stroke="#B8282E" stroke-width="1"/>
+    <circle cx="60" cy="52" r="18" fill="#D9A47E"/>
+    <path d="M39 46 L30 63 L40 65 L44 49 Z M81 46 L90 63 L80 65 L76 49 Z" fill="#2A2A32" stroke="#B8282E" stroke-width="1"/>
+    <path d="M39 46 C39 30 48 25 60 25 C72 25 81 30 81 46 Z" fill="#1E1E24"/>
+    <path d="M60 25 L60 44 M50 27 L49 44 M70 27 L71 44" stroke="#34343E" stroke-width="1.2"/>
+    <path d="M37 44 Q60 39 83 44 L83 47.5 Q60 42.5 37 47.5 Z" fill="#2A2A32"/>
+    <path d="M60 38 C48 36 40 26 37 13 C46 25 52 29.5 60 30.5 C68 29.5 74 25 83 13 C80 26 72 36 60 38 Z" fill="url(#goldmetal)"/>
+    <path d="M50 49 L56.5 50.5 M70 49 L63.5 50.5" stroke="#1E1410" stroke-width="1.7" stroke-linecap="round"/>
+    <circle cx="53.5" cy="53.5" r="1.8" fill="#1E1410"/><circle cx="66.5" cy="53.5" r="1.8" fill="#1E1410"/>
+    <path d="M53 60.5 Q60 58.5 67 60.5" stroke="#1E1410" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    <path d="M55.5 64 L64.5 64" stroke="#8A4E3C" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+  <circle cx="60" cy="60" r="56" fill="none" stroke="url(#ring)" stroke-width="2.5"/>
+</svg>

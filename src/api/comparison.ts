@@ -1,4 +1,6 @@
 import { PortfolioResponse, Holding, PublicHolding, isOwnHolding, percent } from "./social";
+import { fill } from "../i18n/fill";
+import { MessageKey } from "../i18n/messages";
 
 /* ===========================================================================
    Turns two portfolios into plain-language findings.
@@ -72,29 +74,37 @@ const concentration = (holdings: Holding[]) => {
   return { symbol: top.symbol, share: top.weight };
 };
 
+// `t` gives the reader's language; `iso` keeps names, tickers and figures in
+// their own direction inside a Hebrew sentence (identity in English).
 export const buildInsights = (
   mine: PortfolioResponse,
-  theirs: PortfolioResponse
+  theirs: PortfolioResponse,
+  t: (key: MessageKey) => string,
+  iso: (value: string) => string = (v) => v
 ): Insight[] => {
   const insights: Insight[] = [];
-  const them = theirs.owner.display_name;
+  const them = iso(theirs.owner.display_name);
+  const pct = (n: number) => iso(percent(n));
 
   const pctGap = mine.summary.return_pct - theirs.summary.return_pct;
+  const gap = iso(Math.abs(pctGap).toFixed(2));
 
   // 1. The headline: who is ahead on return, and by how much.
   if (Math.abs(pctGap) < 0.01) {
     insights.push({
-      label: "Return",
-      text: `You and ${them} are level at ${percent(mine.summary.return_pct)}.`,
+      label: t("ins_return"),
+      text: fill(t("ins_level"), { them, pct: pct(mine.summary.return_pct) }),
       tone: "neutral",
     });
   } else {
     insights.push({
-      label: "Return",
-      text:
-        pctGap > 0
-          ? `You are ahead on return: ${percent(mine.summary.return_pct)} against ${percent(theirs.summary.return_pct)}, a gap of ${Math.abs(pctGap).toFixed(2)} percentage points.`
-          : `${them} is ahead on return: ${percent(theirs.summary.return_pct)} against your ${percent(mine.summary.return_pct)}, a gap of ${Math.abs(pctGap).toFixed(2)} percentage points.`,
+      label: t("ins_return"),
+      text: fill(t(pctGap > 0 ? "ins_ahead" : "ins_behind"), {
+        them,
+        mine: pct(mine.summary.return_pct),
+        theirs: pct(theirs.summary.return_pct),
+        gap,
+      }),
       tone: pctGap > 0 ? "good" : "bad",
     });
   }
@@ -104,10 +114,12 @@ export const buildInsights = (
   if (mine.summary.holdings_count !== theirs.summary.holdings_count) {
     const wider = mine.summary.holdings_count > theirs.summary.holdings_count;
     insights.push({
-      label: "Breadth",
-      text: wider
-        ? `You are spread across ${mine.summary.holdings_count} positions against ${them}'s ${theirs.summary.holdings_count}. A concentrated book moves harder in both directions.`
-        : `${them} is spread across ${theirs.summary.holdings_count} positions against your ${mine.summary.holdings_count}. A concentrated book moves harder in both directions.`,
+      label: t("ins_breadth"),
+      text: fill(t(wider ? "ins_wider" : "ins_narrower"), {
+        them,
+        mine: mine.summary.holdings_count,
+        theirs: theirs.summary.holdings_count,
+      }),
       tone: "neutral",
     });
   }
@@ -117,8 +129,14 @@ export const buildInsights = (
   const theirsConc = concentration(theirs.holdings);
   if (mineConc.symbol && theirsConc.symbol) {
     insights.push({
-      label: "Concentration",
-      text: `Your largest position is ${mineConc.symbol} at ${mineConc.share.toFixed(0)}% of the book. ${them} sits ${theirsConc.share.toFixed(0)}% in ${theirsConc.symbol}.`,
+      label: t("ins_concentration"),
+      text: fill(t("ins_conc"), {
+        them,
+        mine_symbol: iso(mineConc.symbol),
+        mine_share: mineConc.share.toFixed(0),
+        theirs_symbol: iso(theirsConc.symbol),
+        theirs_share: theirsConc.share.toFixed(0),
+      }),
       tone:
         mineConc.share > 50 && mineConc.share > theirsConc.share ? "bad" : "neutral",
     });
@@ -132,29 +150,28 @@ export const buildInsights = (
 
   if (shared.length > 0 || onlyTheirs.length > 0) {
     const parts: string[] = [];
-    if (shared.length > 0) parts.push(`You both hold ${shared.sort().join(", ")}.`);
+    if (shared.length > 0) parts.push(fill(t("ins_both_hold"), { list: iso(shared.sort().join(", ")) }));
     if (onlyTheirs.length > 0)
-      parts.push(
-        `${them} holds ${onlyTheirs.sort().join(", ")}, which you do not.`
-      );
-    insights.push({ label: "Overlap", text: parts.join(" "), tone: "neutral" });
+      parts.push(fill(t("ins_only_theirs"), { them, list: iso(onlyTheirs.sort().join(", ")) }));
+    insights.push({ label: t("ins_overlap"), text: parts.join(" "), tone: "neutral" });
   }
 
   // 5. Which single position is doing the work on each side.
   const mineExt = extremes(mine.holdings);
   const theirsExt = extremes(theirs.holdings);
   if (mineExt.best && theirsExt.best) {
+    const at = (key: MessageKey, p: { symbol: string; pct: number }) =>
+      fill(t(key), { symbol: iso(p.symbol), pct: pct(p.pct) });
     insights.push({
-      label: "Standouts",
-      text: `Your best position is ${mineExt.best.symbol} at ${percent(mineExt.best.pct)}${
-        mineExt.worst && mineExt.worst.symbol !== mineExt.best.symbol
-          ? `, your weakest ${mineExt.worst.symbol} at ${percent(mineExt.worst.pct)}`
-          : ""
-      }. Theirs is ${theirsExt.best.symbol} at ${percent(theirsExt.best.pct)}${
-        theirsExt.worst && theirsExt.worst.symbol !== theirsExt.best.symbol
-          ? `, their weakest ${theirsExt.worst.symbol} at ${percent(theirsExt.worst.pct)}`
-          : ""
-      }.`,
+      label: t("ins_standouts"),
+      text:
+        at("ins_best_mine", mineExt.best) +
+        (mineExt.worst && mineExt.worst.symbol !== mineExt.best.symbol ? at("ins_worst_mine", mineExt.worst) : "") +
+        at("ins_best_theirs", theirsExt.best) +
+        (theirsExt.worst && theirsExt.worst.symbol !== theirsExt.best.symbol
+          ? at("ins_worst_theirs", theirsExt.worst)
+          : "") +
+        ".",
       tone: "neutral",
     });
   }

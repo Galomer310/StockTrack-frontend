@@ -13,6 +13,11 @@ import {
 } from "chart.js";
 import { PortfolioResponse, isOwnHolding } from "../../api/social";
 import { SERIES } from "../../charts/chartTheme";
+import { useLanguage } from "../../i18n/LanguageContext";
+
+// Left-to-right mark: keeps a minus sign in front of a number drawn in a
+// right-to-left canvas.
+const LRM = String.fromCharCode(0x200e);
 
 ChartJS.register(
   CategoryScale,
@@ -50,6 +55,7 @@ interface Props {
 }
 
 const PortfolioComparisonChart: React.FC<Props> = ({ mine, theirs }) => {
+  const { t, dir, locale } = useLanguage();
   const { labels, mineSeries, theirsSeries } = useMemo(() => {
     // Shared, ordered timeline of every purchase date across both portfolios.
     const dates = Array.from(
@@ -96,11 +102,11 @@ const PortfolioComparisonChart: React.FC<Props> = ({ mine, theirs }) => {
       });
 
     return {
-      labels: dates.map((d) => new Date(d).toLocaleDateString()),
+      labels: dates.map((d) => new Date(d).toLocaleDateString(locale)),
       mineSeries: seriesFor(mine),
       theirsSeries: seriesFor(theirs),
     };
-  }, [mine, theirs]);
+  }, [mine, theirs, locale]);
 
   if (labels.length === 0) return null;
 
@@ -138,6 +144,7 @@ const PortfolioComparisonChart: React.FC<Props> = ({ mine, theirs }) => {
     plugins: {
       legend: { position: "top" as const },
       tooltip: {
+        rtl: dir === "rtl",
         callbacks: {
           label: (ctx: any) =>
             `${ctx.dataset.label}: ${Number(ctx.parsed.y).toFixed(2)}%`,
@@ -147,7 +154,9 @@ const PortfolioComparisonChart: React.FC<Props> = ({ mine, theirs }) => {
     scales: {
       y: {
         ticks: {
-          callback: (v: any) => `${v}%`,
+          // The canvas follows the page's direction, which in Hebrew would draw
+          // "-5%" as "5%-"; a left-to-right mark keeps the sign in front.
+          callback: (v: any) => `${dir === "rtl" ? LRM : ""}${v}%`,
         },
       },
     },
@@ -159,10 +168,7 @@ const PortfolioComparisonChart: React.FC<Props> = ({ mine, theirs }) => {
         <Line data={data} options={options} />
       </div>
 
-      <p className="compare-note">
-        Each point shows the positions owned by that date, valued at today's
-        prices — not a historical price series.
-      </p>
+      <p className="compare-note">{t("cmp_chart_note")}</p>
     </div>
   );
 };

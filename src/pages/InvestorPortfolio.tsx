@@ -11,6 +11,9 @@ import {
   money,
   percent,
 } from "../api/social";
+import { useLanguage } from "../i18n/LanguageContext";
+import { MessageKey } from "../i18n/messages";
+import { fill, ltr } from "../i18n/fill";
 
 /* ===========================================================================
    Read-only view of one investor's portfolio, reached from the leaderboard.
@@ -23,27 +26,29 @@ import {
 
    Opening your OWN id (the dashboard links here) still shows everything,
    because at that point you are looking at your own numbers.
+
+   Translated: right to left in Hebrew; names keep their own direction, and
+   money and signed percentages stay left to right.
    =========================================================================== */
 const InvestorPortfolio = () => {
+  const { t, dir, lang, locale } = useLanguage();
+  // Inside Hebrew sentences, names keep their own direction.
+  const iso = (value: string) => (lang === "he" ? ltr(value) : value);
   const { id } = useParams();
   const navigate = useNavigate();
   const [data, setData] = useState<PortfolioResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<MessageKey | null>(null);
 
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      setError("");
+      setError(null);
       try {
         setData(await fetchPortfolio(Number(id)));
       } catch (err: any) {
         // 403 is what the future paid-tier gate will return.
-        setError(
-          err.response?.status === 403
-            ? "You do not have access to this portfolio."
-            : "Could not load this portfolio."
-        );
+        setError(err.response?.status === 403 ? "portfolio_no_access" : "inv_failed");
       } finally {
         setLoading(false);
       }
@@ -51,25 +56,27 @@ const InvestorPortfolio = () => {
     load();
   }, [id]);
 
-  if (loading) return <div className="investor-page"><p>Loading portfolio…</p></div>;
-  if (error) return <div className="investor-page"><p className="error">{error}</p></div>;
+  if (loading) return <div className="investor-page" dir={dir} lang={lang}><p>{t("inv_loading")}</p></div>;
+  if (error) return <div className="investor-page" dir={dir} lang={lang}><p className="error">{t(error)}</p></div>;
   if (!data) return null;
 
   const { portfolio, owner, summary, holdings, is_self } = data;
 
   return (
-    <div className="investor-page">
+    <div className="investor-page" dir={dir} lang={lang}>
       <button className="back-btn" onClick={() => navigate("/leaderboard")}>
-        ← Back to leaderboard
+        {t("back_to_leaderboard")}
       </button>
 
       <h2>
-        {portfolio.name}
-        {is_self && <span className="lb-you">you</span>}
+        <bdi>{portfolio.name}</bdi>
+        {is_self && <span className="lb-you">{t("you_badge")}</span>}
       </h2>
       <p className="investor-since">
-        {owner.display_name} · opened{" "}
-        {new Date(portfolio.created_at).toLocaleDateString()}
+        {fill(t("inv_owner_opened"), {
+          name: iso(owner.display_name),
+          date: new Date(portfolio.created_at).toLocaleDateString(locale),
+        })}
       </p>
       {/* Following is per player, not per portfolio. Hidden on your own. */}
       {!is_self && <FollowButton playerId={owner.id} />}
@@ -77,45 +84,45 @@ const InvestorPortfolio = () => {
       <div className="summary-cards">
         {/* Total return is the whole story for a visitor. */}
         <div className="summary-card">
-          <span className="summary-label">Total return</span>
+          <span className="summary-label">{t("total_return")}</span>
           <span
             className={`summary-value ${summary.return_pct >= 0 ? "gain" : "loss"}`}
           >
-            {percent(summary.return_pct)}
+            <bdi dir="ltr">{percent(summary.return_pct)}</bdi>
           </span>
         </div>
         <div className="summary-card">
-          <span className="summary-label">Holdings</span>
+          <span className="summary-label">{t("col_holdings")}</span>
           <span className="summary-value">{summary.holdings_count}</span>
         </div>
         {/* A ratio, so everyone sees it: how much of the book is uninvested
             says as much about the strategy as the return does. */}
         <div className="summary-card">
-          <span className="summary-label">In cash</span>
-          <span className="summary-value">{summary.cash_weight_pct.toFixed(1)}%</span>
+          <span className="summary-label">{t("inv_in_cash")}</span>
+          <span className="summary-value"><bdi dir="ltr">{summary.cash_weight_pct.toFixed(1)}%</bdi></span>
         </div>
 
         {/* Your own figures, which nobody else receives. */}
         {is_self && summary.equity !== undefined && (
           <>
             <div className="summary-card">
-              <span className="summary-label">Equity</span>
-              <span className="summary-value">{money(summary.equity)}</span>
+              <span className="summary-label">{t("inv_equity")}</span>
+              <span className="summary-value"><bdi dir="ltr">{money(summary.equity)}</bdi></span>
             </div>
             <div className="summary-card">
-              <span className="summary-label">Cash</span>
-              <span className="summary-value">{money(summary.cash ?? 0)}</span>
+              <span className="summary-label">{t("inv_cash")}</span>
+              <span className="summary-value"><bdi dir="ltr">{money(summary.cash ?? 0)}</bdi></span>
             </div>
             <div className="summary-card">
-              <span className="summary-label">Opened with</span>
-              <span className="summary-value">{money(summary.starting_balance ?? 0)}</span>
+              <span className="summary-label">{t("inv_opened_with")}</span>
+              <span className="summary-value"><bdi dir="ltr">{money(summary.starting_balance ?? 0)}</bdi></span>
             </div>
             <div className="summary-card">
-              <span className="summary-label">Profit / loss</span>
+              <span className="summary-label">{t("profit_loss")}</span>
               <span
                 className={`summary-value ${(summary.profit ?? 0) >= 0 ? "gain" : "loss"}`}
               >
-                {money(summary.profit ?? 0)}
+                <bdi dir="ltr">{money(summary.profit ?? 0)}</bdi>
               </span>
             </div>
           </>
@@ -124,42 +131,37 @@ const InvestorPortfolio = () => {
 
       {!is_self && (
         <>
-          <p className="privacy-note">
-            You are seeing {owner.display_name}'s results as percentages. What
-            they paid, what they hold and what it is worth stay private.
-          </p>
+          <p className="privacy-note">{fill(t("inv_privacy"), { name: iso(owner.display_name) })}</p>
           <button
             className="compare-btn"
             onClick={() => navigate(`/compare/${portfolio.id}`)}
           >
-            Compare with my portfolio
+            {t("inv_compare")}
           </button>
         </>
       )}
 
-      <h3>Trade journal</h3>
+      <h3>{t("inv_journal")}</h3>
       <p className="compare-note">
-        Every buy and sell {is_self ? "you have" : `${owner.display_name} has`} recorded
-        in this portfolio, with the date and time it was taken and the reasoning
-        at the time.
+        {is_self ? t("inv_journal_self") : fill(t("inv_journal_other"), { name: iso(owner.display_name) })}
       </p>
       <TradeJournal portfolioId={portfolio.id} />
 
-      <h3>Holdings</h3>
+      <h3>{t("col_holdings")}</h3>
       {holdings.length === 0 ? (
-        <p>This investor has no holdings yet.</p>
+        <p>{t("inv_no_holdings")}</p>
       ) : is_self ? (
         /* Your own book, in full. */
         <div className="table-wrap">
           <table className="holdings-table">
             <thead>
               <tr>
-                <th>Ticker</th>
-                <th>Bought at</th>
-                <th>Latest</th>
-                <th>Qty</th>
-                <th>Added</th>
-                <th>Profit / loss</th>
+                <th>{t("col_ticker")}</th>
+                <th>{t("col_bought_at")}</th>
+                <th>{t("col_latest")}</th>
+                <th>{t("col_qty")}</th>
+                <th>{t("col_added")}</th>
+                <th>{t("profit_loss")}</th>
               </tr>
             </thead>
             <tbody>
@@ -170,12 +172,12 @@ const InvestorPortfolio = () => {
                       {h.stock_symbol}
                     </Link>
                   </td>
-                  <td>{money(h.price_at_time)}</td>
-                  <td>{money(h.latest_price)}</td>
+                  <td><bdi dir="ltr">{money(h.price_at_time)}</bdi></td>
+                  <td><bdi dir="ltr">{money(h.latest_price)}</bdi></td>
                   <td>{h.quantity}</td>
-                  <td>{new Date(h.added_at).toLocaleDateString()}</td>
+                  <td>{new Date(h.added_at).toLocaleDateString(locale)}</td>
                   <td className={h.profit_loss >= 0 ? "gain" : "loss"}>
-                    {money(h.profit_loss)}
+                    <bdi dir="ltr">{money(h.profit_loss)}</bdi>
                   </td>
                 </tr>
               ))}
@@ -190,10 +192,10 @@ const InvestorPortfolio = () => {
           <table className="holdings-table">
             <thead>
               <tr>
-                <th>Ticker</th>
-                <th>Held since</th>
-                <th>Share of portfolio</th>
-                <th>Return</th>
+                <th>{t("col_ticker")}</th>
+                <th>{t("col_held_since")}</th>
+                <th>{t("col_share")}</th>
+                <th>{t("col_return")}</th>
               </tr>
             </thead>
             <tbody>
@@ -204,7 +206,7 @@ const InvestorPortfolio = () => {
                       {h.stock_symbol}
                     </Link>
                   </td>
-                  <td>{new Date(h.added_at).toLocaleDateString()}</td>
+                  <td>{new Date(h.added_at).toLocaleDateString(locale)}</td>
                   <td>
                     <span className="weight-bar" aria-hidden="true">
                       <span
@@ -212,10 +214,10 @@ const InvestorPortfolio = () => {
                         style={{ width: `${Math.min(h.weight_pct, 100)}%` }}
                       />
                     </span>
-                    {h.weight_pct.toFixed(1)}%
+                    <bdi dir="ltr">{h.weight_pct.toFixed(1)}%</bdi>
                   </td>
                   <td className={h.gain_pct >= 0 ? "gain" : "loss"}>
-                    {percent(h.gain_pct)}
+                    <bdi dir="ltr">{percent(h.gain_pct)}</bdi>
                   </td>
                 </tr>
               ))}

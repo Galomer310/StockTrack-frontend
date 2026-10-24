@@ -2,8 +2,19 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../api/axiosInstance";
 import StockDetailPanel from "../components/stock/StockDetailPanel";
+import { useLanguage } from "../i18n/LanguageContext";
+import { MessageKey } from "../i18n/messages";
+import { fill } from "../i18n/fill";
 
 const API = import.meta.env.VITE_BACKEND_API_URL;
+
+// The server's closed-market reasons are fixed English phrases. Hebrew shows
+// its own wording for each, and a general line for any it does not know.
+const REASONS: Record<string, MessageKey> = {
+  Weekend: "market_reason_weekend",
+  "Before the opening bell": "market_reason_before_open",
+  "After the closing bell": "market_reason_after_close",
+};
 
 // Search for a ticker, then render the shared detail panel for it. All of the
 // quote/profile/chart/news rendering lives in that panel so this page and
@@ -11,7 +22,9 @@ const API = import.meta.env.VITE_BACKEND_API_URL;
 const StockSearch: React.FC = () => {
   const [query, setQuery] = useState("");
   const [symbol, setSymbol] = useState(""); // the submitted ticker
-  const [marketNote, setMarketNote] = useState<string | null>(null);
+  // The reason the market is closed, or null while it is open. Kept raw so the
+  // banner follows a language switch.
+  const [closedReason, setClosedReason] = useState<string | null>(null);
   const [quotaLeft, setQuotaLeft] = useState<number | null>(null);
 
   const [searchDisabled, setSearchDisabled] = useState(false);
@@ -23,11 +36,7 @@ const StockSearch: React.FC = () => {
     const checkMarket = async () => {
       try {
         const res = await axiosInstance.get(`${API}/stocks/market-status`);
-        setMarketNote(
-          res.data.is_open
-            ? null
-            : `Market closed (${res.data.reason}). Prices reflect the last close.`
-        );
+        setClosedReason(res.data.is_open ? null : String(res.data.reason ?? ""));
       } catch {
         /* non-critical banner */
       }
@@ -55,6 +64,16 @@ const StockSearch: React.FC = () => {
     return () => clearInterval(timer);
   }, [searchDisabled]);
 
+  const { t, dir, lang } = useLanguage();
+  const reasonKey = closedReason === null ? undefined : REASONS[closedReason];
+  const reasonText = lang === "en" ? closedReason : reasonKey && t(reasonKey);
+  const marketNote =
+    closedReason === null
+      ? null
+      : reasonText
+        ? fill(t("market_closed"), { reason: reasonText })
+        : t("market_closed_plain");
+
   const submit = () => {
     const next = query.trim().toUpperCase();
     if (!next || searchDisabled) return;
@@ -64,30 +83,29 @@ const StockSearch: React.FC = () => {
   };
 
   return (
-    <div className="stock-search">
-      <h2>Search Stocks</h2>
-      <p>Quote, company profile, price history and news. Data by Massive; prices are the latest market close.</p>
-      <p>Example tickers: AAPL, TSLA, MSFT, AMZN, GOOGL</p>
+    <div className="stock-search" dir={dir} lang={lang}>
+      <h2>{t("search_title")}</h2>
+      <p>{t("search_intro")}</p>
+      <p>{t("search_examples")}</p>
 
       {/* The plan allows 5 requests a minute, so a running count would be
           noise; speak up only when the minute's budget is nearly spent. */}
       {quotaLeft !== null && quotaLeft <= 1 && (
-        <p className="quota-warning">
-          Market data is busy (5 requests a minute). If something doesn't load,
-          try again in a minute.
-        </p>
+        <p className="quota-warning">{t("quota_busy")}</p>
       )}
 
       <div className="search-row">
         <input
           type="text"
-          placeholder="Enter stock symbol"
+          // Empty, the placeholder follows the page; a typed ticker reads left to right.
+          dir={query ? "ltr" : dir}
+          placeholder={t("search_placeholder")}
           value={query}
           onChange={(e) => setQuery(e.target.value.toUpperCase())}
           onKeyDown={(e) => e.key === "Enter" && submit()}
         />
         <button onClick={submit} disabled={searchDisabled}>
-          {searchDisabled ? `Wait ${countdown}s` : "Search"}
+          {searchDisabled ? fill(t("search_wait"), { n: countdown }) : t("search_button")}
         </button>
       </div>
 
@@ -96,7 +114,7 @@ const StockSearch: React.FC = () => {
       {symbol ? (
         <StockDetailPanel symbol={symbol} allowAdd onQuota={setQuotaLeft} />
       ) : (
-        <p className="stock-empty">Search for a ticker to see its details.</p>
+        <p className="stock-empty">{t("search_empty")}</p>
       )}
     </div>
   );

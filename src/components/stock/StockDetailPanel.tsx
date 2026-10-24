@@ -19,6 +19,9 @@ import { useToast } from "../ui/ToastProvider";
 import TradeNoteModal, { TradeSubmission } from "../trades/TradeNoteModal";
 import { fetchMyPortfolios, MyPortfolio } from "../../api/portfolios";
 import { setActivePortfolio as selectPortfolio } from "../../features/portfolioSlice";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { MessageKey } from "../../i18n/messages";
+import { fill, ltr } from "../../i18n/fill";
 
 ChartJS.register(
   CategoryScale,
@@ -42,17 +45,25 @@ const API = import.meta.env.VITE_BACKEND_API_URL;
    =========================================================================== */
 
 // Daily bars only. A 1-day range needs intraday bars, which the free Massive
-// plan does not include. Re-add { key: "1d", label: "1D", days: 1 } here and
-// set MASSIVE_INTRADAY=true on the server after upgrading.
-export const RANGES = [
-  { key: "5d", label: "5D", days: 5 },
-  { key: "1w", label: "1W", days: 7 },
-  { key: "1m", label: "1M", days: 30 },
-  { key: "3m", label: "3M", days: 90 },
-  { key: "6m", label: "6M", days: 180 },
-  { key: "1y", label: "1Y", days: 365 },
-  { key: "2y", label: "2Y", days: 730 },
+// plan does not include. Re-add { key: "1d", label: "range_1d", days: 1 } here
+// (with range_1d in messages.ts) and set MASSIVE_INTRADAY=true on the server
+// after upgrading.
+export const RANGES: { key: string; label: MessageKey; days: number }[] = [
+  { key: "5d", label: "range_5d", days: 5 },
+  { key: "1w", label: "range_1w", days: 7 },
+  { key: "1m", label: "range_1m", days: 30 },
+  { key: "3m", label: "range_3m", days: 90 },
+  { key: "6m", label: "range_6m", days: 180 },
+  { key: "1y", label: "range_1y", days: 365 },
+  { key: "2y", label: "range_2y", days: 730 },
 ];
+
+// The provider's news sentiment, as the server capitalises it.
+const SENTIMENTS: Record<string, MessageKey> = {
+  Positive: "sentiment_positive",
+  Negative: "sentiment_negative",
+  Neutral: "sentiment_neutral",
+};
 
 export interface Quote {
   symbol: string;
@@ -114,14 +125,19 @@ const compact = (n: number) =>
   : n >= 1e6 ? `$${(n / 1e6).toFixed(2)}M`
   : `$${n.toLocaleString()}`;
 
-const describeError = (err: any, fallback: string) => {
-  if (err.response?.status === 429) {
-    return err.response.data?.error || "Daily market data limit reached.";
-  }
-  if (err.response?.status === 404) {
-    return err.response.data?.error || "No data available for this ticker.";
-  }
-  return fallback;
+// In English the server's own message is the most specific one there is. In
+// Hebrew it would be English text in a Hebrew screen, so the message is chosen
+// by status instead: market-data refusals carry no error codes.
+const describeError = (
+  err: any,
+  lang: "he" | "en",
+  t: (key: MessageKey) => string,
+  fallback: MessageKey
+) => {
+  const server = lang === "en" ? err.response?.data?.error : undefined;
+  if (err.response?.status === 429) return server || t("stock_err_limit");
+  if (err.response?.status === 404) return server || t("stock_err_no_data");
+  return t(fallback);
 };
 
 const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }) => {
@@ -135,7 +151,7 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
   const [loading, setLoading] = useState(true);
   const [barsLoading, setBarsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
+  const [stale, setStale] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [noteOpen, setNoteOpen] = useState(false);
 
@@ -155,6 +171,9 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
 
   const user = useSelector((state: RootState) => state.auth.user);
   const toast = useToast();
+  const { t, dir, lang, locale } = useLanguage();
+  // Inside Hebrew sentences, prices, tickers and names keep their own direction.
+  const iso = (value: string) => (lang === "he" ? ltr(value) : value);
 
   const readQuota = (headers: any) => {
     const remaining = headers?.["x-quota-remaining"];
@@ -170,7 +189,7 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
     const load = async () => {
       setLoading(true);
       setError("");
-      setNotice("");
+      setStale(false);
       setQuote(null);
       setOverview(null);
       setNews([]);
@@ -180,12 +199,10 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
         if (cancelled) return;
         readQuota(res.headers);
         setQuote(res.data);
-        if (res.headers?.["x-cache"] === "STALE") {
-          setNotice("Showing the last known price; today's request budget is used up.");
-        }
+        if (res.headers?.["x-cache"] === "STALE") setStale(true);
       } catch (err: any) {
         if (cancelled) return;
-        setError(describeError(err, "Could not load this stock."));
+        setError(describeError(err, lang, t, "stock_load_failed"));
         setLoading(false);
         return;
       }
@@ -242,7 +259,7 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
         setBars([]);
         // Failing to load a chart should not blank the whole panel, so this
         // surfaces as a toast rather than replacing the page with an error.
-        toast.error(describeError(err, "Could not load price history."));
+        toast.error(describeError(err, lang, t, "stock_history_failed"));
       } finally {
         if (!cancelled) setBarsLoading(false);
       }
@@ -293,10 +310,14 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
     setNoteOpen(false);
     setCashRefresh((k) => k + 1);
     toast.success(
-      `${quote.symbol} × ${quantity} at ${money(quote.price)} added. ${money(
-        res.data?.cash_remaining ?? 0
-      )} cash left in ${activePortfolio?.name ?? "this portfolio"}.`,
-      "Purchase recorded"
+      fill(t("stock_bought_toast"), {
+        symbol: iso(quote.symbol),
+        qty: quantity,
+        price: iso(money(quote.price)),
+        cash: iso(money(res.data?.cash_remaining ?? 0)),
+        portfolio: activePortfolio ? iso(activePortfolio.name) : t("stock_this_portfolio"),
+      }),
+      t("stock_bought_title")
     );
   };
 
@@ -325,12 +346,12 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
   const chartData = {
     labels: bars.map((b) =>
       intraday
-        ? new Date(b.t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-        : new Date(b.t).toLocaleDateString()
+        ? new Date(b.t).toLocaleTimeString(locale ?? [], { hour: "2-digit", minute: "2-digit" })
+        : new Date(b.t).toLocaleDateString(locale)
     ),
     datasets: [
       {
-        label: `${symbol} close`,
+        label: fill(t("stock_close_series"), { symbol: iso(symbol) }),
         data: bars.map((b) => b.c),
         borderColor: lineColor,
         backgroundColor: positive ? SERIES.goldFill : "rgba(224, 85, 97, 0.12)",
@@ -349,6 +370,7 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
     plugins: {
       legend: { display: false },
       title: { display: false },
+      tooltip: { rtl: dir === "rtl" },
     },
     scales: {
       x: { ticks: { maxTicksLimit: 8 } },
@@ -357,7 +379,7 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
   };
 
   if (loading && !quote) {
-    return <p className="stock-panel-loading">Loading {symbol}…</p>;
+    return <p className="stock-panel-loading">{fill(t("stock_loading"), { symbol: iso(symbol) })}</p>;
   }
 
   if (error) {
@@ -384,17 +406,17 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
       {allowAdd && user && activePortfolio && (
         <div className="buying-into">
           <div className="buying-into-which">
-            <span className="summary-label">Buying into</span>
+            <span className="summary-label">{t("stock_buying_into")}</span>
             {portfolios.length > 1 ? (
               <select
                 className="buying-into-select"
                 value={activePortfolio.id}
                 onChange={(e) => handlePortfolioChange(Number(e.target.value))}
-                aria-label="Portfolio this purchase goes into"
+                aria-label={t("stock_portfolio_select_label")}
               >
                 {portfolios.map((p) => (
                   <option key={p.id} value={p.id}>
-                    {p.name} — {money(p.cash)} available
+                    {fill(t("stock_portfolio_option"), { name: iso(p.name), cash: iso(money(p.cash)) })}
                   </option>
                 ))}
               </select>
@@ -404,38 +426,44 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
           </div>
 
           <div className="buying-into-cash">
-            <span className="summary-label">Available to trade</span>
+            <span className="summary-label">{t("stock_available")}</span>
             <span className="summary-value">{money(cash)}</span>
           </div>
 
           {portfolios.length > 1 && (
             <span className="field-hint">
-              {portfolios.findIndex((p) => p.id === activePortfolio.id) + 1} of{" "}
-              {portfolios.length} portfolios
+              {fill(t("stock_portfolio_count"), {
+                n: portfolios.findIndex((p) => p.id === activePortfolio.id) + 1,
+                total: portfolios.length,
+              })}
             </span>
           )}
         </div>
       )}
 
-      {notice && <p className="market-status">{notice}</p>}
+      {stale && <p className="market-status">{t("stock_stale")}</p>}
 
       {/* Headline */}
       {quote && (
         <div className="stock-headline">
           <div>
             <h2>
-              {overview?.name || quote.symbol}
+              {/* Company names arrive in English; bdi keeps "Apple Inc." from
+                  showing as ".Apple Inc" on a Hebrew page. */}
+              <bdi>{overview?.name || quote.symbol}</bdi>
               <span className="stock-ticker-chip">{quote.symbol}</span>
             </h2>
             <div className="stock-price-row">
               <span className="stock-price">{money(quote.price)}</span>
-              <span className={quote.change >= 0 ? "gain" : "loss"}>
+              <span className={quote.change >= 0 ? "gain" : "loss"} dir="ltr">
                 {quote.change >= 0 ? "▲" : "▼"} {money(Math.abs(quote.change))} (
                 {quote.change_percent.toFixed(2)}%)
               </span>
             </div>
             {quote.latest_trading_day && (
-              <p className="stock-asof">As of {quote.latest_trading_day}</p>
+              <p className="stock-asof">
+                {fill(t("stock_as_of"), { date: iso(quote.latest_trading_day) })}
+              </p>
             )}
           </div>
 
@@ -443,13 +471,13 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
             <div className="stock-add">
               <div className="stock-add-row">
                 <label className="stock-qty">
-                  <span className="summary-label">Shares</span>
+                  <span className="summary-label">{t("stock_shares")}</span>
                   <input
                     type="number"
                     min="1"
                     value={quantity}
                     onChange={(e) => setQuantity(Number(e.target.value))}
-                    aria-label="Quantity"
+                    aria-label={t("stock_quantity_label")}
                   />
                 </label>
                 <button
@@ -457,7 +485,7 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
                   onClick={() => setNoteOpen(true)}
                   disabled={tooExpensive}
                 >
-                  Buy…
+                  {t("stock_buy")}
                 </button>
               </div>
 
@@ -468,36 +496,40 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
               {activePortfolio && (
                 <div className={`order-preview${tooExpensive ? " is-over" : ""}`}>
                   <div className="order-line">
-                    <span>
+                    <span dir="ltr">
                       {quantity} × {money(quote.price)}
                     </span>
-                    <span className="order-figure">{money(orderCost)}</span>
+                    <span className="order-figure" dir="ltr">{money(orderCost)}</span>
                   </div>
                   <div className="order-line">
-                    <span>Cash after this purchase</span>
-                    <span className={`order-figure ${tooExpensive ? "loss" : ""}`}>
+                    <span>{t("stock_cash_after")}</span>
+                    <span className={`order-figure ${tooExpensive ? "loss" : ""}`} dir="ltr">
                       {money(cashAfter)}
                     </span>
                   </div>
                   {tooExpensive ? (
                     <p className="order-warning">
-                      {activePortfolio.name} is {money(orderCost - cash)} short. You
-                      can afford {maxAffordable} share{maxAffordable === 1 ? "" : "s"}{" "}
-                      at this price.
+                      {fill(t(maxAffordable === 1 ? "stock_short_one" : "stock_short_many"), {
+                        name: iso(activePortfolio.name),
+                        short: iso(money(orderCost - cash)),
+                        n: maxAffordable,
+                      })}
                       {maxAffordable > 0 && (
                         <button
                           type="button"
                           className="link-btn"
                           onClick={() => setQuantity(maxAffordable)}
                         >
-                          buy {maxAffordable}
+                          {fill(t("stock_buy_n"), { n: maxAffordable })}
                         </button>
                       )}
                     </p>
                   ) : (
                     <p className="field-hint">
-                      Leaves {((cashAfter / (activePortfolio.equity || 1)) * 100).toFixed(0)}%
-                      of {activePortfolio.name} in cash.
+                      {fill(t("stock_leaves"), {
+                        pct: ((cashAfter / (activePortfolio.equity || 1)) * 100).toFixed(0),
+                        name: iso(activePortfolio.name),
+                      })}
                     </p>
                   )}
                 </div>
@@ -511,28 +543,28 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
       {quote && (
         <div className="summary-cards">
           <div className="summary-card">
-            <span className="summary-label">Open</span>
+            <span className="summary-label">{t("stock_open")}</span>
             <span className="summary-value">{money(quote.open)}</span>
           </div>
           <div className="summary-card">
-            <span className="summary-label">Day range</span>
-            <span className="summary-value">
+            <span className="summary-label">{t("stock_day_range")}</span>
+            <span className="summary-value" dir="ltr">
               {money(quote.low)}–{money(quote.high)}
             </span>
           </div>
           <div className="summary-card">
-            <span className="summary-label">Prev close</span>
+            <span className="summary-label">{t("stock_prev_close")}</span>
             <span className="summary-value">{money(quote.previous_close)}</span>
           </div>
           <div className="summary-card">
-            <span className="summary-label">Volume</span>
-            <span className="summary-value">{quote.volume.toLocaleString()}</span>
+            <span className="summary-label">{t("stock_volume")}</span>
+            <span className="summary-value">{quote.volume.toLocaleString(locale)}</span>
           </div>
         </div>
       )}
 
       {/* Price history */}
-      <h3>Price history</h3>
+      <h3>{t("stock_price_history")}</h3>
       <div className="range-picker">
         {RANGES.map((option) => (
           <button
@@ -541,10 +573,10 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
             onClick={() => setRange(option.key)}
             disabled={barsLoading}
           >
-            {option.label}
+            {t(option.label)}
           </button>
         ))}
-        {barsLoading && <span className="range-loading">Loading…</span>}
+        {barsLoading && <span className="range-loading">{t("loading")}</span>}
       </div>
 
       {bars.length > 0 ? (
@@ -552,50 +584,50 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
           <Line data={chartData} options={chartOptions} />
         </div>
       ) : (
-        !barsLoading && <p className="stock-empty">No price history for this range.</p>
+        !barsLoading && <p className="stock-empty">{t("stock_no_history")}</p>
       )}
 
       {/* Company profile */}
       {overview && overview.name && (
         <>
-          <h3>About</h3>
+          <h3>{t("stock_about")}</h3>
           <div className="company-details">
-            {overview.description && <p>{overview.description}</p>}
+            {overview.description && <p dir="auto">{overview.description}</p>}
             <div className="profile-grid">
               {overview.sector && (
                 <div>
-                  <span className="summary-label">Sector</span>
+                  <span className="summary-label">{t("stock_sector")}</span>
                   <span>{overview.sector}</span>
                 </div>
               )}
               {overview.industry && (
                 <div>
-                  <span className="summary-label">Industry</span>
+                  <span className="summary-label">{t("stock_industry")}</span>
                   <span>{overview.industry}</span>
                 </div>
               )}
               {overview.exchange && (
                 <div>
-                  <span className="summary-label">Exchange</span>
+                  <span className="summary-label">{t("stock_exchange")}</span>
                   <span>{overview.exchange}</span>
                 </div>
               )}
               {overview.market_cap > 0 && (
                 <div>
-                  <span className="summary-label">Market cap</span>
+                  <span className="summary-label">{t("stock_market_cap")}</span>
                   <span>{compact(overview.market_cap)}</span>
                 </div>
               )}
               {overview.pe_ratio > 0 && (
                 <div>
-                  <span className="summary-label">P/E ratio</span>
+                  <span className="summary-label">{t("stock_pe")}</span>
                   <span>{overview.pe_ratio.toFixed(2)}</span>
                 </div>
               )}
               {overview.week52_high > 0 && (
                 <div>
-                  <span className="summary-label">52-week range</span>
-                  <span>
+                  <span className="summary-label">{t("stock_52w")}</span>
+                  <span dir="ltr">
                     {money(overview.week52_low)}–{money(overview.week52_high)}
                   </span>
                 </div>
@@ -608,20 +640,24 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
       {/* News */}
       {news.length > 0 && (
         <>
-          <h3>Latest news</h3>
+          <h3>{t("stock_news")}</h3>
           <div className="company-news">
             <ul>
               {news.map((article, i) => (
                 <li key={article.url || i}>
-                  <a href={article.url} target="_blank" rel="noopener noreferrer">
+                  {/* Headlines arrive in English; dir="auto" keeps them reading correctly in Hebrew. */}
+                  <a href={article.url} target="_blank" rel="noopener noreferrer" dir="auto">
                     {article.title}
                   </a>
                   <p>
                     {article.source}
                     {article.published &&
-                      ` · ${new Date(article.published).toLocaleString()}`}
+                      ` · ${new Date(article.published).toLocaleString(locale)}`}
                     {article.sentiment && (
-                      <span className="news-sentiment"> {article.sentiment}</span>
+                      <span className="news-sentiment">
+                        {" "}
+                        {SENTIMENTS[article.sentiment] ? t(SENTIMENTS[article.sentiment]) : article.sentiment}
+                      </span>
                     )}
                   </p>
                 </li>

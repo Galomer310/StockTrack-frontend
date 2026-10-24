@@ -11,6 +11,9 @@ import {
 } from "../api/feed";
 import { percentOrDash, dateTime } from "../api/social";
 import { useToast } from "../components/ui/ToastProvider";
+import { useLanguage } from "../i18n/LanguageContext";
+import { MessageKey } from "../i18n/messages";
+import { fill, ltr } from "../i18n/fill";
 
 /* ===========================================================================
    The feed.
@@ -21,9 +24,25 @@ import { useToast } from "../components/ui/ToastProvider";
    No prices anywhere, including on your own posts: a post carries what was
    done, to which ticker, when, why, and how the stock has moved since. The
    server enforces that - this page could not show a price if it wanted to.
+
+   Translated: the page lays out right to left in Hebrew. What people wrote
+   (names, theses, replies, portfolio names) keeps its own direction, and the
+   signed percentage stays left to right.
    =========================================================================== */
 
 const PAGE_SIZE = 25;
+
+// The reactions' names, by the key the server stores.
+const REACTION_TITLES: Record<string, MessageKey> = {
+  like: "reaction_like",
+  dislike: "reaction_dislike",
+  "🚀": "reaction_rocket",
+  "🔥": "reaction_fire",
+  "💎": "reaction_diamond",
+  "😂": "reaction_funny",
+  "😮": "reaction_surprised",
+  "😢": "reaction_painful",
+};
 
 // A single post.
 const PostCard = ({
@@ -37,6 +56,7 @@ const PostCard = ({
   const [sending, setSending] = useState(false);
   const [showAllComments, setShowAllComments] = useState(false);
   const toast = useToast();
+  const { t, dir, lang, locale } = useLanguage();
 
   // The reply box grows with what is typed, so a reply longer than one line
   // can be read back before posting - on a phone a one-line input showed only
@@ -60,7 +80,7 @@ const PostCard = ({
       const result = await react(post.id, reaction);
       onChanged({ ...post, reactions: result.reactions, my_reaction: result.my_reaction });
     } catch {
-      toast.error("Could not save your reaction.");
+      toast.error(t("feed_react_failed"));
     }
   };
 
@@ -74,7 +94,8 @@ const PostCard = ({
       onChanged({ ...post, comments: [...post.comments, created] });
       setDraft("");
     } catch (err: any) {
-      toast.error(err.response?.data?.error || "Could not post your reply.");
+      // The server's reason is English, so Hebrew shows its own message.
+      toast.error((lang === "en" && err.response?.data?.error) || t("feed_reply_failed"));
     } finally {
       setSending(false);
     }
@@ -85,7 +106,7 @@ const PostCard = ({
       await deleteComment(c.id);
       onChanged({ ...post, comments: post.comments.filter((x) => x.id !== c.id) });
     } catch {
-      toast.error("Could not delete that reply.");
+      toast.error(t("feed_delete_failed"));
     }
   };
 
@@ -97,6 +118,7 @@ const PostCard = ({
       : post.comments.slice(-3);
 
   const moved = post.change_pct_since;
+  const actionText = t(post.action === "buy" ? "trade_buy" : "trade_sell");
 
   return (
     <article className={`feed-post feed-${post.action}`}>
@@ -107,28 +129,31 @@ const PostCard = ({
 
         <div className="feed-byline">
           <span className="feed-author">
-            {post.user.display_name}
-            {post.is_mine && <span className="lb-you">you</span>}
+            <bdi>{post.user.display_name}</bdi>
+            {post.is_mine && <span className="lb-you">{t("feed_you")}</span>}
             {/* Which book the trade was made in. The link goes to the
                 portfolio, since that is the thing being ranked and viewed. */}
             {post.portfolio && (
               <Link className="feed-portfolio" to={`/investor/${post.portfolio.id}`}>
-                {post.portfolio.name}
+                <bdi>{post.portfolio.name}</bdi>
               </Link>
             )}
           </span>
           <span className="feed-action-line">
-            <span className={`trade-badge trade-${post.action}`}>{post.action}</span>
+            <span className={`trade-badge trade-${post.action}`}>{actionText}</span>
             <Link className="ticker-link" to={`/stock/${post.stock_symbol}`}>
               {post.stock_symbol}
             </Link>
             {/* The date and time the action was taken. */}
             <time className="feed-time" dateTime={post.occurred_at}>
-              {dateTime(post.occurred_at)}
+              {dateTime(post.occurred_at, locale)}
             </time>
             {post.backdated && (
-              <span className="journal-backdated" title={`Written ${dateTime(post.created_at)}`}>
-                recorded later
+              <span
+                className="journal-backdated"
+                title={fill(t("journal_written"), { date: dateTime(post.created_at, locale) })}
+              >
+                {t("journal_recorded_later")}
               </span>
             )}
           </span>
@@ -137,25 +162,28 @@ const PostCard = ({
         {/* How the stock has moved since the trade - the only figure on a post. */}
         <div
           className={`feed-move ${(moved ?? 0) >= 0 ? "gain" : "loss"}`}
-          title={`Move in ${post.stock_symbol} since this ${post.action}`}
+          title={fill(t(post.action === "buy" ? "journal_move_title_buy" : "journal_move_title_sell"), {
+            symbol: lang === "he" ? ltr(post.stock_symbol) : post.stock_symbol,
+          })}
         >
-          {percentOrDash(moved)}
-          <span className="feed-move-label">since</span>
+          <bdi dir="ltr">{percentOrDash(moved)}</bdi>
+          <span className="feed-move-label">{t("feed_since")}</span>
         </div>
       </header>
 
-      <p className="feed-note">{post.note}</p>
+      <p className="feed-note" dir="auto">{post.note}</p>
 
       <div className="feed-reactions">
         {REACTIONS.map((r) => {
           const count = post.reactions[r.key] || 0;
           const mine = post.my_reaction === r.key;
+          const title = t(REACTION_TITLES[r.key]);
           return (
             <button
               key={r.key}
               className={`reaction-chip${mine ? " is-mine" : ""}`}
               onClick={() => handleReact(r.key)}
-              title={mine ? `${r.title} — tap to undo` : r.title}
+              title={mine ? fill(t("reaction_undo"), { title }) : title}
               aria-pressed={mine}
             >
               <span className="reaction-emoji">{r.label}</span>
@@ -170,23 +198,27 @@ const PostCard = ({
           {!showAllComments && post.comments.length > 3 && (
             <li className="feed-more">
               <button className="link-btn" onClick={() => setShowAllComments(true)}>
-                Show all {post.comments.length} replies
+                {fill(t("feed_show_all"), { n: post.comments.length })}
               </button>
             </li>
           )}
           {visibleComments.map((c) => (
             <li key={c.id} className="feed-comment">
-              <span className="feed-comment-author">{c.user.display_name}</span>
-              <span className="feed-comment-body">{c.body}</span>
+              {/* The name is isolated inside the span, so the gap after it follows
+                  the page's direction rather than the name's. */}
+              <span className="feed-comment-author">
+                <bdi>{c.user.display_name}</bdi>
+              </span>
+              <span className="feed-comment-body" dir="auto">{c.body}</span>
               <span className="feed-comment-meta">
-                <time dateTime={c.created_at}>{dateTime(c.created_at)}</time>
+                <time dateTime={c.created_at}>{dateTime(c.created_at, locale)}</time>
                 {c.is_mine && (
                   <button
                     className="link-btn"
                     onClick={() => handleDeleteComment(c)}
-                    title="Delete your reply"
+                    title={t("feed_delete_title")}
                   >
-                    delete
+                    {t("feed_delete")}
                   </button>
                 )}
               </span>
@@ -201,8 +233,11 @@ const PostCard = ({
           rows={1}
           value={draft}
           maxLength={500}
-          placeholder="Write a reply…"
-          aria-label="Write a reply"
+          // Edge treats an empty dir="auto" box as left to right, which would
+          // reverse a Hebrew placeholder, so it follows the page until typed in.
+          dir={draft ? "auto" : dir}
+          placeholder={t("feed_reply_placeholder")}
+          aria-label={t("feed_reply_label")}
           onChange={(e) => setDraft(e.target.value)}
           // Enter still posts, as it did when this was a one-line input;
           // Shift+Enter starts a new line. Not while an input method is
@@ -215,7 +250,7 @@ const PostCard = ({
           }}
         />
         <button type="submit" disabled={!draft.trim() || sending}>
-          {sending ? "Posting…" : "Reply"}
+          {sending ? t("feed_posting") : t("feed_reply")}
         </button>
       </form>
     </article>
@@ -227,7 +262,8 @@ const Feed = () => {
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<MessageKey | null>(null);
+  const { t, dir, lang } = useLanguage();
 
   useEffect(() => {
     let cancelled = false;
@@ -238,7 +274,7 @@ const Feed = () => {
         setPosts(page.posts);
         setHasMore(page.has_more);
       } catch {
-        if (!cancelled) setError("Could not load the feed.");
+        if (!cancelled) setError("feed_failed");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -256,7 +292,7 @@ const Feed = () => {
       setPosts((prev) => [...prev, ...page.posts]);
       setHasMore(page.has_more);
     } catch {
-      setError("Could not load more posts.");
+      setError("feed_more_failed");
     } finally {
       setLoadingMore(false);
     }
@@ -267,21 +303,16 @@ const Feed = () => {
   const replacePost = (updated: FeedPost) =>
     setPosts((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
 
-  if (loading) return <div className="feed-page"><p>Loading feed…</p></div>;
-  if (error) return <div className="feed-page"><p className="error">{error}</p></div>;
+  if (loading) return <div className="feed-page" dir={dir} lang={lang}><p>{t("feed_loading")}</p></div>;
+  if (error) return <div className="feed-page" dir={dir} lang={lang}><p className="error">{t(error)}</p></div>;
 
   return (
-    <div className="feed-page">
-      <h2>Feed</h2>
-      <p className="feed-subtitle">
-        Every buy and sell as it happens, from everyone. Percentages only — what
-        each investor paid stays their own business.
-      </p>
+    <div className="feed-page" dir={dir} lang={lang}>
+      <h2>{t("feed_title")}</h2>
+      <p className="feed-subtitle">{t("feed_subtitle")}</p>
 
       {posts.length === 0 ? (
-        <p className="stock-empty">
-          Nothing here yet. The moment anyone buys or sells, it appears here.
-        </p>
+        <p className="stock-empty">{t("feed_empty")}</p>
       ) : (
         <div className="feed-list">
           {posts.map((post) => (
@@ -292,7 +323,7 @@ const Feed = () => {
 
       {hasMore && (
         <button className="feed-more-btn" onClick={loadMore} disabled={loadingMore}>
-          {loadingMore ? "Loading…" : "Load older posts"}
+          {loadingMore ? t("loading") : t("feed_load_older")}
         </button>
       )}
     </div>

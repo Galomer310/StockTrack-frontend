@@ -1195,6 +1195,16 @@ body.nav-locked { overflow: hidden; }
 .feed-page { max-width: 46rem; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
 .feed-subtitle { color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.5rem; }
 
+/* Follow / Following, beside a player's follower count. */
+.follow-control { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 0.6rem; margin-block: 0.4rem 1rem; }
+.follow-btn {
+  background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+  border-color: var(--gold-deep); color: #17130A; min-width: 7.5rem;
+}
+.follow-btn:hover { color: #17130A; }
+.follow-btn.is-following { background: transparent; border-color: var(--gold-line); color: var(--gold-bright); }
+.follow-count { font-size: 0.85rem; color: var(--text-muted); }
+
 .feed-list { display: flex; flex-direction: column; gap: 1rem; }
 
 .feed-post {

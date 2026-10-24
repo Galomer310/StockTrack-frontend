@@ -446,6 +446,23 @@ const en = {
   reaction_surprised: "Surprising",
   reaction_painful: "Painful",
   reaction_undo: "{title} — tap to undo",
+
+  // Following
+  follow_follow: "Follow",
+  follow_following: "Following",
+  follow_unfollow: "Unfollow",
+  follow_back: "Follow back",
+  follow_followers_one: "1 follower",
+  follow_followers_n: "{n} followers",
+  follow_failed: "Could not update the follow. Try again.",
+  follow_view_lists: "Followers & following",
+  follow_lists_title: "Followers & Following",
+  follow_lists_private: "Only you can see these lists. Everyone sees the counts.",
+  follow_tab_followers: "Followers",
+  follow_tab_following: "Following",
+  follow_empty_followers: "No one follows you yet.",
+  follow_empty_following: "You are not following anyone yet. Follow players from their portfolio page.",
+  follow_since: "Since {date}",
 };
 
 export type MessageKey = keyof typeof en;
@@ -860,6 +877,22 @@ const he: Messages = {
   reaction_surprised: "מפתיע",
   reaction_painful: "כואב",
   reaction_undo: "{title} — הקשה נוספת מבטלת",
+
+  follow_follow: "מעקב",
+  follow_following: "במעקב",
+  follow_unfollow: "הסרת מעקב",
+  follow_back: "מעקב חזרה",
+  follow_followers_one: "עוקב אחד",
+  follow_followers_n: "{n} עוקבים",
+  follow_failed: "לא ניתן היה לעדכן את המעקב. נסו שוב.",
+  follow_view_lists: "עוקבים ונעקבים",
+  follow_lists_title: "עוקבים ונעקבים",
+  follow_lists_private: "רק אתם רואים את הרשימות האלה. את המספרים רואים כולם.",
+  follow_tab_followers: "עוקבים",
+  follow_tab_following: "במעקב",
+  follow_empty_followers: "עדיין אף אחד לא עוקב אחריכם.",
+  follow_empty_following: "עדיין לא עקבתם אחרי אף אחד. אפשר לעקוב אחרי שחקנים מעמוד התיק שלהם.",
+  follow_since: "מאז {date}",
 };
 
 export const MESSAGES: Record<Lang, Messages> = { en, he };

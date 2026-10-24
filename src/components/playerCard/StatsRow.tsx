@@ -21,6 +21,7 @@ const StatCard = ({
   icon,
   iconTone,
   value,
+  action,
   children,
 }: {
   title: MessageKey;
@@ -28,6 +29,8 @@ const StatCard = ({
   icon: IconName;
   iconTone?: "pos";
   value?: CardValue<unknown>;
+  /** A small control under the value, such as opening the follower lists. */
+  action?: ReactNode;
   children?: ReactNode;
 }) => {
   const { t } = useLanguage();
@@ -38,12 +41,13 @@ const StatCard = ({
       <h3 className="pc-stat-title">{t(title)}</h3>
       <Icon name={icon} className={`pc-stat-icon${iconTone ? ` pc-${iconTone}-icon` : ""}${withheld ? " is-dim" : ""}`} />
       <div className="pc-stat-value">{withheld ? <NotShown value={withheld} /> : children}</div>
+      {action}
     </article>
   );
 };
 
-export const StatsRow = ({ data }: { data: PlayerCardData }) => {
-  const { locale } = useLanguage();
+export const StatsRow = ({ data, onOpenFollows }: { data: PlayerCardData; onOpenFollows?: () => void }) => {
+  const { t, locale } = useLanguage();
   const { stats, social, medals, achievements } = data;
   const count = (n: number) => <bdi>{formatNumber(n, locale)}</bdi>;
 
@@ -61,7 +65,18 @@ export const StatsRow = ({ data }: { data: PlayerCardData }) => {
       <StatCard title="s_subscribers" tip="t_subscribers" icon="user">
         {count(social.subscribers)}
       </StatCard>
-      <StatCard title="s_followers" tip="t_followers" icon="users">
+      <StatCard
+        title="s_followers"
+        tip="t_followers"
+        icon="users"
+        action={
+          onOpenFollows && (
+            <button type="button" className="pc-stat-action" onClick={onOpenFollows}>
+              {t("follow_view_lists")}
+            </button>
+          )
+        }
+      >
         {count(social.followers)}
       </StatCard>
       <StatCard title="s_best" tip="t_best" icon="trend" iconTone="pos" value={stats.best_portfolio_gain}>

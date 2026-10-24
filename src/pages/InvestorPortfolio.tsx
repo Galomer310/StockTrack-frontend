@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import TradeJournal from "../components/trades/TradeJournal";
+import { FollowButton } from "../components/social/FollowButton";
 import {
   fetchPortfolio,
   PortfolioResponse,
@@ -70,6 +71,8 @@ const InvestorPortfolio = () => {
         {owner.display_name} · opened{" "}
         {new Date(portfolio.created_at).toLocaleDateString()}
       </p>
+      {/* Following is per player, not per portfolio. Hidden on your own. */}
+      {!is_self && <FollowButton playerId={owner.id} />}
 
       <div className="summary-cards">
         {/* Total return is the whole story for a visitor. */}

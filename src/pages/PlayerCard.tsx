@@ -8,6 +8,7 @@ import { PlayerHeader } from "../components/playerCard/PlayerHeader";
 import { StatsRow } from "../components/playerCard/StatsRow";
 import { CompetitionsPanel, PerformancePanel, ProgressionPanel } from "../components/playerCard/TablePanels";
 import { TitleCollectionDialog } from "../components/progression/TitleCollectionDialog";
+import { FollowListsDialog } from "../components/social/FollowListsDialog";
 import { useLanguage } from "../i18n/LanguageContext";
 import "../components/playerCard/playerCard.css";
 import "../components/progression/progression.css";
@@ -45,6 +46,7 @@ const PlayerCard = () => {
   const [failed, setFailed] = useState(false);
   const [open, setOpen] = useState<{ award: Award; kind: AwardKind } | null>(null);
   const [titlesOpen, setTitlesOpen] = useState(false);
+  const [followsOpen, setFollowsOpen] = useState(false);
 
   useEffect(() => {
     let live = true;
@@ -117,7 +119,8 @@ const PlayerCard = () => {
               onSave={saveEdit}
               onOpenTitles={() => setTitlesOpen(true)}
             />
-            <StatsRow data={result.data} />
+            {/* Who follows you is yours alone, and demo data has no real lists. */}
+            <StatsRow data={result.data} onOpenFollows={result.demo ? undefined : () => setFollowsOpen(true)} />
             <div className="pc-row3">
               <CompetitionsPanel competitions={result.data.competitions} />
               <AwardsPanel
@@ -142,6 +145,11 @@ const PlayerCard = () => {
         )}
       </div>
       <AwardDialog award={open?.award ?? null} kind={open?.kind ?? "medal"} onClose={() => setOpen(null)} />
+      <FollowListsDialog
+        open={followsOpen}
+        onClose={() => setFollowsOpen(false)}
+        onChanged={() => fetchPlayerCard().then(setResult).catch(() => undefined)}
+      />
       <TitleCollectionDialog
         open={titlesOpen}
         scenario={scenario}

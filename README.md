@@ -62,6 +62,11 @@ earn XP calls `requestProgressionCheck()` from `src/api/progression.ts`. The
 server decides every state; the screens only display it. Styles live in
 `src/components/progression/progression.css`.
 
+**Following.** One click, no approval. The Follow button is on another
+player's portfolio page (`FollowButton`); your followers and the players you
+follow open from the Followers figure on your own card (`FollowListsDialog`).
+Counts are public; the lists are yours alone.
+
 Demo data, kept apart from the components in
 `src/features/playerCard/demoData.ts`, is available for design work:
 `/player?demo=1` for an established player, `/player?demo=new` for a new one.

@@ -1136,6 +1136,8 @@ body.nav-locked { overflow: hidden; }
   margin: 1.25rem 0 1.75rem;
 }
 .market-lookup input { flex: 0 1 14rem; text-transform: uppercase; }
+/* Tickers read left to right, but the box lines up with the Hebrew around it. */
+.market-page:lang(he) .market-lookup input { text-align: right; }
 .market-lookup .field-hint { flex: 1 1 100%; }
 
 .market-grid {

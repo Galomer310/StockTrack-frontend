@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "../i18n/LanguageContext";
+import { MessageKey } from "../i18n/messages";
+import { fill, ltr } from "../i18n/fill";
 
 /* ===========================================================================
    Market.
@@ -13,8 +16,9 @@ import { useNavigate } from "react-router-dom";
    =========================================================================== */
 
 interface Destination {
+  /** A brand name, so the same in both languages */
   name: string;
-  blurb: string;
+  blurb: MessageKey;
   /** The site's front page */
   home: string;
   /** Deep link for one ticker, or null when the site has no clean pattern */
@@ -24,50 +28,50 @@ interface Destination {
 const DESTINATIONS: Destination[] = [
   {
     name: "Yahoo Finance",
-    blurb: "Quotes, financials and filings. The most complete free source.",
+    blurb: "market_blurb_yahoo",
     home: "https://finance.yahoo.com",
     quote: (s) => `https://finance.yahoo.com/quote/${s}`,
   },
   {
     name: "Google Finance",
-    blurb: "Fast, clean quotes and the news that moved them.",
+    blurb: "market_blurb_google",
     home: "https://www.google.com/finance",
     quote: (s) => `https://www.google.com/finance/quote/${s}:NASDAQ`,
   },
   {
     name: "TradingView",
-    blurb: "Charting, and where most technical setups get argued about.",
+    blurb: "market_blurb_tradingview",
     home: "https://www.tradingview.com",
     quote: (s) => `https://www.tradingview.com/symbols/${s}/`,
   },
   {
     name: "MarketWatch",
-    blurb: "Market news with a bias towards what happened today.",
+    blurb: "market_blurb_marketwatch",
     home: "https://www.marketwatch.com",
     quote: (s) => `https://www.marketwatch.com/investing/stock/${s}`,
   },
   {
     name: "Investing.com",
-    blurb: "Broad coverage, including the economic calendar.",
+    blurb: "market_blurb_investing",
     home: "https://www.investing.com",
     quote: null,
   },
   {
     name: "SEC EDGAR",
-    blurb: "The filings themselves, before anyone has summarised them.",
+    blurb: "market_blurb_edgar",
     home: "https://www.sec.gov/edgar/search/",
     quote: (s) =>
       `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&ticker=${s}&type=10-K&dateb=&owner=include&count=40`,
   },
   {
     name: "Finviz",
-    blurb: "Screener and heat map. Good for seeing the whole market at once.",
+    blurb: "market_blurb_finviz",
     home: "https://finviz.com",
     quote: (s) => `https://finviz.com/quote.ashx?t=${s}`,
   },
   {
     name: "CNBC",
-    blurb: "Live coverage while the market is open.",
+    blurb: "market_blurb_cnbc",
     home: "https://www.cnbc.com/markets/",
     quote: (s) => `https://www.cnbc.com/quotes/${s}`,
   },
@@ -76,15 +80,16 @@ const DESTINATIONS: Destination[] = [
 const Market = () => {
   const [ticker, setTicker] = useState("");
   const navigate = useNavigate();
+  const { t, dir, lang } = useLanguage();
   const symbol = ticker.trim().toUpperCase();
+  // Inside Hebrew text the symbol is isolated so it keeps its own direction.
+  // English needs no marks, and copied text stays free of invisible characters.
+  const sym = lang === "he" ? ltr(symbol) : symbol;
 
   return (
-    <div className="market-page">
-      <h2>Market</h2>
-      <p className="leaderboard-subtitle">
-        Research a ticker before you commit to it. These all open elsewhere —
-        your portfolio and your positions stay here.
-      </p>
+    <div className="market-page" dir={dir} lang={lang}>
+      <h2>{t("market_title")}</h2>
+      <p className="leaderboard-subtitle">{t("market_subtitle")}</p>
 
       {/* Type a ticker once, then jump to it on any of the sites below. */}
       <form
@@ -97,17 +102,19 @@ const Market = () => {
         <input
           type="text"
           value={ticker}
-          placeholder="Ticker, e.g. NVDA"
+          // Empty, the placeholder follows the page; a typed ticker reads left to right.
+          dir={ticker ? "ltr" : dir}
+          placeholder={t("market_ticker_placeholder")}
           onChange={(e) => setTicker(e.target.value)}
-          aria-label="Ticker symbol"
+          aria-label={t("market_ticker_label")}
         />
         <button type="submit" disabled={!symbol}>
-          Open {symbol || "here"}
+          {symbol ? fill(t("market_open"), { symbol: sym }) : t("market_open_here")}
         </button>
         <span className="field-hint">
           {symbol
-            ? `Opens ${symbol} in Investments. The cards below deep-link to ${symbol} on each site.`
-            : "Enter a ticker to deep-link it on every site below."}
+            ? fill(t("market_hint_symbol"), { symbol: sym })
+            : t("market_hint_empty")}
         </span>
       </form>
 
@@ -131,19 +138,20 @@ const Market = () => {
                   ↗
                 </span>
               </span>
-              <span className="market-card-blurb">{d.blurb}</span>
+              <span className="market-card-blurb">{t(d.blurb)}</span>
               <span className="field-hint">
-                {deepLinked ? `Goes straight to ${symbol}` : new URL(d.home).hostname}
+                {deepLinked ? (
+                  fill(t("market_goes_to"), { symbol: sym })
+                ) : (
+                  <bdi dir="ltr">{new URL(d.home).hostname}</bdi>
+                )}
               </span>
             </a>
           );
         })}
       </div>
 
-      <p className="compare-note market-disclaimer">
-        These are third-party sites, listed for convenience. Nothing here is a
-        recommendation, and none of them can see your account.
-      </p>
+      <p className="compare-note market-disclaimer">{t("market_disclaimer")}</p>
     </div>
   );
 };

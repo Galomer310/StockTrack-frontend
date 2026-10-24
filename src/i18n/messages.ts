@@ -7,7 +7,7 @@
    fails the build instead of rendering blank.
 
    Translated so far: the navbar, the sign-in pages (Home, Login, Register),
-   the Dashboard, the Market page, Search and the stock page, the Player
+   the Dashboard, the Market page, Search and the stock page, the Feed, the Player
    Card with its title collection and unlock ceremony, and the game
    achievement collection. Other screens move here
    as they are ported to right-to-left.
@@ -416,6 +416,36 @@ const en = {
   rarity_rare: "Rare",
   rarity_epic: "Epic",
   rarity_exceptional: "Exceptional",
+
+  // Feed
+  feed_title: "Feed",
+  feed_subtitle: "Every buy and sell as it happens, from everyone. Percentages only — what each investor paid stays their own business.",
+  feed_loading: "Loading feed…",
+  feed_failed: "Could not load the feed.",
+  feed_more_failed: "Could not load more posts.",
+  feed_empty: "Nothing here yet. The moment anyone buys or sells, it appears here.",
+  feed_load_older: "Load older posts",
+  feed_you: "you",
+  feed_since: "since",
+  feed_react_failed: "Could not save your reaction.",
+  feed_reply_failed: "Could not post your reply.",
+  feed_delete_failed: "Could not delete that reply.",
+  feed_show_all: "Show all {n} replies",
+  feed_delete: "delete",
+  feed_delete_title: "Delete your reply",
+  feed_reply_placeholder: "Write a reply…",
+  feed_reply_label: "Write a reply",
+  feed_reply: "Reply",
+  feed_posting: "Posting…",
+  reaction_like: "Like",
+  reaction_dislike: "Dislike",
+  reaction_rocket: "To the moon",
+  reaction_fire: "Hot",
+  reaction_diamond: "Diamond hands",
+  reaction_funny: "Funny",
+  reaction_surprised: "Surprising",
+  reaction_painful: "Painful",
+  reaction_undo: "{title} — tap to undo",
 };
 
 export type MessageKey = keyof typeof en;
@@ -801,6 +831,35 @@ const he: Messages = {
   rarity_rare: "נדיר",
   rarity_epic: "אפי",
   rarity_exceptional: "יוצא דופן",
+
+  feed_title: "פיד",
+  feed_subtitle: "כל קנייה ומכירה ברגע שהיא קורית, של כולם. באחוזים בלבד — כמה כל משקיע שילם נשאר עניין שלו.",
+  feed_loading: "טוען את הפיד…",
+  feed_failed: "לא ניתן היה לטעון את הפיד.",
+  feed_more_failed: "לא ניתן היה לטעון פוסטים נוספים.",
+  feed_empty: "עדיין אין כאן כלום. ברגע שמישהו קונה או מוכר, זה יופיע כאן.",
+  feed_load_older: "טעינת פוסטים קודמים",
+  feed_you: "אני",
+  feed_since: "מאז",
+  feed_react_failed: "לא ניתן היה לשמור את התגובה שלך.",
+  feed_reply_failed: "לא ניתן היה לפרסם את התגובה.",
+  feed_delete_failed: "לא ניתן היה למחוק את התגובה.",
+  feed_show_all: "הצגת כל {n} התגובות",
+  feed_delete: "מחיקה",
+  feed_delete_title: "מחיקת התגובה שלך",
+  feed_reply_placeholder: "כתבו תגובה…",
+  feed_reply_label: "כתיבת תגובה",
+  feed_reply: "שליחה",
+  feed_posting: "שולח…",
+  reaction_like: "אהבתי",
+  reaction_dislike: "לא אהבתי",
+  reaction_rocket: "עד הירח",
+  reaction_fire: "לוהט",
+  reaction_diamond: "ידיים של יהלום",
+  reaction_funny: "מצחיק",
+  reaction_surprised: "מפתיע",
+  reaction_painful: "כואב",
+  reaction_undo: "{title} — הקשה נוספת מבטלת",
 };
 
 export const MESSAGES: Record<Lang, Messages> = { en, he };

@@ -47,8 +47,11 @@ Built from the reference design and the Player Card spec (Parts 3 and 4 of
 the backend's spec document). It shows the signed-in player's real card from
 the backend's `GET /players/me/card`, where every figure is calculated. Figures
 whose data or rules do not exist yet show as locked or unavailable with the
-reason, rather than invented. Players can edit their first name and bio from
-the card; the nickname and picture follow once their rules and storage are
+reason, rather than invented. Players can edit their first name, bio and
+picture from the card. The picture comes from the avatar gallery in
+`src/components/avatars` (standalone SVGs; the server stores only the chosen
+id and accepts only the ids in its own list, so add new avatars to both).
+The nickname and uploaded pictures follow once their rules and storage are
 decided.
 
 **Titles and achievements** (Part 5 of the spec document). The active title

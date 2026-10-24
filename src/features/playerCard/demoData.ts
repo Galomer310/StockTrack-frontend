@@ -60,6 +60,7 @@ const established: PlayerCardData = {
     nickname: "growthhunter",
     first_name: "Roee",
     avatar_url: null,
+    avatar_id: "investor",
     bio: "משקיע צמיחה עם חשיבה אנליטית. מתמקד בטכנולוגיה, ביצועים עקביים וניהול סיכון.",
   },
   progression: {
@@ -149,6 +150,7 @@ const newcomer: PlayerCardData = {
     nickname: "newinvestor",
     first_name: null,
     avatar_url: null,
+    avatar_id: null,
     bio: "Learning the ropes, one trade at a time.",
   },
   progression: {

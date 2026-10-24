@@ -96,6 +96,8 @@ export interface PlayerCardData {
     nickname: string | null;
     first_name: string | null;
     avatar_url: string | null;
+    /** A gallery avatar's id (components/avatars), or null for the default picture. */
+    avatar_id: string | null;
     bio: string;
   };
   /** Level, title and XP: one value, so the header and the progress panel always agree. */
@@ -131,12 +133,15 @@ export const FIRST_NAME_MAX_LENGTH = 50;
 // Counts characters as a person does, so a Hebrew letter or an emoji is one.
 export const bioLength = (text: string): number => [...text].length;
 
-// What the player may change about themselves. The nickname and picture are
-// not editable yet: their rules and storage are still to be decided.
+// What the player may change about themselves. The nickname is not editable
+// yet (its rules are still to be decided), and pictures cannot be uploaded:
+// the avatar is chosen from the built-in gallery.
 export interface ProfileUpdate {
   bio?: string;
   /** null removes it; the first name is optional. */
   first_name?: string | null;
+  /** A gallery id, or null to return to the default picture. */
+  avatar_id?: string | null;
 }
 
 // Reasons the server gives for refusing an edit, so the page can explain
@@ -146,6 +151,7 @@ export type ProfileErrorCode =
   | "FIRST_NAME_TOO_LONG"
   | "INVALID_CHARACTERS"
   | "NOT_EDITABLE"
+  | "INVALID_AVATAR"
   | "UNKNOWN";
 
 export class ProfileSaveError extends Error {
@@ -161,9 +167,15 @@ export const fetchPlayerCard = async (demo?: DemoScenario): Promise<PlayerCardRe
   return { data: res.data, demo: false };
 };
 
-const KNOWN_CODES: ProfileErrorCode[] = ["BIO_TOO_LONG", "FIRST_NAME_TOO_LONG", "INVALID_CHARACTERS", "NOT_EDITABLE"];
+const KNOWN_CODES: ProfileErrorCode[] = [
+  "BIO_TOO_LONG",
+  "FIRST_NAME_TOO_LONG",
+  "INVALID_CHARACTERS",
+  "NOT_EDITABLE",
+  "INVALID_AVATAR",
+];
 
-// Saves the player's own bio and/or first name with PATCH /players/me and
+// Saves the player's own bio, first name and/or avatar with PATCH /players/me and
 // returns their identity as it now stands. On demo data nothing is sent: the
 // edit is applied locally and lasts until the page is reloaded.
 export const saveProfile = async (
@@ -180,6 +192,7 @@ export const saveProfile = async (
       ...current,
       ...(bio !== undefined ? { bio } : {}),
       ...("first_name" in update ? { first_name: firstName || null } : {}),
+      ...("avatar_id" in update ? { avatar_id: update.avatar_id ?? null } : {}),
     };
   }
   try {

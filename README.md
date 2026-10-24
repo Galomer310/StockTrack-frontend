@@ -21,7 +21,8 @@ Illustrative video: https://youtu.be/XTYVHmeUiLY
 | `/` | Landing page. |
 | `/login`, `/register` | Sign in and create an account. |
 | `/user` | Dashboard: portfolio switcher, holdings, cash, buy and sell with a required note, allocation and performance charts, trade journal. |
-| `/player` | Player Card: the player's profile, six headline figures, medals, achievements, competitions, game progress and performance. |
+| `/player` | Player Card: the player's profile, level and active title, six headline figures, medals, achievements, competitions, game progress and performance. |
+| `/player/achievements` | Game Achievement Collection: totals, the seven categories with their next milestone, and every achievement's state and progress. |
 | `/search` | Find a stock and buy it at the market price. |
 | `/stock/:ticker` | One stock: quote, chart, fundamentals and news. |
 | `/market` | Links out to outside research sites, with a ticker box that opens a stock on the chosen site. |
@@ -36,8 +37,9 @@ signed-in session.
 ## Languages
 
 The interface is switchable between Hebrew (right to left) and English from
-the toggle in the navbar, and the choice is remembered per browser. So far
-only the Player Card is translated; the other screens are moving over one
+the toggle in the navbar, and the choice is remembered per browser. The
+navbar, sign-in pages, Dashboard, Market, Search, stock page, Player Card and
+achievement collection are translated; the other screens are moving over one
 at a time. Copy lives in `src/i18n/messages.ts`, where the Hebrew table is
 typed against the English one, so a missing translation fails the build.
 
@@ -46,10 +48,19 @@ typed against the English one, so a missing translation fails the build.
 Built from the reference design and the Player Card spec (Parts 3 and 4 of
 the backend's spec document). It shows the signed-in player's real card from
 the backend's `GET /players/me/card`, where every figure is calculated. Figures
-whose data or rules do not exist yet, such as XP and levels, show as locked
-or unavailable with the reason, rather than invented. Players can edit their
-first name and bio from the card; the nickname and picture follow once their
-rules and storage are decided.
+whose data or rules do not exist yet show as locked or unavailable with the
+reason, rather than invented. Players can edit their first name and bio from
+the card; the nickname and picture follow once their rules and storage are
+decided.
+
+**Titles and achievements** (Part 5 of the spec document). The active title
+sits under the player's level, and "My Title Collection" lists all 60 titles
+by category, unlocked and locked. When a new title tier is reached, the
+unlock ceremony offers its three titles. Unlock notices appear in the corner
+on any page (`ProgressionWatcher`, mounted in `App.tsx`). Anything that can
+earn XP calls `requestProgressionCheck()` from `src/api/progression.ts`. The
+server decides every state; the screens only display it. Styles live in
+`src/components/progression/progression.css`.
 
 Demo data, kept apart from the components in
 `src/features/playerCard/demoData.ts`, is available for design work:
@@ -107,7 +118,7 @@ src/
   api/              one module per backend area, through axiosInstance
   pages/            one component per screen
   components/       charts, layout, trades, stock detail, toasts, Player Card
-  features/         Redux slices and Player Card demo data
+  features/         Redux slices, Player Card demo data, demo progression catalog
   i18n/             languages: copy, provider, hook
   charts/           shared Chart.js theme
 prototypes/         standalone design prototypes, not built

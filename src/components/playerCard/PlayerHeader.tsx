@@ -10,6 +10,7 @@ import {
 } from "../../api/playerCard";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { MessageKey } from "../../i18n/messages";
+import { AVATARS, findAvatar } from "../avatars/avatars";
 import { PlayerStanding } from "../progression/PlayerStanding";
 import { Icon } from "./icons";
 
@@ -18,6 +19,7 @@ const ERROR_TEXT: Record<ProfileErrorCode, MessageKey> = {
   FIRST_NAME_TOO_LONG: "err_first_name_too_long",
   INVALID_CHARACTERS: "err_invalid_characters",
   NOT_EDITABLE: "err_not_editable",
+  INVALID_AVATAR: "err_invalid_avatar",
   UNKNOWN: "bio_save_failed",
 };
 
@@ -37,9 +39,10 @@ const oneLine = (text: string): string => text.replace(/[\r\n]+/g, " ");
 
    Under the name: the level, and the active title directly beneath it
    (PlayerStanding). The level is never edited - XP sets it - and the title
-   is chosen from the player's collection. The owner can edit the first name
-   and the bio (spec 11); the nickname and picture follow once their rules
-   and storage exist.
+   is chosen from the player's collection. The owner can edit the first name,
+   the bio and the picture (spec 11), the picture from the avatar gallery;
+   the nickname and uploaded pictures follow once their rules and storage
+   exist. While editing, the large picture previews the avatar being chosen.
    =========================================================================== */
 
 type Player = PlayerCardData["player"];
@@ -62,12 +65,14 @@ export const PlayerHeader = ({
   const [editing, setEditing] = useState(false);
   const [bioDraft, setBioDraft] = useState(player.bio);
   const [nameDraft, setNameDraft] = useState(player.first_name ?? "");
+  const [avatarDraft, setAvatarDraft] = useState<string | null>(player.avatar_id);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<MessageKey | null>(null);
 
   const startEditing = () => {
     setBioDraft(player.bio);
     setNameDraft(player.first_name ?? "");
+    setAvatarDraft(findAvatar(player.avatar_id) ? player.avatar_id : null);
     setError(null);
     setEditing(true);
   };
@@ -77,6 +82,7 @@ export const PlayerHeader = ({
     const update: ProfileUpdate = {};
     if (bioDraft.trim() !== player.bio) update.bio = bioDraft;
     if ((nameDraft.trim() || null) !== player.first_name) update.first_name = nameDraft.trim() || null;
+    if (avatarDraft !== player.avatar_id) update.avatar_id = avatarDraft;
     if (Object.keys(update).length === 0) {
       setEditing(false);
       return;
@@ -94,6 +100,7 @@ export const PlayerHeader = ({
   };
 
   const length = bioLength(bioDraft);
+  const shownAvatar = findAvatar(editing ? avatarDraft : player.avatar_id);
   const tooLong = length > BIO_MAX_LENGTH || bioLength(nameDraft) > FIRST_NAME_MAX_LENGTH;
 
   return (
@@ -118,6 +125,37 @@ export const PlayerHeader = ({
                 autoFocus
               />
             </label>
+            <fieldset className="pc-avatar-picker">
+              <legend>{t("avatar_choose")}</legend>
+              <div className="pc-avatar-options">
+                <label className="pc-avatar-option" title={t("avatar_default")}>
+                  <input
+                    type="radio"
+                    name="pc-avatar"
+                    id="pc-avatar-default"
+                    checked={avatarDraft === null}
+                    onChange={() => setAvatarDraft(null)}
+                  />
+                  <span className="pc-avatar-option-art pc-avatar-option-initial" aria-hidden="true">
+                    {player.nickname ? player.nickname.charAt(0).toUpperCase() : <Icon name="person" />}
+                  </span>
+                  <span className="pc-visually-hidden">{t("avatar_default")}</span>
+                </label>
+                {AVATARS.map((a) => (
+                  <label key={a.id} className="pc-avatar-option" title={t(a.label)}>
+                    <input
+                      type="radio"
+                      name="pc-avatar"
+                      id={`pc-avatar-${a.id}`}
+                      checked={avatarDraft === a.id}
+                      onChange={() => setAvatarDraft(a.id)}
+                    />
+                    <img className="pc-avatar-option-art" src={a.src} alt="" />
+                    <span className="pc-visually-hidden">{t(a.label)}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
             <textarea
               id="pc-bio-input"
               dir="auto"
@@ -176,7 +214,9 @@ export const PlayerHeader = ({
         role="img"
         aria-label={player.nickname ? `${t("avatar_label")}: @${player.nickname}` : t("avatar_label")}
       >
-        {player.avatar_url ? (
+        {shownAvatar ? (
+          <img src={shownAvatar.src} alt="" />
+        ) : player.avatar_url && !editing ? (
           <img src={player.avatar_url} alt="" />
         ) : (
           // The default picture for a player who has not chosen one (spec 3.1):

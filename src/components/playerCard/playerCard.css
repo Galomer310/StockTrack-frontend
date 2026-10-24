@@ -137,6 +137,32 @@
   font: inherit; font-size: 0.95rem; color: var(--pc-cream);
   background: #0B0B0D; border: 1px solid var(--pc-line); border-radius: 10px;
 }
+/* Avatar gallery in edit mode: real radio buttons, hidden, so arrow keys
+   move between pictures; the picture itself shows the choice. */
+.pc-avatar-picker { min-width: 0; margin: 0 0 10px; padding: 0; border: 0; }
+.pc-avatar-picker legend { padding: 0; margin-block-end: 6px; font-size: 0.85rem; color: var(--pc-muted); }
+.pc-avatar-options { display: flex; flex-wrap: wrap; gap: 8px; }
+.pc-avatar-option { position: relative; display: block; cursor: pointer; border-radius: 50%; }
+.pc-avatar-option input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }
+.pc-avatar-option-art {
+  display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%;
+  outline: 2px solid transparent; outline-offset: 2px;
+  transition: outline-color 0.15s ease, transform 0.15s ease;
+}
+.pc-avatar-option-initial {
+  background: radial-gradient(circle at 35% 30%, #2A2418, #0C0B09 70%);
+  border: 1.5px solid var(--pc-gold-deep);
+  font-family: var(--pc-display-en); font-weight: 700; font-size: 1.4rem; color: var(--pc-gold-bright);
+}
+.pc-avatar-option-initial svg { width: 55%; height: 55%; color: var(--pc-gold-deep); }
+.pc-avatar-option:hover .pc-avatar-option-art { transform: scale(1.06); }
+.pc-avatar-option input:checked + .pc-avatar-option-art { outline-color: var(--pc-gold-bright); }
+.pc-avatar-option input:focus-visible + .pc-avatar-option-art { outline-color: var(--pc-cream); outline-style: dashed; }
+.pc-visually-hidden {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) { .pc-avatar-option-art { transition: none; } }
 .pc-bio-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-block-start: 10px; }
 .pc-bio .pc-error { margin-block: 10px 0; text-align: start; }
 .pc-counter { margin-inline-start: auto; font-size: 0.8rem; color: var(--pc-muted); font-variant-numeric: tabular-nums; }
@@ -343,6 +369,9 @@
   .pc-progress-main { width: 100%; }
   .pc-profile { grid-template-columns: minmax(0, 1fr); grid-template-areas: "avatar" "identity" "bio"; justify-items: center; text-align: center; }
   .pc-identity { justify-items: center; }
+  /* All six choices on one line at phone width. */
+  .pc-avatar-options { justify-content: center; gap: 6px; }
+  .pc-avatar-option-art { width: 42px; height: 42px; }
   .pc-ornament { display: none; }
   .pc-corner-chart { opacity: 0.35; }
 }

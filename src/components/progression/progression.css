@@ -195,6 +195,30 @@
 .prg-chip.is-locked { color: var(--prg-muted); border-color: transparent; padding-inline: 0; }
 .prg-special { margin-block-start: 20px; display: grid; gap: 10px; }
 
+/* ---------- Followers and following (Player Card) ---------- */
+.prg-follows { inline-size: min(calc(100% - 32px), 560px); }
+.prg-tabs--two { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-block-end: 14px; }
+.prg-follows .prg-tab { justify-content: center; text-align: center; --accent: var(--prg-gold); }
+.prg-follows .prg-tab-name { font-family: var(--prg-body); font-size: 0.95rem; font-weight: 500; }
+.prg-follow-empty { padding-block: 18px; }
+.prg-follow-list { max-block-size: min(60vh, 520px); overflow-y: auto; }
+.prg-follow-row {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px;
+  padding: 8px 12px; border: 1px solid var(--prg-line); border-radius: 3px; background: var(--prg-surface-2);
+}
+.prg-follow-avatar {
+  display: grid; place-items: center; inline-size: 34px; block-size: 34px; border-radius: 50%;
+  border: 1px solid rgba(217, 190, 137, 0.45); color: var(--prg-gold); font-weight: 600;
+}
+.prg-follow-main { display: grid; justify-items: start; min-inline-size: 0; }
+.prg-follow-name { color: var(--prg-ivory); font-weight: 500; overflow-wrap: anywhere; }
+.prg-follow-since { font-size: 0.74rem; color: var(--prg-muted); }
+.prg .prg-follow-btn { background: transparent; cursor: pointer; font-family: inherit; }
+.prg .prg-follow-btn:hover { border-color: var(--prg-gold); color: var(--prg-ivory); }
+.prg .prg-follow-btn.is-cta { color: var(--prg-bg); background: var(--prg-gold); border-color: var(--prg-gold); }
+.prg .prg-follow-btn:disabled { opacity: 0.6; cursor: progress; color: var(--prg-ivory); }
+.prg .prg-follow-btn.is-cta:disabled { color: var(--prg-bg); }
+
 /* ---------- Unlock ceremony ---------- */
 .prg-ceremony { inline-size: min(calc(100% - 32px), 900px); }
 .prg-ceremony-frame {

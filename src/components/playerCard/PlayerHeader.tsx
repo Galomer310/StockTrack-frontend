@@ -10,9 +10,8 @@ import {
 } from "../../api/playerCard";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { MessageKey } from "../../i18n/messages";
-import { formatNumber } from "./format";
+import { PlayerStanding } from "../progression/PlayerStanding";
 import { Icon } from "./icons";
-import { reasonKey } from "./reasons";
 
 const ERROR_TEXT: Record<ProfileErrorCode, MessageKey> = {
   BIO_TOO_LONG: "err_bio_too_long",
@@ -36,10 +35,11 @@ const oneLine = (text: string): string => text.replace(/[\r\n]+/g, " ");
    it. The image shows a full name above the nickname instead; the spec's
    text decides, and it makes the nickname the player's primary identity.
 
-   Level and title are shown, never edited: the system sets them. While the
-   XP rules are undefined the server withholds them, and the badge says so
-   in place of a number. The owner can edit the first name and the bio (spec
-   11); the nickname and picture follow once their rules and storage exist.
+   Under the name: the level, and the active title directly beneath it
+   (PlayerStanding). The level is never edited - XP sets it - and the title
+   is chosen from the player's collection. The owner can edit the first name
+   and the bio (spec 11); the nickname and picture follow once their rules
+   and storage exist.
    =========================================================================== */
 
 type Player = PlayerCardData["player"];
@@ -49,14 +49,16 @@ export const PlayerHeader = ({
   progression,
   canEdit,
   onSave,
+  onOpenTitles,
 }: {
   player: Player;
   progression: PlayerCardData["progression"];
   canEdit: boolean;
   /** Saves the edit; rejects with ProfileSaveError when the server refuses it. */
   onSave: (update: ProfileUpdate) => Promise<void>;
+  onOpenTitles: () => void;
 }) => {
-  const { t, locale } = useLanguage();
+  const { t } = useLanguage();
   const [editing, setEditing] = useState(false);
   const [bioDraft, setBioDraft] = useState(player.bio);
   const [nameDraft, setNameDraft] = useState(player.first_name ?? "");
@@ -166,29 +168,7 @@ export const PlayerHeader = ({
           <p className="pc-nickname is-missing">{t("nickname_missing")}</p>
         )}
         {player.first_name && <span className="pc-first-name">{player.first_name}</span>}
-        <div className="pc-badges">
-          {progression.state === "available" ? (
-            <>
-              <span className="pc-badge">
-                <Icon name="star" />
-                <bdi dir="ltr">
-                  {t("level")} {formatNumber(progression.value.level, locale)}
-                </bdi>
-              </span>
-              <span className="pc-badge">
-                <Icon name="crown" />
-                <bdi dir="ltr">{progression.value.title}</bdi>
-              </span>
-            </>
-          ) : (
-            <span className="pc-badge is-muted">
-              <Icon name="star" />
-              <span>
-                <bdi dir="ltr">{t("level")}</bdi>: {t(reasonKey(progression) ?? "unavailable_missing")}
-              </span>
-            </span>
-          )}
-        </div>
+        <PlayerStanding progression={progression} onOpenCollection={onOpenTitles} />
       </div>
 
       <div

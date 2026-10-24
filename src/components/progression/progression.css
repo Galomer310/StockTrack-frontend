@@ -1,0 +1,411 @@
+/* ===========================================================================
+   Player titles and game achievements - "private banking meets an exclusive
+   investment club" (Player Title spec 2, Game Achievements spec 12).
+   ---------------------------------------------------------------------------
+   Everything is scoped under .prg with the approved palette as tokens: deep
+   navy surfaces, fine steel borders, champagne gold used sparingly, warm
+   ivory text. A category or achievement colour arrives as --accent on the
+   element, so the three title categories and seven achievement categories
+   share one design and differ only by emblem and accent.
+
+   Logical properties throughout, so Hebrew mirrors English. Every button is
+   styled under `.prg` so the app's global button rules do not leak in.
+   Motion is short and quiet, and switched off for reduced-motion users.
+   =========================================================================== */
+
+.prg {
+  --prg-bg: #080C13;
+  --prg-surface: #101721;
+  --prg-surface-2: #141D29;
+  --prg-line: #313B49;
+  --prg-gold: #D9BE89;
+  --prg-ivory: #F2EADC;
+  --prg-muted: #8995A7;
+  --prg-serif-en: "Cormorant Garamond", Georgia, serif;
+  --prg-serif-he: "Frank Ruhl Libre", "David", serif;
+  --prg-body: "Heebo", "Arial Hebrew", "Segoe UI", system-ui, sans-serif;
+  --prg-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  color: var(--prg-ivory);
+  font-family: var(--prg-body);
+}
+.prg :focus-visible { outline: 1px solid var(--prg-gold); outline-offset: 3px; }
+.prg h1, .prg h2, .prg h3 { margin: 0; letter-spacing: normal; line-height: 1.2; font-weight: 600; }
+
+.prg-serif { font-family: var(--prg-serif-en); font-weight: 600; }
+.prg:lang(he) .prg-serif:not(bdi) { font-family: var(--prg-serif-he); font-weight: 500; }
+.prg-muted { margin: 0; color: var(--prg-muted); line-height: 1.6; }
+.prg-small { font-size: 0.82rem; }
+.prg-center { text-align: center; }
+.prg-error { margin: 12px 0 0; color: #E3A08F; font-size: 0.9rem; text-align: center; }
+
+.prg-eyebrow {
+  display: block; margin: 0; font-size: 0.7rem; font-weight: 500; color: var(--prg-gold);
+  text-transform: uppercase; letter-spacing: 0.24em;
+}
+.prg:lang(he) .prg-eyebrow { text-transform: none; letter-spacing: 0.04em; font-size: 0.8rem; }
+
+/* A thin bar, filled from the inline start: right to left in Hebrew. */
+.prg-meter {
+  display: block; block-size: 3px; border-radius: 2px; overflow: hidden;
+  background: color-mix(in srgb, var(--prg-line) 80%, transparent);
+}
+.prg-meter > span {
+  display: block; block-size: 100%; border-radius: inherit;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent, var(--prg-gold)) 55%, #000), var(--accent, var(--prg-gold)));
+  transition: inline-size 0.6s var(--prg-ease);
+}
+.prg[dir="rtl"] .prg-meter > span, [dir="rtl"] .prg .prg-meter > span {
+  background: linear-gradient(270deg, color-mix(in srgb, var(--accent, var(--prg-gold)) 55%, #000), var(--accent, var(--prg-gold)));
+}
+
+/* ---------- Level and active title (Player Card header) ---------- */
+.prg-standing {
+  display: grid; justify-items: center; gap: 6px; margin-block-start: 10px;
+  inline-size: min(100%, 340px); padding: 14px 18px 12px;
+  border: 1px solid var(--prg-line); border-radius: 4px;
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(217, 190, 137, 0.07), transparent 65%),
+    linear-gradient(180deg, var(--prg-surface-2), var(--prg-surface));
+  text-align: center;
+}
+.prg-level { font-size: 2.9rem; line-height: 1; color: var(--prg-ivory); font-variant-numeric: lining-nums; }
+.prg-level-missing { font-size: 0.9rem; color: var(--prg-muted); }
+.prg-ornament { inline-size: 120px; block-size: 12px; color: var(--prg-gold); }
+
+.prg-plate {
+  display: flex; align-items: center; gap: 12px; inline-size: 100%; padding: 9px 12px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--prg-line));
+  border-radius: 3px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 9%, var(--prg-surface)), var(--prg-surface));
+  text-align: start;
+  transition: border-color 0.5s var(--prg-ease), background-color 0.5s var(--prg-ease);
+}
+.prg-plate.is-empty { --accent: var(--prg-line); border-style: dashed; }
+.prg-plate-icon {
+  display: grid; place-items: center; flex-shrink: 0; inline-size: 38px; block-size: 38px;
+  color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  transition: color 0.5s var(--prg-ease), border-color 0.5s var(--prg-ease);
+}
+.prg-plate.is-empty .prg-plate-icon { color: var(--prg-muted); }
+.prg-plate-icon svg { inline-size: 20px; block-size: 20px; }
+.prg-plate-text { display: grid; min-inline-size: 0; gap: 1px; }
+.prg-plate-name {
+  font-size: 1.32rem; line-height: 1.15; color: var(--prg-ivory); overflow-wrap: anywhere;
+  animation: prg-rise 0.45s var(--prg-ease);
+}
+.prg-plate.is-empty .prg-plate-name { font-family: var(--prg-body); font-size: 0.92rem; color: var(--prg-muted); animation: none; }
+.prg-plate-category {
+  font-size: 0.66rem; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--accent);
+}
+
+.prg .prg-link {
+  display: inline-flex; align-items: center; gap: 7px; min-block-size: 32px; padding: 4px 6px; margin-block-start: 2px;
+  border: 0; background: none; color: var(--prg-gold); font: inherit; font-size: 0.82rem; font-weight: 500;
+  letter-spacing: 0.02em; cursor: pointer;
+}
+.prg .prg-link:hover { color: var(--prg-ivory); border: 0; text-decoration: underline; text-underline-offset: 4px; }
+.prg .prg-link svg { inline-size: 15px; block-size: 15px; }
+
+/* ---------- Dialogs: shared frame ---------- */
+.prg-dialog {
+  /* The app's global reset zeroes margins, which un-centres a modal dialog. */
+  margin: auto;
+  inline-size: min(calc(100% - 32px), 760px); max-block-size: calc(100dvh - 32px);
+  padding: 0; overflow: auto; color: var(--prg-ivory);
+  background: var(--prg-surface); border: 1px solid rgba(217, 190, 137, 0.45); border-radius: 4px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+}
+.prg-dialog[open] { animation: prg-dialog-in 0.42s var(--prg-ease); }
+.prg-dialog::backdrop { background: rgba(4, 7, 12, 0.78); backdrop-filter: blur(4px); }
+.prg-dialog-frame { position: relative; padding: 28px 28px 24px; }
+/* A second hairline inside the border, as on an engraved card. */
+.prg-dialog-frame::before {
+  content: ""; position: absolute; inset: 7px; pointer-events: none;
+  border: 1px solid rgba(217, 190, 137, 0.14); border-radius: 2px;
+}
+.prg-dialog-head { position: relative; display: grid; gap: 6px; padding-inline-end: 36px; margin-block-end: 18px; }
+.prg-dialog-head h2 { font-size: 1.9rem; color: var(--prg-ivory); }
+.prg .prg-close {
+  position: absolute; inset-block-start: -6px; inset-inline-end: -8px; inline-size: 40px; block-size: 40px; padding: 0;
+  border: 0; background: none; color: var(--prg-muted); font-size: 1.6rem; line-height: 1; cursor: pointer;
+}
+.prg .prg-close:hover { color: var(--prg-ivory); border: 0; }
+
+/* ---------- Title collection ---------- */
+.prg-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.prg .prg-tab {
+  display: flex; align-items: center; gap: 10px; min-inline-size: 0; padding: 12px; text-align: start;
+  border: 1px solid var(--prg-line); border-radius: 3px; background: var(--prg-surface-2); color: var(--prg-muted);
+  font: inherit; cursor: pointer; transition: border-color 0.25s ease, background-color 0.25s ease, color 0.25s ease;
+}
+.prg .prg-tab:hover { border-color: color-mix(in srgb, var(--accent) 50%, var(--prg-line)); color: var(--prg-ivory); }
+.prg .prg-tab.is-selected {
+  color: var(--prg-ivory); border-color: color-mix(in srgb, var(--accent) 70%, transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, var(--prg-surface-2)), var(--prg-surface-2));
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+.prg-tab > svg { inline-size: 22px; block-size: 22px; flex-shrink: 0; color: var(--accent); }
+.prg-tab-text { display: grid; min-inline-size: 0; }
+.prg-tab-name { font-family: var(--prg-serif-en); font-size: 1.1rem; font-weight: 600; line-height: 1.2; }
+.prg-tab-count { font-size: 0.74rem; color: var(--prg-muted); }
+.prg-tab-panel { margin-block-start: 14px; }
+.prg-tagline { margin: 0 0 10px; font-size: 0.85rem; color: var(--accent); letter-spacing: 0.02em; }
+.prg-title-list { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.prg .prg-title-row {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px;
+  inline-size: 100%; min-block-size: 54px; padding: 8px 12px; text-align: start;
+  border: 1px solid var(--prg-line); border-radius: 3px; background: var(--prg-surface-2); color: var(--prg-ivory);
+  font: inherit; cursor: pointer;
+  transition: border-color 0.25s ease, background-color 0.25s ease, transform 0.25s var(--prg-ease);
+}
+.prg .prg-title-row:hover:not(:disabled) {
+  transform: translateY(-1px); color: var(--prg-ivory);
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--prg-line));
+}
+.prg .prg-title-row.is-active {
+  border-color: color-mix(in srgb, var(--accent) 80%, transparent);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 12%, var(--prg-surface-2)), var(--prg-surface-2));
+}
+.prg[dir="rtl"] .prg-title-row.is-active {
+  background: linear-gradient(270deg, color-mix(in srgb, var(--accent) 12%, var(--prg-surface-2)), var(--prg-surface-2));
+}
+.prg .prg-title-row:disabled { cursor: default; opacity: 1; transform: none; color: var(--prg-ivory); border-color: var(--prg-line); }
+.prg .prg-title-row.is-active:disabled { border-color: color-mix(in srgb, var(--accent) 80%, transparent); }
+.prg .prg-title-row.is-locked { background: transparent; border-style: dashed; color: var(--prg-muted); }
+.prg-title-row-icon {
+  display: grid; place-items: center; inline-size: 34px; block-size: 34px; color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.prg-title-row.is-locked .prg-title-row-icon { color: var(--prg-muted); border-color: var(--prg-line); }
+.prg-title-row-icon svg { inline-size: 18px; block-size: 18px; }
+/* justify-self, not text-align: an English name is isolated left to right,
+   so its own "start" would be the left edge even in a Hebrew row. */
+.prg-title-row-main { display: grid; justify-items: start; min-inline-size: 0; }
+.prg-title-row-name { font-size: 1.18rem; line-height: 1.2; overflow-wrap: anywhere; }
+.prg-title-row.is-locked .prg-title-row-name { color: var(--prg-muted); }
+.prg-title-row-range { font-size: 0.74rem; color: var(--prg-muted); }
+.prg-chip {
+  display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; white-space: nowrap;
+  border: 1px solid var(--prg-line); border-radius: 999px; font-size: 0.74rem; font-weight: 500; color: var(--prg-ivory);
+}
+.prg-chip svg { inline-size: 13px; block-size: 13px; }
+.prg-chip.is-active { color: var(--prg-bg); background: var(--accent); border-color: var(--accent); }
+.prg-chip.is-locked { color: var(--prg-muted); border-color: transparent; padding-inline: 0; }
+.prg-special { margin-block-start: 20px; display: grid; gap: 10px; }
+
+/* ---------- Unlock ceremony ---------- */
+.prg-ceremony { inline-size: min(calc(100% - 32px), 900px); }
+.prg-ceremony-frame {
+  display: grid; justify-items: center; gap: 10px; padding: 34px 30px 24px; text-align: center;
+  background:
+    radial-gradient(70% 45% at 50% 0%, rgba(217, 190, 137, 0.12), transparent 70%),
+    linear-gradient(180deg, #121A26, var(--prg-surface) 55%);
+}
+.prg-crest { position: relative; display: grid; place-items: center; inline-size: 68px; block-size: 68px; color: var(--prg-gold); }
+.prg-crest > svg, .prg-card-crest > svg { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; }
+.prg-crest { animation: prg-crest-in 0.8s var(--prg-ease) both; }
+.prg-crest-star { position: relative; font-size: 1.15rem; }
+.prg-ceremony-heading { font-size: clamp(2rem, 4.6vw, 2.9rem); color: var(--prg-ivory); }
+.prg-ceremony-frame > .prg-muted { max-inline-size: 46ch; text-wrap: balance; }
+.prg-ceremony-heading:focus { outline: none; }
+.prg-ceremony-cards {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px;
+  inline-size: 100%; margin: 14px 0 6px; padding: 0; list-style: none;
+}
+.prg-ceremony-cards > li { display: grid; animation: prg-rise 0.6s var(--prg-ease) both; animation-delay: calc(0.35s + var(--i) * 0.14s); }
+.prg .prg-ceremony-card {
+  display: grid; justify-items: center; align-content: start; gap: 10px; padding: 24px 16px 18px;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--prg-line)); border-radius: 3px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 8%, var(--prg-surface-2)), var(--prg-surface));
+  color: var(--prg-ivory); font: inherit; cursor: pointer;
+  transition: transform 0.35s var(--prg-ease), border-color 0.35s ease, box-shadow 0.35s ease;
+}
+.prg .prg-ceremony-card:hover:not(:disabled), .prg .prg-ceremony-card:focus-visible {
+  transform: translateY(-3px); color: var(--prg-ivory);
+  border-color: color-mix(in srgb, var(--accent) 80%, transparent);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.prg .prg-ceremony-card:disabled { opacity: 0.6; cursor: progress; color: var(--prg-ivory); }
+.prg-card-crest { position: relative; display: grid; place-items: center; inline-size: 58px; block-size: 58px; color: var(--accent); }
+.prg-crest-inner { position: relative; display: grid; place-items: center; }
+.prg-card-crest .prg-crest-inner svg { inline-size: 22px; block-size: 22px; }
+.prg-card-category { font-size: 0.66rem; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); }
+.prg-card-title { font-size: 1.5rem; line-height: 1.15; color: var(--prg-ivory); overflow-wrap: anywhere; }
+.prg-card-action {
+  margin-block-start: 4px; padding: 5px 16px; font-size: 0.78rem; font-weight: 500; color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 999px;
+}
+.prg .prg-quiet {
+  min-block-size: 40px; margin-block-start: 6px; padding: 6px 12px; border: 0; background: none;
+  color: var(--prg-muted); font: inherit; font-size: 0.86rem; letter-spacing: 0.02em; cursor: pointer;
+  text-decoration: underline; text-decoration-color: rgba(137, 149, 167, 0.4); text-underline-offset: 4px;
+}
+.prg .prg-quiet:hover { color: var(--prg-ivory); border: 0; }
+
+/* ---------- Unlock notices ---------- */
+.prg-notices {
+  position: fixed; z-index: 1200; inset-block-end: 20px; inset-inline-end: 20px;
+  inline-size: min(360px, calc(100vw - 32px)); pointer-events: none;
+}
+.prg-notice {
+  position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px;
+  padding: 12px 10px 12px 14px; pointer-events: auto;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--prg-line)); border-radius: 4px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 7%, var(--prg-surface-2)), var(--prg-surface));
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  animation: prg-notice-in 0.45s var(--prg-ease);
+}
+.prg-notice.is-prestige { padding-block: 16px; border-color: rgba(217, 190, 137, 0.6); }
+.prg-notice.is-prestige::before {
+  content: ""; position: absolute; inset: 4px; pointer-events: none;
+  border: 1px solid rgba(217, 190, 137, 0.16); border-radius: 2px;
+}
+.prg-notice-icon {
+  display: grid; place-items: center; inline-size: 40px; block-size: 40px; color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent); transform: rotate(45deg);
+}
+.prg-notice-icon svg { inline-size: 20px; block-size: 20px; transform: rotate(-45deg); }
+.prg-notice-text { display: grid; gap: 1px; min-inline-size: 0; }
+.prg-notice-name { font-size: 1.2rem; line-height: 1.2; color: var(--prg-ivory); overflow-wrap: anywhere; }
+.prg-notice-xp { font-size: 0.82rem; font-weight: 600; color: var(--prg-gold); }
+.prg .prg-notice-close {
+  align-self: start; inline-size: 30px; block-size: 30px; padding: 0; border: 0; background: none;
+  color: var(--prg-muted); font-size: 1.2rem; line-height: 1; cursor: pointer;
+}
+.prg .prg-notice-close:hover { color: var(--prg-ivory); border: 0; }
+
+/* ---------- Achievement collection page ---------- */
+.prg-page {
+  min-block-size: 100vh; padding: 0 16px 56px;
+  background:
+    radial-gradient(1100px 520px at 85% -10%, rgba(217, 190, 137, 0.07), transparent 60%),
+    var(--prg-bg);
+}
+.prg-page-wrap { max-inline-size: 1180px; margin-inline: auto; overflow-x: clip; }
+.prg .prg-back {
+  display: inline-block; margin-block: 18px 6px; color: var(--prg-muted); font-size: 0.88rem; text-decoration: none;
+}
+.prg .prg-back:hover { color: var(--prg-gold); }
+.prg-page-head { display: grid; justify-items: center; gap: 8px; padding-block: 10px 26px; text-align: center; }
+.prg-page-head h1 { font-size: clamp(2.2rem, 5vw, 3.2rem); color: var(--prg-ivory); }
+.prg-page-head .prg-muted { max-inline-size: 62ch; }
+
+.prg-summary {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-block-end: 22px;
+  border: 1px solid var(--prg-line); border-radius: 4px; background: var(--prg-surface);
+}
+.prg-summary-item { display: grid; justify-items: center; align-content: center; gap: 4px; padding: 18px 12px; text-align: center; }
+.prg-summary-item + .prg-summary-item { border-inline-start: 1px solid var(--prg-line); }
+.prg-summary-value { font-size: 2.3rem; line-height: 1; color: var(--prg-ivory); font-variant-numeric: lining-nums; }
+.prg-summary-of { font-size: 1.2rem; color: var(--prg-muted); }
+.prg-summary-label { font-size: 0.78rem; color: var(--prg-muted); letter-spacing: 0.04em; }
+.prg-summary-item .prg-meter { inline-size: min(160px, 80%); margin-block-start: 6px; }
+
+.prg-cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 10px; }
+.prg .prg-cat {
+  display: grid; gap: 10px; inline-size: 100%; block-size: 100%; padding: 14px; text-align: start;
+  border: 1px solid var(--prg-line); border-radius: 3px; background: var(--prg-surface); color: var(--prg-ivory);
+  font: inherit; cursor: pointer;
+  transition: border-color 0.25s ease, transform 0.25s var(--prg-ease), background-color 0.25s ease;
+}
+.prg .prg-cat:hover { transform: translateY(-2px); color: var(--prg-ivory); border-color: color-mix(in srgb, var(--accent) 50%, var(--prg-line)); }
+.prg .prg-cat.is-selected {
+  border-color: color-mix(in srgb, var(--accent) 75%, transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 9%, var(--prg-surface)), var(--prg-surface));
+}
+.prg-cat-head { display: flex; align-items: center; gap: 10px; min-inline-size: 0; }
+.prg-cat-icon { display: grid; place-items: center; flex-shrink: 0; inline-size: 32px; block-size: 32px; color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); }
+.prg-cat-icon svg { inline-size: 18px; block-size: 18px; }
+.prg-cat-name { flex: 1; min-inline-size: 0; font-weight: 500; font-size: 0.95rem; line-height: 1.25; }
+.prg-cat-count { font-size: 0.82rem; color: var(--prg-muted); font-variant-numeric: tabular-nums; }
+.prg-cat-next { font-size: 0.76rem; color: var(--prg-muted); line-height: 1.4; }
+
+.prg-cat-panel { margin-block-start: 22px; padding: 22px; border: 1px solid var(--prg-line); border-radius: 4px; background: var(--prg-surface); }
+.prg-cat-panel-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; margin-block-end: 16px; }
+.prg-cat-panel-head h2 { display: flex; align-items: center; gap: 10px; font-size: 1.7rem; color: var(--prg-ivory); }
+.prg-cat-panel-head h2 svg { inline-size: 24px; block-size: 24px; color: var(--accent); }
+.prg-filters { display: flex; flex-wrap: wrap; gap: 6px; }
+.prg .prg-filter {
+  min-block-size: 34px; padding: 5px 14px; border: 1px solid var(--prg-line); border-radius: 999px;
+  background: transparent; color: var(--prg-muted); font: inherit; font-size: 0.82rem; font-weight: 500; cursor: pointer;
+}
+.prg .prg-filter:hover { color: var(--prg-ivory); border-color: color-mix(in srgb, var(--accent) 50%, var(--prg-line)); }
+.prg .prg-filter.is-selected { color: var(--prg-bg); background: var(--accent); border-color: var(--accent); }
+.prg-next { display: grid; gap: 8px; margin-block-end: 18px; }
+
+.prg-ach-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+.prg-ach-grid > li { display: grid; }
+.prg-ach {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; padding: 14px;
+  border: 1px solid var(--prg-line); border-radius: 3px; background: var(--prg-surface-2);
+}
+.prg-ach.is-unlocked {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--prg-line));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 8%, var(--prg-surface-2)), var(--prg-surface-2));
+}
+.prg-ach.is-highlight { border-color: color-mix(in srgb, var(--accent) 65%, transparent); }
+.prg-ach-icon {
+  position: relative; display: grid; place-items: center; inline-size: 46px; block-size: 46px; margin: 4px;
+  color: var(--accent);
+}
+.prg-ach-icon::before {
+  content: ""; position: absolute; inset: 4px; transform: rotate(45deg);
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+}
+.prg-ach.is-rare .prg-ach-icon::after, .prg-ach.is-epic .prg-ach-icon::after, .prg-ach.is-exceptional .prg-ach-icon::after {
+  content: ""; position: absolute; inset: -1px; transform: rotate(45deg);
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+}
+.prg-ach.is-exceptional .prg-ach-icon::after { border-color: rgba(217, 190, 137, 0.7); }
+.prg-ach-icon > svg { position: relative; inline-size: 22px; block-size: 22px; }
+.prg-ach.is-locked .prg-ach-icon, .prg-ach.is-in_progress .prg-ach-icon { color: var(--prg-muted); }
+.prg-ach.is-locked .prg-ach-icon::before { border-color: var(--prg-line); }
+.prg-ach-check {
+  position: absolute; inset-block-end: -6px; inset-inline-end: -6px; display: grid; place-items: center;
+  inline-size: 18px; block-size: 18px; border-radius: 50%; background: var(--accent); color: var(--prg-bg);
+}
+.prg-ach-check svg { inline-size: 12px; block-size: 12px; stroke-width: 2.2; }
+.prg-ach-body { display: grid; gap: 6px; min-inline-size: 0; }
+.prg-ach-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.prg-ach-name { font-size: 1.02rem; font-weight: 600; color: var(--prg-ivory); }
+.prg:lang(en) .prg-ach-name { font-family: var(--prg-serif-en); font-size: 1.22rem; }
+.prg-ach.is-locked .prg-ach-name { color: color-mix(in srgb, var(--prg-ivory) 70%, var(--prg-muted)); }
+.prg-ach-xp { flex-shrink: 0; font-size: 0.8rem; font-weight: 600; color: var(--prg-gold); white-space: nowrap; }
+.prg-ach.is-locked .prg-ach-xp { color: var(--prg-muted); }
+.prg-ach-desc { margin: 0; font-size: 0.86rem; color: var(--prg-muted); line-height: 1.5; }
+.prg-ach-progress { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; font-size: 0.78rem; color: var(--prg-ivory); font-variant-numeric: tabular-nums; }
+.prg-ach-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 0.74rem; color: var(--prg-muted); }
+.prg-rarity { color: var(--accent); letter-spacing: 0.06em; }
+.prg-ach.is-locked .prg-rarity { color: var(--prg-muted); }
+.prg-waits { font-style: italic; }
+
+/* ---------- Motion ---------- */
+@keyframes prg-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes prg-dialog-in { from { opacity: 0; transform: translateY(10px) scale(0.985); } to { opacity: 1; transform: none; } }
+@keyframes prg-crest-in { from { opacity: 0; transform: scale(0.85) rotate(-8deg); } to { opacity: 1; transform: none; } }
+@keyframes prg-notice-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 720px) {
+  .prg-ceremony-cards { grid-template-columns: minmax(0, 1fr); }
+  .prg .prg-ceremony-card { grid-template-columns: auto minmax(0, 1fr); justify-items: start; align-items: center; text-align: start; padding: 14px 16px; gap: 4px 14px; }
+  .prg-ceremony-card .prg-card-crest { grid-row: span 3; inline-size: 50px; block-size: 50px; }
+  .prg-ceremony-card .prg-card-action { margin: 4px 0 0; }
+  .prg-ceremony-frame { padding: 26px 18px 18px; }
+  .prg-tabs { grid-template-columns: minmax(0, 1fr); }
+  .prg-dialog-frame { padding: 22px 18px 18px; }
+  .prg-summary { grid-template-columns: minmax(0, 1fr); }
+  .prg-summary-item + .prg-summary-item { border-inline-start: 0; border-block-start: 1px solid var(--prg-line); }
+  .prg-summary-item { padding: 12px; }
+  .prg-cat-panel { padding: 16px; }
+  .prg-notices { inset-inline: 16px; inset-block-end: 16px; inline-size: auto; }
+}
+@media (max-width: 560px) {
+  .prg-standing { inline-size: 100%; }
+  .prg-cat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .prg *, .prg *::before, .prg *::after, .prg { animation: none !important; transition: none !important; }
+}

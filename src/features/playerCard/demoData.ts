@@ -5,10 +5,10 @@
    shape the backend will return, so swapping it out touches only
    src/api/playerCard.ts.
 
-   Illustrative values only. Nothing here is the medal bank, the achievement
-   bank, the title bank or an XP table - none of those is defined yet - and
-   the figures are not the reference image's sample values hard-coded into
-   components.
+   Illustrative values only. The medals are not a medal bank (none is
+   defined yet) and the levels and XP are not an XP table. Titles and game
+   achievements are real entries from the catalog, so the demo shows them as
+   they will look.
 
    Two players: an established one (/player?demo=1) and a new one whose card
    shows the locked and empty states (/player?demo=new). Without ?demo the
@@ -16,19 +16,44 @@
    =========================================================================== */
 
 import type { Award, PlayerCardData } from "../../api/playerCard";
+import type { Title } from "../../api/progression";
 
 export type DemoScenario = "established" | "newcomer";
 
-const firstTrade = (earnedAt: string): Award => ({
-  id: "first-trade",
-  art: "hex_blue",
-  rank: 20,
-  xp: 50,
+// A game achievement as the card receives it.
+const achievement = (
+  id: string,
+  category: string,
+  art: string,
+  accent: string,
+  rarity: string,
+  xp: number,
+  earnedAt: string,
+  name: { he: string; en: string },
+  condition: { he: string; en: string }
+): Award => ({
+  id,
+  art,
+  category,
+  accent_color: accent,
+  rarity,
+  rank: { basic: 1, advanced: 2, rare: 3, epic: 4, exceptional: 5 }[rarity] ?? 1,
+  xp,
   earned_at: earnedAt,
-  name: { he: "First Trade", en: "First Trade" },
-  description: { he: "הקנייה הראשונה בפלטפורמה.", en: "A first purchase on the platform." },
-  condition: { he: "לבצע קנייה ראשונה.", en: "Make a first purchase." },
+  name,
+  description: condition,
+  condition,
 });
+
+const openingBell = (earnedAt: string) =>
+  achievement("the_opening_bell", "first_steps", "flag", "#8FA7C2", "advanced", 50, earnedAt,
+    { he: "פעמון הפתיחה", en: "The Opening Bell" },
+    { he: "פתיחת תיק השקעות ראשון", en: "Create the first portfolio" });
+
+const momentumRider: Title = {
+  id: "momentum_rider", name: "Momentum Rider", category: "market_legends", source_type: "level",
+  required_level: 26, tier: 6, icon: "flame", accent_color: "#DAA17F", sort_order: 61, rarity: null,
+};
 
 const established: PlayerCardData = {
   player: {
@@ -39,7 +64,10 @@ const established: PlayerCardData = {
   },
   progression: {
     state: "available",
-    value: { level: 27, title: "Elite Investor", xp: 8420, next_level_xp: 10000, next_level: 28, next_title: "Master Strategist" },
+    value: {
+      level: 27, xp: 8420, current_level_xp: 8000, next_level: 28, next_level_xp: 10000,
+      thresholds_configured: true, thresholds_provisional: true, next_title_level: 31, active_title: momentumRider,
+    },
   },
   social: { followers: 2430, subscribers: 618 },
   stats: {
@@ -100,48 +128,18 @@ const established: PlayerCardData = {
     ],
   },
   achievements: {
-    total: 12,
+    total: 13,
     top: [
-      {
-        id: "first-100-subscribers",
-        art: "hex_blue",
-        rank: 90,
-        xp: 600,
-        earned_at: "2026-05-30",
-        name: { he: "First 100 Subscribers", en: "First 100 Subscribers" },
-        description: { he: "הגעה ל־100 מנויים משלמים.", en: "Reached 100 paid subscribers." },
-        condition: { he: "100 מנויים משלמים פעילים.", en: "100 active paid subscribers." },
-      },
-      {
-        id: "community-builder",
-        art: "hex_green",
-        rank: 80,
-        xp: 400,
-        earned_at: "2026-03-12",
-        name: { he: "Community Builder", en: "Community Builder" },
-        description: { he: "פעילות קהילתית עקבית בפיד.", en: "Consistent activity in the community feed." },
-        condition: { he: "50 תגובות שקיבלו תגובה חוזרת.", en: "50 comments that drew a reply." },
-      },
-      {
-        id: "veteran-player",
-        art: "hex_purple",
-        rank: 70,
-        xp: 300,
-        earned_at: "2026-03-02",
-        name: { he: "Veteran Player", en: "Veteran Player" },
-        description: { he: "שנה שלמה של פעילות בפלטפורמה.", en: "A full year of activity on the platform." },
-        condition: { he: "שנה מפתיחת התיק הראשון.", en: "One year since the first portfolio opened." },
-      },
-      {
-        id: "competition-explorer",
-        art: "hex_gold",
-        rank: 60,
-        xp: 250,
-        earned_at: "2025-11-30",
-        name: { he: "Competition Explorer", en: "Competition Explorer" },
-        description: { he: "השתתפות בחמש תחרויות שונות.", en: "Entered five different competitions." },
-        condition: { he: "חמש השתתפויות בתחרויות.", en: "Five competition entries." },
-      },
+      achievement("one_year_veteran", "dedication", "hourglass", "#83B498", "rare", 100, "2026-03-02",
+        { he: "ותיק של שנה", en: "One-Year Veteran" },
+        { he: "החזקת תיק פתוח במשך שנה", en: "Keep a portfolio open for 365 days" }),
+      achievement("founding_member", "legacy_milestones", "crown", "#C9AB71", "rare", 100, "2025-11-02",
+        { he: "חבר מייסד", en: "Founding Member" },
+        { he: "הצטרפות בתקופת ההשקה הרשמית", en: "Join during the official launch period" }),
+      achievement("three_of_a_kind", "portfolio_lab", "briefcase", "#C5A56C", "advanced", 50, "2025-12-14",
+        { he: "שלישייה מנצחת", en: "Three of a Kind" },
+        { he: "פתיחת 3 תיקים", en: "Open 3 portfolios" }),
+      openingBell("2025-11-03"),
     ],
   },
 };
@@ -155,7 +153,10 @@ const newcomer: PlayerCardData = {
   },
   progression: {
     state: "available",
-    value: { level: 3, title: "Rookie", xp: 340, next_level_xp: 500, next_level: 4, next_title: "Apprentice" },
+    value: {
+      level: 1, xp: 75, current_level_xp: 0, next_level: null, next_level_xp: null,
+      thresholds_configured: false, thresholds_provisional: false, next_title_level: 6, active_title: null,
+    },
   },
   social: { followers: 14, subscribers: 0 },
   stats: {
@@ -168,7 +169,7 @@ const newcomer: PlayerCardData = {
   },
   competitions: { participations: 0, prize_wins: 0, top_3: 0, first_place: 0 },
   medals: { total: 0, top: [] },
-  achievements: { total: 1, top: [firstTrade("2026-10-03")] },
+  achievements: { total: 2, top: [openingBell("2026-10-03")] },
 };
 
 export const DEMO_PLAYER_CARDS: Record<DemoScenario, PlayerCardData> = { established, newcomer };

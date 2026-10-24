@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import type { PlayerCardData } from "../../api/playerCard";
+import { fill } from "../../i18n/fill";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { MessageKey } from "../../i18n/messages";
 import { LevelEmblem } from "./art";
@@ -81,13 +82,24 @@ export const PerformancePanel = ({ stats }: { stats: PlayerCardData["stats"] }) 
   );
 };
 
-// Spec 10. The level here and in the header come from the same value. While
-// the server withholds progression (the XP rules are not written yet), every
-// part of the panel stays in place and says why instead of showing a number.
+// Spec 10. The level here and in the header come from the same value. XP per
+// level is not decided yet: until the server has thresholds, the bar stays
+// empty and says so, rather than fill towards an invented target. The bar
+// measures progress within the current level.
 export const ProgressionPanel = ({ progression }: { progression: PlayerCardData["progression"] }) => {
   const { t, locale } = useLanguage();
   const p = progression.state === "available" ? progression.value : null;
-  const pct = p ? Math.max(0, Math.min(100, (p.xp / p.next_level_xp) * 100)) : 0;
+  const span = p && p.next_level_xp !== null ? p.next_level_xp - p.current_level_xp : null;
+  const pct = p && span ? Math.max(0, Math.min(100, ((p.xp - p.current_level_xp) / span) * 100)) : 0;
+  const note = !p
+    ? null
+    : !p.thresholds_configured
+      ? t("prg_thresholds_unset")
+      : p.next_level === null
+        ? t("prg_top_level")
+        : p.thresholds_provisional
+          ? t("prg_thresholds_provisional")
+          : null;
   return (
     <section className="pc-card pc-panel">
       <h2 className="pc-panel-title">
@@ -101,8 +113,8 @@ export const ProgressionPanel = ({ progression }: { progression: PlayerCardData[
           <p className="pc-xp">
             {p ? (
               <bdi dir="ltr">
-                <span className="pc-xp-label">XP</span> <span className="pc-xp-now">{formatNumber(p.xp, locale)}</span>{" "}
-                <span className="pc-xp-of">/ {formatNumber(p.next_level_xp, locale)}</span>
+                <span className="pc-xp-label">XP</span> <span className="pc-xp-now">{formatNumber(p.xp, locale)}</span>
+                {p.next_level_xp !== null && <span className="pc-xp-of"> / {formatNumber(p.next_level_xp, locale)}</span>}
               </bdi>
             ) : (
               <>
@@ -114,18 +126,40 @@ export const ProgressionPanel = ({ progression }: { progression: PlayerCardData[
             className="pc-bar"
             role="progressbar"
             aria-label="XP"
-            aria-valuemin={0}
-            aria-valuemax={p?.next_level_xp ?? 0}
-            aria-valuenow={p?.xp}
+            aria-valuemin={p?.current_level_xp ?? 0}
+            aria-valuemax={p?.next_level_xp ?? undefined}
+            aria-valuenow={p && p.next_level_xp !== null ? p.xp : undefined}
+            aria-valuetext={note ?? undefined}
           >
             <div style={{ inlineSize: `${pct.toFixed(1)}%` }} />
           </div>
+          {note && <p className="pc-progress-note">{note}</p>}
           <div className="pc-table">
             <Row icon="crown" label="next_goal">
-              <Gated value={progression} compact render={(v) => <bdi dir="ltr">{t("level")} {formatNumber(v.next_level, locale)}</bdi>} />
+              <Gated
+                value={progression}
+                compact
+                render={(v) =>
+                  v.next_level !== null ? (
+                    <bdi>{fill(t("prg_level_n"), { n: formatNumber(v.next_level, locale) })}</bdi>
+                  ) : (
+                    <span className="pc-muted-value">{t(v.thresholds_configured ? "prg_top_level" : "prg_not_set")}</span>
+                  )
+                }
+              />
             </Row>
             <Row icon="gem" label="next_title">
-              <Gated value={progression} compact render={(v) => <bdi dir="ltr">{v.next_title}</bdi>} />
+              <Gated
+                value={progression}
+                compact
+                render={(v) =>
+                  v.next_title_level !== null ? (
+                    <bdi>{fill(t("prg_level_n"), { n: formatNumber(v.next_title_level, locale) })}</bdi>
+                  ) : (
+                    <span className="pc-muted-value">{t("prg_all_titles")}</span>
+                  )
+                }
+              />
             </Row>
           </div>
         </div>

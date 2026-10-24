@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Award, fetchPlayerCard, PlayerCardResult, ProfileUpdate, saveProfile } from "../api/playerCard";
+import { PROGRESSION_CHANGED, requestProgressionCheck, TitleCollection } from "../api/progression";
 import { ArtDefs, CornerChart, TitleOrnament } from "../components/playerCard/art";
 import { AwardDialog, AwardKind, AwardsPanel } from "../components/playerCard/AwardsPanel";
 import { PlayerHeader } from "../components/playerCard/PlayerHeader";
 import { StatsRow } from "../components/playerCard/StatsRow";
 import { CompetitionsPanel, PerformancePanel, ProgressionPanel } from "../components/playerCard/TablePanels";
+import { TitleCollectionDialog } from "../components/progression/TitleCollectionDialog";
 import { useLanguage } from "../i18n/LanguageContext";
 import "../components/playerCard/playerCard.css";
+import "../components/progression/progression.css";
 
 /* ===========================================================================
    Player Card (docs/PRODUCT-SPEC-AND-GAP.md in the backend, Parts 3-4).
@@ -25,6 +28,11 @@ import "../components/playerCard/playerCard.css";
    The player can edit their first name and bio, saved with PATCH
    /players/me. On demo data the edit is applied locally and lasts until
    reload.
+
+   The active title sits under the level; "My Title Collection" opens the
+   collection, and a choice there updates the card from the server's answer.
+   When an unlock notice arrives (ProgressionWatcher), the card reloads so
+   its XP, level and achievements stay current.
    =========================================================================== */
 
 const PlayerCard = () => {
@@ -36,6 +44,7 @@ const PlayerCard = () => {
   const [result, setResult] = useState<PlayerCardResult | null>(null);
   const [failed, setFailed] = useState(false);
   const [open, setOpen] = useState<{ award: Award; kind: AwardKind } | null>(null);
+  const [titlesOpen, setTitlesOpen] = useState(false);
 
   useEffect(() => {
     let live = true;
@@ -44,8 +53,14 @@ const PlayerCard = () => {
     fetchPlayerCard(scenario)
       .then((r) => live && setResult(r))
       .catch(() => live && setFailed(true));
+    // Something unlocked: reload quietly, keeping the card on screen.
+    const refresh = () => {
+      if (!scenario) fetchPlayerCard().then((r) => live && setResult(r)).catch(() => undefined);
+    };
+    window.addEventListener(PROGRESSION_CHANGED, refresh);
     return () => {
       live = false;
+      window.removeEventListener(PROGRESSION_CHANGED, refresh);
     };
   }, [scenario]);
 
@@ -55,6 +70,25 @@ const PlayerCard = () => {
     if (!result) return;
     const player = await saveProfile(update, result.data.player, result.demo);
     setResult((r) => (r ? { ...r, data: { ...r.data, player } } : r));
+    if (!result.demo) requestProgressionCheck(); // a completed profile earns The Introduction
+  };
+
+  // A title was chosen in the collection: show it at once, then let the
+  // watcher fetch anything it earned (a first choice is an achievement).
+  const titleChanged = (collection: TitleCollection) => {
+    const active = collection.titles.find((x) => x.id === collection.active_title_id) ?? null;
+    setResult((r) =>
+      r && r.data.progression.state === "available"
+        ? {
+            ...r,
+            data: {
+              ...r.data,
+              progression: { state: "available", value: { ...r.data.progression.value, active_title: active } },
+            },
+          }
+        : r
+    );
+    if (!scenario) requestProgressionCheck();
   };
 
   return (
@@ -81,6 +115,7 @@ const PlayerCard = () => {
               progression={result.data.progression}
               canEdit
               onSave={saveEdit}
+              onOpenTitles={() => setTitlesOpen(true)}
             />
             <StatsRow data={result.data} />
             <div className="pc-row3">
@@ -88,11 +123,14 @@ const PlayerCard = () => {
               <AwardsPanel
                 kind="achievement"
                 awards={result.data.achievements.top}
+                total={result.data.achievements.total}
+                demo={demoParam}
                 onOpen={(award) => setOpen({ award, kind: "achievement" })}
               />
               <AwardsPanel
                 kind="medal"
                 awards={result.data.medals.top}
+                total={result.data.medals.total}
                 onOpen={(award) => setOpen({ award, kind: "medal" })}
               />
             </div>
@@ -104,6 +142,12 @@ const PlayerCard = () => {
         )}
       </div>
       <AwardDialog award={open?.award ?? null} kind={open?.kind ?? "medal"} onClose={() => setOpen(null)} />
+      <TitleCollectionDialog
+        open={titlesOpen}
+        scenario={scenario}
+        onClose={() => setTitlesOpen(false)}
+        onChanged={titleChanged}
+      />
     </div>
   );
 };

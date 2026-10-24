@@ -150,14 +150,6 @@
 }
 .pc-nickname.is-missing { font-family: var(--pc-body); font-size: 1.15rem; font-weight: 500; color: var(--pc-muted); }
 .pc-first-name { color: var(--pc-muted); font-size: 1.05rem; }
-.pc-badges { display: flex; flex-wrap: wrap; gap: 10px; margin-block-start: 6px; }
-.pc-badge {
-  display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 10px;
-  border: 1px solid var(--pc-line); background: rgba(217, 169, 78, 0.06); font-weight: 500;
-}
-.pc-badge svg { width: 18px; height: 18px; color: var(--pc-gold); }
-.pc-badge.is-muted { color: var(--pc-muted); border-color: var(--pc-line-soft); background: none; }
-.pc-badge.is-muted svg { color: var(--pc-gold-deep); }
 .pc-avatar-silhouette { width: 55%; height: 55%; color: var(--pc-gold-deep); }
 
 .pc-avatar {
@@ -240,6 +232,32 @@
 .pc-award svg { width: 100%; max-width: 72px; height: auto; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.6)); }
 .pc-award span { font-size: 0.82rem; font-weight: 400; line-height: 1.3; }
 .pc-empty { margin: 0; padding: 26px 8px; text-align: center; font-size: 0.9rem; color: var(--pc-muted); }
+/* Game achievements: the category emblem in a fine diamond frame, coloured by
+   category. Rarer ones get a second frame line, never a louder colour. */
+.pc-ach-emblem {
+  position: relative; display: grid; place-items: center; width: 64px; height: 64px; margin-block: 4px;
+  color: var(--accent, var(--pc-gold));
+}
+.pc-ach-emblem::before {
+  content: ""; position: absolute; inset: 10px; transform: rotate(45deg);
+  border: 1px solid color-mix(in srgb, var(--accent, #D9BE89) 70%, transparent);
+  background: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--accent, #D9BE89) 14%, transparent), transparent 70%), #101721;
+}
+.pc-ach-emblem.is-rare::after, .pc-ach-emblem.is-epic::after, .pc-ach-emblem.is-exceptional::after {
+  content: ""; position: absolute; inset: 4px; transform: rotate(45deg);
+  border: 1px solid color-mix(in srgb, var(--accent, #D9BE89) 35%, transparent);
+}
+.pc-ach-emblem.is-exceptional::after { border-color: rgba(217, 190, 137, 0.75); }
+.pc-ach-emblem svg { position: relative; width: 26px; height: 26px; filter: none; max-width: none; }
+.pc-dialog-art.pc-ach-emblem { width: 96px; height: 96px; }
+.pc-dialog-art.pc-ach-emblem svg { width: 36px; height: 36px; }
+.pc-awards-foot {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;
+  margin-block-start: 12px; padding-block-start: 10px; border-block-start: 1px solid var(--pc-line-soft);
+  font-size: 0.85rem; color: var(--pc-muted);
+}
+.pc .pc-awards-link { color: var(--pc-gold-bright); text-decoration: none; font-weight: 500; }
+.pc .pc-awards-link:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 /* ---------- Areas 5-7: tables ---------- */
 .pc-table { display: grid; border: 1px solid var(--pc-line-soft); border-radius: 10px; background: rgba(0, 0, 0, 0.25); }
@@ -261,6 +279,8 @@
 .pc-xp-label { color: var(--pc-xp); font-size: 1.25rem; font-weight: 800; }
 .pc-xp-now { color: var(--pc-gold-bright); font-size: 1.5rem; font-weight: 800; }
 .pc-xp-of { color: var(--pc-muted); font-size: 1.05rem; }
+.pc-progress-note { margin: -6px 0 10px; font-size: 0.82rem; color: var(--pc-muted); }
+.pc-muted-value { color: var(--pc-muted); font-weight: 400; }
 .pc-bar { height: 14px; margin-block: 10px 14px; padding: 2px; border-radius: 999px; background: #0A0A0C; border: 1px solid var(--pc-line); }
 .pc-bar > div {
   height: 100%; border-radius: 999px; box-shadow: 0 0 12px rgba(217, 169, 78, 0.5);
@@ -318,7 +338,6 @@
   .pc-progress-main { width: 100%; }
   .pc-profile { grid-template-columns: minmax(0, 1fr); grid-template-areas: "avatar" "identity" "bio"; justify-items: center; text-align: center; }
   .pc-identity { justify-items: center; }
-  .pc-badges { justify-content: center; }
   .pc-ornament { display: none; }
   .pc-corner-chart { opacity: 0.35; }
 }

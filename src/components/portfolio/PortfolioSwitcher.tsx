@@ -11,6 +11,7 @@ import { money, percent } from "../../api/social";
 import { useToast } from "../ui/ToastProvider";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { fill, serverMessage } from "../../i18n/fill";
+import { requestProgressionCheck } from "../../api/progression";
 
 /* ===========================================================================
    Choosing which portfolio you are working in.
@@ -93,6 +94,7 @@ const PortfolioSwitcher: React.FC<Props> = ({ refreshKey = 0, onPortfolioChange 
     setSubmitting(true);
     try {
       const created = await createPortfolio(name);
+      requestProgressionCheck(); // portfolio milestones
       setPortfolios((prev) => [...prev, created]);
       dispatch(setActivePortfolio(created.id));
       onPortfolioChange?.(created);

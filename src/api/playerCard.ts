@@ -14,13 +14,14 @@
    =========================================================================== */
 
 import axiosInstance from "./axiosInstance";
+import type { Title } from "./progression";
 import { DEMO_PLAYER_CARDS, DemoScenario } from "../features/playerCard/demoData";
 
 const BASE = `${import.meta.env.VITE_BACKEND_API_URL}/players`;
 
 export type LockReason = "requires_min_active_portfolios" | "no_active_portfolio_above_threshold";
-// not_defined: the rules behind the figure are deliberately unwritten yet
-// (XP, levels and titles), so the server withholds it rather than invent it.
+// not_defined: the rules behind the figure are deliberately unwritten yet,
+// so the server withholds it rather than invent it.
 export type UnavailableReason = "missing_data" | "no_active_portfolios" | "not_defined";
 
 // Mirrors CardValue in the backend metric engine.
@@ -34,8 +35,9 @@ export interface Localized {
   en: string;
 }
 
-// Which drawing represents an award. The banks are not defined yet, so these
-// are the shapes the reference image uses.
+// Which drawing represents a medal. The medal bank is not defined yet, so
+// these are the shapes the reference image uses. Game achievements carry a
+// category and are drawn with their category's emblem instead.
 export type AwardArt =
   | "laurel_trophy"
   | "gem"
@@ -48,7 +50,12 @@ export type AwardArt =
 
 export interface Award {
   id: string;
-  art: AwardArt;
+  /** A medal drawing, or for a game achievement the name of its emblem. */
+  art: AwardArt | string;
+  /** Game achievements only. */
+  category?: string;
+  accent_color?: string;
+  rarity?: string;
   name: Localized;
   description: Localized;
   condition: Localized;
@@ -65,13 +72,22 @@ export interface TopPortfolio {
   cumulative_return: number;
 }
 
+// Mirrors the backend's LevelProgress plus the active title. XP per level is
+// not decided yet: until thresholds are configured every player is level 1,
+// next_level is null and thresholds_configured says why.
 export interface Progression {
   level: number;
-  title: string;
   xp: number;
-  next_level_xp: number;
-  next_level: number;
-  next_title: string;
+  /** XP at which the current level began; 0 at level 1. */
+  current_level_xp: number;
+  next_level: number | null;
+  next_level_xp: number | null;
+  thresholds_configured: boolean;
+  thresholds_provisional: boolean;
+  /** Level at which the next three titles unlock; null after the last tier. */
+  next_title_level: number | null;
+  /** null until the player chooses a title. */
+  active_title: Title | null;
 }
 
 export interface PlayerCardData {

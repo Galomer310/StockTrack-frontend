@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <radialGradient id="bg-mar" cx="50%" cy="35%" r="70%"><stop offset="0" stop-color="#3E7FC4"/><stop offset="1" stop-color="#12305A"/></radialGradient>
+    <clipPath id="disc"><circle cx="60" cy="60" r="56"/></clipPath>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F1DCAE"/><stop offset=".5" stop-color="#B8995F"/><stop offset="1" stop-color="#E6CC97"/></linearGradient>
+  </defs>
+  <circle cx="60" cy="60" r="56" fill="url(#bg-mar)"/>
+  <g clip-path="url(#disc)">
+    <rect x="53" y="62" width="14" height="18" fill="#E8B48C"/>
+    <path d="M14 124 C14 94 34 80 60 80 C86 80 106 94 106 124 Z" fill="#D42A2A"/>
+    <path d="M40 124 L42 92 L50 92 L52 104 L68 104 L70 92 L78 92 L80 124 Z" fill="#2A55B8"/>
+    <circle cx="46" cy="100" r="2.6" fill="#F2D24A"/><circle cx="74" cy="100" r="2.6" fill="#F2D24A"/>
+    <circle cx="42" cy="53" r="4" fill="#EBB892"/><circle cx="78" cy="53" r="4" fill="#EBB892"/>
+    <circle cx="60" cy="51" r="18.5" fill="#F2C29A"/>
+    <path d="M41.5 47 L41.5 58 L45.5 56 L45.5 47 Z M78.5 47 L78.5 58 L74.5 56 L74.5 47 Z" fill="#4A2A14"/>
+    <path d="M40 46 C40 30 50 23 61 23 C72 23 80 30 80 44 Z" fill="#D42A2A"/>
+    <path d="M43 44.5 C54 40 74 40 89 46.5 C86 51 76 50.5 60 47.5 C52 46.5 46 47.5 43 44.5 Z" fill="#B81E1E"/>
+    <circle cx="60" cy="33" r="6.2" fill="#F8F6F0"/>
+    <path d="M56.5 36.5 L56.5 30 L60 34 L63.5 30 L63.5 36.5" stroke="#D42A2A" stroke-width="1.6" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+    <ellipse cx="54" cy="51.5" rx="1.9" ry="2.7" fill="#1E3A8A"/><ellipse cx="66" cy="51.5" rx="1.9" ry="2.7" fill="#1E3A8A"/>
+    <path d="M50.5 47 Q54 45.5 57 47 M63 47 Q66 45.5 69.5 47" stroke="#3A2210" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    <circle cx="60" cy="57.5" r="5" fill="#EFAE84"/>
+    <path d="M46 63 C48 59 54 59 60 61 C66 59 72 59 74 63 C70 67 64 65 60 64 C56 65 50 67 46 63 Z" fill="#3A2210"/>
+    <path d="M56 67.5 Q60 69.5 64 67.5" stroke="#9A4A3A" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  </g>
+  <circle cx="60" cy="60" r="56" fill="none" stroke="url(#ring)" stroke-width="2.5"/>
+</svg>

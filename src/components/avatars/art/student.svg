@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <radialGradient id="bg-stu" cx="50%" cy="35%" r="70%"><stop offset="0" stop-color="#8A6A1E"/><stop offset="1" stop-color="#2A1E08"/></radialGradient>
+    <clipPath id="disc"><circle cx="60" cy="60" r="56"/></clipPath>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F1DCAE"/><stop offset=".5" stop-color="#B8995F"/><stop offset="1" stop-color="#E6CC97"/></linearGradient>
+  </defs>
+  <circle cx="60" cy="60" r="56" fill="url(#bg-stu)"/>
+  <g clip-path="url(#disc)">
+    <path d="M40 50 C38 68 40 80 46 84 L74 84 C80 80 82 68 80 50 Z" fill="#2A1C14"/>
+    <rect x="53" y="62" width="14" height="18" fill="#C99470"/>
+    <path d="M14 124 C14 94 34 80 60 80 C86 80 106 94 106 124 Z" fill="#22305A"/>
+    <path d="M50 80 L60 92 L54 95 Z M70 80 L60 92 L66 95 Z" fill="#F2EADC"/>
+    <path d="M34 92 L40 124 M86 92 L80 124" stroke="#8A5A2E" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="42" cy="53" r="4" fill="#CF9A74"/><circle cx="78" cy="53" r="4" fill="#CF9A74"/>
+    <circle cx="60" cy="51" r="18.5" fill="#D9A47E"/>
+    <path d="M42 48 C44 38 52 34 60 34 C68 34 76 38 78 48 C72 43 64 41 58 43 C52 45 46 45 42 48 Z" fill="#2A1C14"/>
+    <path d="M43 38 Q60 32 77 38 L77 33 Q60 28 43 33 Z" fill="#15171C"/>
+    <path d="M60 16 L93 27 L60 38 L27 27 Z" fill="#1E2128"/>
+    <circle cx="60" cy="27" r="1.6" fill="#D9BE89"/>
+    <path d="M60 27 L86 30 L86 42" stroke="#D9BE89" stroke-width="1.6" fill="none"/>
+    <rect x="84" y="41" width="4" height="7" rx="1" fill="#D9BE89"/>
+    <circle cx="53.5" cy="53" r="1.8" fill="#2A1E18"/><circle cx="66.5" cy="53" r="1.8" fill="#2A1E18"/>
+    <path d="M54.5 60.5 Q60 64.5 65.5 60.5" stroke="#8A4E3C" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  </g>
+  <circle cx="60" cy="60" r="56" fill="none" stroke="url(#ring)" stroke-width="2.5"/>
+</svg>

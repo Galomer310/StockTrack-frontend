@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <radialGradient id="bg-cap" cx="50%" cy="35%" r="70%"><stop offset="0" stop-color="#1E3570"/><stop offset="1" stop-color="#08112A"/></radialGradient>
+    <clipPath id="disc"><circle cx="60" cy="60" r="56"/></clipPath>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F1DCAE"/><stop offset=".5" stop-color="#B8995F"/><stop offset="1" stop-color="#E6CC97"/></linearGradient>
+  </defs>
+  <circle cx="60" cy="60" r="56" fill="url(#bg-cap)"/>
+  <g clip-path="url(#disc)">
+    <rect x="53" y="62" width="14" height="18" fill="#2A4E9A"/>
+    <path d="M14 124 C14 94 34 80 60 80 C86 80 106 94 106 124 Z" fill="#2A4E9A"/>
+    <path d="M60 93 L62.6 100.6 L70.6 100.6 L64.1 105.3 L66.6 113 L60 108.3 L53.4 113 L55.9 105.3 L49.4 100.6 L57.4 100.6 Z" fill="#F2F2F2"/>
+    <circle cx="60" cy="50" r="18.5" fill="#EDBE98"/>
+    <path fill-rule="evenodd" fill="#2A4E9A" d="M40 58 C39 34 49 26 60 26 C71 26 81 34 80 58 L71 59 L60 57 L49 59 Z M47.5 48.5 L57 48.5 L57 55 L47.5 55 Z M63 48.5 L72.5 48.5 L72.5 55 L63 55 Z"/>
+    <path d="M56.6 42 L60 32.5 L63.4 42 M57.8 38.8 L62.2 38.8" stroke="#F2F2F2" stroke-width="1.9" fill="none" stroke-linejoin="round"/>
+    <path d="M44 42 L37 39 L44 47 Z M76 42 L83 39 L76 47 Z" fill="#F2F2F2"/>
+    <circle cx="52.5" cy="52" r="1.7" fill="#1E2A44"/><circle cx="67.5" cy="52" r="1.7" fill="#1E2A44"/>
+    <path d="M55 63 Q60 66 65 63" stroke="#8A4E3C" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    <circle cx="24" cy="104" r="17" fill="#B8282E"/><circle cx="24" cy="104" r="12.5" fill="#F2F2F2"/>
+    <circle cx="24" cy="104" r="8.5" fill="#B8282E"/><circle cx="24" cy="104" r="5" fill="#2A4E9A"/>
+    <path d="M24 100.6 L25 103.3 L27.8 103.3 L25.5 104.9 L26.4 107.6 L24 105.9 L21.6 107.6 L22.5 104.9 L20.2 103.3 L23 103.3 Z" fill="#F2F2F2"/>
+  </g>
+  <circle cx="60" cy="60" r="56" fill="none" stroke="url(#ring)" stroke-width="2.5"/>
+</svg>

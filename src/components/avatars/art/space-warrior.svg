@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <radialGradient id="bg-spw" cx="50%" cy="35%" r="70%"><stop offset="0" stop-color="#0E5A6E"/><stop offset="1" stop-color="#03161C"/></radialGradient>
+    <clipPath id="disc"><circle cx="60" cy="60" r="56"/></clipPath>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F1DCAE"/><stop offset=".5" stop-color="#B8995F"/><stop offset="1" stop-color="#E6CC97"/></linearGradient>
+    <linearGradient id="silver" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F2F4F7"/><stop offset=".55" stop-color="#B4BCC7"/><stop offset="1" stop-color="#6E7886"/></linearGradient>
+  </defs>
+  <circle cx="60" cy="60" r="56" fill="url(#bg-spw)"/>
+  <g clip-path="url(#disc)">
+    <rect x="52" y="64" width="16" height="18" fill="#5A6472"/>
+    <path d="M14 124 C14 94 34 80 60 80 C86 80 106 94 106 124 Z" fill="url(#silver)"/>
+    <ellipse cx="29" cy="96" rx="15" ry="10" fill="#8E99A8"/><ellipse cx="91" cy="96" rx="15" ry="10" fill="#8E99A8"/>
+    <path d="M24 94 L34 94 M86 94 L96 94" stroke="#4FE3F0" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M46 98 L60 108 L74 98" stroke="#4FE3F0" stroke-width="2" fill="none" stroke-linejoin="round"/>
+    <circle cx="60" cy="113" r="3.2" fill="#4FE3F0"/>
+    <path d="M57 28 L60 13 L63 28 Z" fill="#8E99A8"/>
+    <path d="M38 52 C38 34 48 26 60 26 C72 26 82 34 82 52 L82 66 C82 74 72 80 60 80 C48 80 38 74 38 66 Z" fill="url(#silver)"/>
+    <path d="M42 45 L78 45 L76 56 C70 58.5 50 58.5 44 56 Z" fill="#0A2A33" stroke="#4FE3F0" stroke-width="1.4"/>
+    <path d="M46 50.5 L74 50.5" stroke="#8AF6FF" stroke-width="1.4" opacity=".85" stroke-linecap="round"/>
+    <path d="M54 65 L54 72 M58 66 L58 74 M62 66 L62 74 M66 65 L66 72" stroke="#6A7480" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="79" cy="61" r="1.7" fill="#4FE3F0"/>
+    <path d="M44 34 Q52 28 62 28.5" stroke="#FFFFFF" stroke-width="1.6" opacity=".6" fill="none" stroke-linecap="round"/>
+  </g>
+  <circle cx="60" cy="60" r="56" fill="none" stroke="url(#ring)" stroke-width="2.5"/>
+</svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <radialGradient id="bg-r2" cx="50%" cy="35%" r="70%"><stop offset="0" stop-color="#5A6E86"/><stop offset="1" stop-color="#1A2230"/></radialGradient>
+    <clipPath id="disc"><circle cx="60" cy="60" r="56"/></clipPath>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F1DCAE"/><stop offset=".5" stop-color="#B8995F"/><stop offset="1" stop-color="#E6CC97"/></linearGradient>
+    <linearGradient id="silver" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F2F4F7"/><stop offset=".55" stop-color="#B4BCC7"/><stop offset="1" stop-color="#6E7886"/></linearGradient>
+  </defs>
+  <circle cx="60" cy="60" r="56" fill="url(#bg-r2)"/>
+  <g clip-path="url(#disc)">
+    <path d="M30 124 L30 76 L90 76 L90 124 Z" fill="#E8ECF1"/>
+    <path d="M30 76 C30 45 44 30 60 30 C76 30 90 45 90 76 Z" fill="url(#silver)"/>
+    <path d="M39 54 L48 47 L48 61 L39 63 Z M72 47 L81 54 L81 63 L72 61 Z" fill="#2E5EAA"/>
+    <rect x="53.5" y="39" width="13" height="10" fill="#2E5EAA"/>
+    <circle cx="60" cy="61" r="6.5" fill="#15171C"/><circle cx="58" cy="59" r="1.7" fill="#6A7A9A"/>
+    <circle cx="74" cy="68" r="2.3" fill="#D43A3A"/><circle cx="46" cy="68" r="1.7" fill="#3A7AD4"/>
+    <rect x="30" y="72" width="60" height="6" fill="#A9B2BE"/>
+    <rect x="42" y="84" width="14" height="20" rx="2" fill="#2E5EAA"/>
+    <rect x="62" y="84" width="16" height="8" rx="1.5" fill="#2E5EAA"/>
+    <rect x="62" y="96" width="16" height="3" fill="#A9B2BE"/><rect x="62" y="102" width="16" height="3" fill="#A9B2BE"/>
+    <circle cx="26" cy="92" r="7" fill="#C8CFD8" stroke="#2E5EAA" stroke-width="2.2"/>
+    <circle cx="94" cy="92" r="7" fill="#C8CFD8" stroke="#2E5EAA" stroke-width="2.2"/>
+    <path d="M40 40 Q50 33 60 33" stroke="#FFFFFF" stroke-width="2" opacity=".6" fill="none" stroke-linecap="round"/>
+  </g>
+  <circle cx="60" cy="60" r="56" fill="none" stroke="url(#ring)" stroke-width="2.5"/>
+</svg>

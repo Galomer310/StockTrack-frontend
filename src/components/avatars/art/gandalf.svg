@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <radialGradient id="bg-gan" cx="50%" cy="35%" r="70%"><stop offset="0" stop-color="#4E5466"/><stop offset="1" stop-color="#14161C"/></radialGradient>
+    <clipPath id="disc"><circle cx="60" cy="60" r="56"/></clipPath>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F1DCAE"/><stop offset=".5" stop-color="#B8995F"/><stop offset="1" stop-color="#E6CC97"/></linearGradient>
+  </defs>
+  <circle cx="60" cy="60" r="56" fill="url(#bg-gan)"/>
+  <g clip-path="url(#disc)">
+    <g transform="rotate(8 96 80)">
+      <rect x="94" y="28" width="4.5" height="100" rx="2" fill="#6A4A2A"/>
+      <ellipse cx="96.2" cy="28" rx="5" ry="4" fill="#7A5634"/>
+    </g>
+    <path d="M14 124 C14 94 34 80 60 80 C86 80 106 94 106 124 Z" fill="#7E838E"/>
+    <path d="M30 124 C32 106 38 96 46 90 M90 124 C88 106 82 96 74 90" stroke="#686D78" stroke-width="2" fill="none"/>
+    <path d="M40 50 C36 64 36 78 40 88 L46 86 C44 76 44 64 44 52 Z M80 50 C84 64 84 78 80 88 L74 86 C76 76 76 64 76 52 Z" fill="#C8C6C0"/>
+    <circle cx="60" cy="52" r="18" fill="#E3B896"/>
+    <path d="M42 54 C40 80 50 104 60 118 C70 104 80 80 78 54 C74 62 68 64.5 60 64.5 C52 64.5 46 62 42 54 Z" fill="#D8D6D0"/>
+    <path d="M52 70 C52 82 55 94 58 104 M60 68 L60 110 M68 70 C68 82 65 94 62 104" stroke="#B5B2AA" stroke-width="1.1" fill="none"/>
+    <path d="M50 60 C54 57 58 58 60 60 C62 58 66 57 70 60 C68 64 64 64 60 62 C56 64 52 64 50 60 Z" fill="#EAE8E2"/>
+    <path d="M48.5 47 Q53 43.5 57.5 46.5 M62.5 46.5 Q67 43.5 71.5 47" stroke="#D8D6D0" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+    <circle cx="53.5" cy="51" r="1.8" fill="#2A2420"/><circle cx="66.5" cy="51" r="1.8" fill="#2A2420"/>
+    <path d="M40 42 C44 30 56 10 84 2 C73 14 76 30 80 42 Z" fill="#7E838E"/>
+    <path d="M58 22 C62 16 70 9 80 5" stroke="#9399A4" stroke-width="1.4" fill="none" opacity=".7"/>
+    <ellipse cx="60" cy="42" rx="31" ry="6" fill="#6A6F7A"/>
+  </g>
+  <circle cx="60" cy="60" r="56" fill="none" stroke="url(#ring)" stroke-width="2.5"/>
+</svg>

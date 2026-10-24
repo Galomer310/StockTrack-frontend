@@ -7,7 +7,7 @@
    fails the build instead of rendering blank.
 
    Translated so far: the navbar, the sign-in pages (Home, Login, Register),
-   the Dashboard and the Player Card. Other screens move here
+   the Dashboard, the Market page and the Player Card. Other screens move here
    as they are ported to right-to-left.
    =========================================================================== */
 
@@ -267,6 +267,28 @@ const en = {
   auth_password_too_simple: "Password must use at least 5 different characters.",
   auth_display_name_required: "Display name is required",
   auth_display_name_too_long: "Display name must be 40 characters or fewer",
+
+  // Market
+  market_title: "Market",
+  market_subtitle:
+    "Research a ticker before you commit to it. These all open elsewhere — your portfolio and your positions stay here.",
+  market_ticker_placeholder: "Ticker, e.g. NVDA",
+  market_ticker_label: "Ticker symbol",
+  market_open: "Open {symbol}",
+  market_open_here: "Open here",
+  market_hint_symbol: "Opens {symbol} in Investments. The cards below deep-link to {symbol} on each site.",
+  market_hint_empty: "Enter a ticker to deep-link it on every site below.",
+  market_goes_to: "Goes straight to {symbol}",
+  market_disclaimer:
+    "These are third-party sites, listed for convenience. Nothing here is a recommendation, and none of them can see your account.",
+  market_blurb_yahoo: "Quotes, financials and filings. The most complete free source.",
+  market_blurb_google: "Fast, clean quotes and the news that moved them.",
+  market_blurb_tradingview: "Charting, and where most technical setups get argued about.",
+  market_blurb_marketwatch: "Market news with a bias towards what happened today.",
+  market_blurb_investing: "Broad coverage, including the economic calendar.",
+  market_blurb_edgar: "The filings themselves, before anyone has summarised them.",
+  market_blurb_finviz: "Screener and heat map. Good for seeing the whole market at once.",
+  market_blurb_cnbc: "Live coverage while the market is open.",
 };
 
 export type MessageKey = keyof typeof en;
@@ -508,6 +530,27 @@ const he: Messages = {
   auth_password_too_simple: "הסיסמה חייבת להכיל לפחות 5 תווים שונים.",
   auth_display_name_required: "יש להזין שם תצוגה.",
   auth_display_name_too_long: "שם התצוגה יכול להכיל עד 40 תווים.",
+
+  market_title: "שוק",
+  market_subtitle:
+    "בדקו מניה לפני שאתם מתחייבים אליה. כל האתרים כאן נפתחים מחוץ לאפליקציה — התיק והפוזיציות שלכם נשארים כאן.",
+  market_ticker_placeholder: "סימול, למשל NVDA",
+  market_ticker_label: "סימול המניה",
+  market_open: "פתיחת {symbol}",
+  market_open_here: "פתיחה כאן",
+  market_hint_symbol: "{symbol} ייפתח כאן באפליקציה. הכרטיסים למטה מקשרים ישירות ל־{symbol} בכל אתר.",
+  market_hint_empty: "הזינו סימול כדי לקשר אליו ישירות בכל אחד מהאתרים למטה.",
+  market_goes_to: "ישירות ל־{symbol}",
+  market_disclaimer:
+    "אלה אתרים של צד שלישי שמופיעים כאן לנוחותכם. שום דבר כאן אינו המלצה, ואף אחד מהם אינו יכול לראות את החשבון שלכם.",
+  market_blurb_yahoo: "מחירים, דוחות כספיים ודיווחים. המקור החינמי המקיף ביותר.",
+  market_blurb_google: "מחירים מהירים ונקיים, והחדשות שהזיזו אותם.",
+  market_blurb_tradingview: "גרפים, והמקום שבו מתווכחים על רוב התבניות הטכניות.",
+  market_blurb_marketwatch: "חדשות שוק, עם דגש על מה שקרה היום.",
+  market_blurb_investing: "כיסוי רחב, כולל לוח האירועים הכלכליים.",
+  market_blurb_edgar: "הדיווחים עצמם, לפני שמישהו סיכם אותם.",
+  market_blurb_finviz: "סורק מניות ומפת חום. מצוין לראות את כל השוק במבט אחד.",
+  market_blurb_cnbc: "סיקור חי בזמן שהשוק פתוח.",
 };
 
 export const MESSAGES: Record<Lang, Messages> = { en, he };

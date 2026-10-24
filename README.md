@@ -37,10 +37,8 @@ signed-in session.
 ## Languages
 
 The interface is switchable between Hebrew (right to left) and English from
-the toggle in the navbar, and the choice is remembered per browser. The
-navbar, sign-in pages, Dashboard, Market, Search, stock page, Player Card and
-achievement collection are translated; the other screens are moving over one
-at a time. Copy lives in `src/i18n/messages.ts`, where the Hebrew table is
+the toggle in the navbar, and the choice is remembered per browser. Every
+screen is translated. Copy lives in `src/i18n/messages.ts`, where the Hebrew table is
 typed against the English one, so a missing translation fails the build.
 
 ## Player Card

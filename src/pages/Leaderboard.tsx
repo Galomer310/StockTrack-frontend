@@ -5,6 +5,8 @@ import {
   LeaderboardEntry,
   percent,
 } from "../api/social";
+import { useLanguage } from "../i18n/LanguageContext";
+import { fill } from "../i18n/fill";
 
 // Ranks every portfolio by percentage return since it was opened, so a
 // cautious book can out-rank a large one on skill rather than capital.
@@ -15,10 +17,14 @@ import {
 // Percentages only, including your own rows: portfolio values are nobody's
 // business here, and every book starts from the same $10,000 anyway, so the
 // percentages are directly comparable.
+//
+// Translated: right to left in Hebrew. Portfolio and owner names keep their
+// own direction, and the signed return stays left to right.
 const Leaderboard = () => {
+  const { t, dir, lang } = useLanguage();
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,7 +32,7 @@ const Leaderboard = () => {
       try {
         setEntries(await fetchLeaderboard());
       } catch (err) {
-        setError("Could not load the leaderboard.");
+        setError(true);
       } finally {
         setLoading(false);
       }
@@ -34,23 +40,20 @@ const Leaderboard = () => {
     load();
   }, []);
 
-  if (loading) return <div className="leaderboard-page"><p>Loading leaderboard…</p></div>;
-  if (error) return <div className="leaderboard-page"><p className="error">{error}</p></div>;
+  if (loading) return <div className="leaderboard-page" dir={dir} lang={lang}><p>{t("lb_loading")}</p></div>;
+  if (error) return <div className="leaderboard-page" dir={dir} lang={lang}><p className="error">{t("lb_failed")}</p></div>;
 
   return (
-    <div className="leaderboard-page">
-      <h2>Leaderboard</h2>
-      <p className="leaderboard-subtitle">
-        Every portfolio ranked by return since it opened. Each starts with the
-        same $10,000, so these are comparable.
-      </p>
+    <div className="leaderboard-page" dir={dir} lang={lang}>
+      <h2>{t("lb_title")}</h2>
+      <p className="leaderboard-subtitle">{t("lb_subtitle")}</p>
 
       <div className="leaderboard-table">
         <div className="leaderboard-row leaderboard-head">
           <div className="lb-rank">#</div>
-          <div className="lb-name">Portfolio</div>
-          <div className="lb-holdings">Holdings</div>
-          <div className="lb-return">Return</div>
+          <div className="lb-name">{t("col_portfolio")}</div>
+          <div className="lb-holdings">{t("col_holdings")}</div>
+          <div className="lb-return">{t("col_return")}</div>
           <div className="lb-actions"></div>
         </div>
 
@@ -61,28 +64,28 @@ const Leaderboard = () => {
           >
             <div className="lb-rank">{entry.rank}</div>
             <div className="lb-name">
-              <span className="lb-portfolio">{entry.name}</span>
-              {entry.is_mine && <span className="lb-you">you</span>}
-              <span className="lb-owner">{entry.owner.display_name}</span>
+              <span className="lb-portfolio"><bdi>{entry.name}</bdi></span>
+              {entry.is_mine && <span className="lb-you">{t("you_badge")}</span>}
+              <span className="lb-owner"><bdi>{entry.owner.display_name}</bdi></span>
             </div>
             <div className="lb-holdings">
               {entry.holdings_count}
               {/* How much of the book is uninvested. A percentage, so it is
                   public, and it says how the return was actually earned. */}
-              <span className="lb-cash">{entry.cash_weight_pct.toFixed(0)}% cash</span>
+              <span className="lb-cash">{fill(t("lb_cash"), { pct: entry.cash_weight_pct.toFixed(0) })}</span>
             </div>
             <div
               className={`lb-return ${entry.return_pct >= 0 ? "gain" : "loss"}`}
             >
-              {percent(entry.return_pct)}
+              <bdi dir="ltr">{percent(entry.return_pct)}</bdi>
             </div>
             <div className="lb-actions">
               <button onClick={() => navigate(`/investor/${entry.id}`)}>
-                View
+                {t("lb_view")}
               </button>
               {!entry.is_mine && (
                 <button onClick={() => navigate(`/compare/${entry.id}`)}>
-                  Compare
+                  {t("lb_compare")}
                 </button>
               )}
             </div>
@@ -90,7 +93,7 @@ const Leaderboard = () => {
         ))}
       </div>
 
-      {entries.length === 0 && <p>No portfolios yet.</p>}
+      {entries.length === 0 && <p>{t("lb_empty")}</p>}
     </div>
   );
 };

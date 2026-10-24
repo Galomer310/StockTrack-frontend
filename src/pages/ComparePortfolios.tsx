@@ -11,6 +11,9 @@ import {
 } from "../api/social";
 import { buildInsights } from "../api/comparison";
 import PortfolioComparisonChart from "../components/charts/PortfolioComparisonChart";
+import { useLanguage } from "../i18n/LanguageContext";
+import { MessageKey } from "../i18n/messages";
+import { fill, ltr } from "../i18n/fill";
 
 /* Side-by-side comparison of your portfolio against another investor's.
    ---------------------------------------------------------------------------
@@ -18,8 +21,13 @@ import PortfolioComparisonChart from "../components/charts/PortfolioComparisonCh
    shape: yours carries prices, theirs carries percentages, because the server
    will not send another investor's money to you. Every row below is therefore
    a ratio - return, weight, position count - which is the only basis on which
-   the two can honestly be compared anyway. */
+   the two can honestly be compared anyway.
+
+   Translated: right to left in Hebrew; names keep their own direction and
+   signed figures stay left to right. */
 const ComparePortfolios = () => {
+  const { t, dir, lang } = useLanguage();
+  const iso = (value: string) => (lang === "he" ? ltr(value) : value);
   const { id } = useParams();
   const navigate = useNavigate();
   // Your side of the comparison is whichever portfolio you currently have
@@ -29,17 +37,17 @@ const ComparePortfolios = () => {
   const [mine, setMine] = useState<PortfolioResponse | null>(null);
   const [theirs, setTheirs] = useState<PortfolioResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<MessageKey | null>(null);
 
   useEffect(() => {
     const load = async () => {
       if (myPortfolioId === null) {
-        setError("Open one of your portfolios first, then come back to compare.");
+        setError("cmp_need_portfolio");
         setLoading(false);
         return;
       }
       setLoading(true);
-      setError("");
+      setError(null);
       try {
         const [a, b] = await Promise.all([
           fetchPortfolio(myPortfolioId),
@@ -48,11 +56,7 @@ const ComparePortfolios = () => {
         setMine(a);
         setTheirs(b);
       } catch (err: any) {
-        setError(
-          err.response?.status === 403
-            ? "You do not have access to this portfolio."
-            : "Could not load the comparison."
-        );
+        setError(err.response?.status === 403 ? "portfolio_no_access" : "cmp_failed");
       } finally {
         setLoading(false);
       }
@@ -97,17 +101,17 @@ const ComparePortfolios = () => {
     }));
   }, [mine, theirs]);
 
-  if (loading) return <div className="compare-page"><p>Loading comparison…</p></div>;
-  if (error) return <div className="compare-page"><p className="error">{error}</p></div>;
+  if (loading) return <div className="compare-page" dir={dir} lang={lang}><p>{t("cmp_loading")}</p></div>;
+  if (error) return <div className="compare-page" dir={dir} lang={lang}><p className="error">{t(error)}</p></div>;
   if (!mine || !theirs) return null;
 
   // Positive means you are ahead on that measure.
   const diffPct = mine.summary.return_pct - theirs.summary.return_pct;
-  const insights = buildInsights(mine, theirs);
+  const insights = buildInsights(mine, theirs, t, iso);
 
   const rows: { label: string; a: string; b: string; winner: "a" | "b" | null }[] = [
     {
-      label: "Total return",
+      label: t("total_return"),
       a: percent(mine.summary.return_pct),
       b: percent(theirs.summary.return_pct),
       winner:
@@ -118,7 +122,7 @@ const ComparePortfolios = () => {
           : "b",
     },
     {
-      label: "Holdings",
+      label: t("col_holdings"),
       a: String(mine.summary.holdings_count),
       b: String(theirs.summary.holdings_count),
       winner: null,
@@ -126,26 +130,22 @@ const ComparePortfolios = () => {
   ];
 
   return (
-    <div className="compare-page">
+    <div className="compare-page" dir={dir} lang={lang}>
       <button className="back-btn" onClick={() => navigate("/leaderboard")}>
-        ← Back to leaderboard
+        {t("back_to_leaderboard")}
       </button>
 
-      <h2>
-        {mine.portfolio.name} vs {theirs.portfolio.name}
-      </h2>
+      <h2>{fill(t("cmp_vs"), { a: iso(mine.portfolio.name), b: iso(theirs.portfolio.name) })}</h2>
       <p className={`compare-verdict ${diffPct >= 0 ? "gain" : "loss"}`}>
-        {diffPct >= 0
-          ? `You are ahead by ${Math.abs(diffPct).toFixed(2)} percentage points.`
-          : `You are behind by ${Math.abs(diffPct).toFixed(2)} percentage points.`}
+        {fill(t(diffPct >= 0 ? "cmp_ahead" : "cmp_behind"), { n: Math.abs(diffPct).toFixed(2) })}
       </p>
 
       {/* Both books on one axis */}
-      <h3>Growth side by side</h3>
+      <h3>{t("cmp_growth")}</h3>
       <PortfolioComparisonChart mine={mine} theirs={theirs} />
 
       {/* What the numbers actually mean */}
-      <h3>What the difference comes down to</h3>
+      <h3>{t("cmp_difference")}</h3>
       <div className="insight-list">
         {insights.map((insight) => (
           <div key={insight.label} className={`insight insight-${insight.tone}`}>
@@ -155,39 +155,37 @@ const ComparePortfolios = () => {
         ))}
       </div>
 
-      <h3>Head to head</h3>
+      <h3>{t("cmp_h2h")}</h3>
       <div className="table-wrap">
       <table className="compare-table">
         <thead>
           <tr>
             <th></th>
-            <th>{mine.portfolio.name}</th>
-            <th>{theirs.portfolio.name}</th>
+            <th><bdi>{mine.portfolio.name}</bdi></th>
+            <th><bdi>{theirs.portfolio.name}</bdi></th>
           </tr>
         </thead>
         <tbody>
           {rows.map((r) => (
             <tr key={r.label}>
               <td className="compare-label">{r.label}</td>
-              <td className={r.winner === "a" ? "compare-winner" : ""}>{r.a}</td>
-              <td className={r.winner === "b" ? "compare-winner" : ""}>{r.b}</td>
+              <td className={r.winner === "a" ? "compare-winner" : ""}><bdi dir="ltr">{r.a}</bdi></td>
+              <td className={r.winner === "b" ? "compare-winner" : ""}><bdi dir="ltr">{r.b}</bdi></td>
             </tr>
           ))}
         </tbody>
       </table>
       </div>
 
-      <h3>Positions by ticker</h3>
-      <p className="compare-note">
-        How much of each book sits in each ticker, as a share of the whole.
-      </p>
+      <h3>{t("cmp_positions")}</h3>
+      <p className="compare-note">{t("cmp_positions_note")}</p>
       <div className="table-wrap">
       <table className="compare-table">
         <thead>
           <tr>
-            <th>Ticker</th>
-            <th>{mine.portfolio.name}</th>
-            <th>{theirs.portfolio.name}</th>
+            <th>{t("col_ticker")}</th>
+            <th><bdi>{mine.portfolio.name}</bdi></th>
+            <th><bdi>{theirs.portfolio.name}</bdi></th>
           </tr>
         </thead>
         <tbody>
@@ -197,16 +195,16 @@ const ComparePortfolios = () => {
                 <Link className="ticker-link" to={`/stock/${row.symbol}`}>
                   {row.symbol}
                 </Link>
-                {row.shared && <span className="compare-badge">both</span>}
+                {row.shared && <span className="compare-badge">{t("cmp_both")}</span>}
               </td>
-              <td>{row.mine ? `${row.mine.toFixed(1)}%` : "—"}</td>
-              <td>{row.theirs ? `${row.theirs.toFixed(1)}%` : "—"}</td>
+              <td><bdi dir="ltr">{row.mine ? `${row.mine.toFixed(1)}%` : "—"}</bdi></td>
+              <td><bdi dir="ltr">{row.theirs ? `${row.theirs.toFixed(1)}%` : "—"}</bdi></td>
             </tr>
           ))}
         </tbody>
       </table>
       </div>
-      {symbolRows.length === 0 && <p>Neither portfolio has any positions yet.</p>}
+      {symbolRows.length === 0 && <p>{t("cmp_empty")}</p>}
     </div>
   );
 };

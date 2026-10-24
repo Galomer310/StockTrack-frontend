@@ -523,6 +523,8 @@ body.nav-locked { overflow: hidden; }
 
 .search-row { display: flex; gap: 0.5rem; margin: 1rem 0; flex-wrap: wrap; }
 .search-row input { flex: 1 1 220px; }
+/* Tickers read left to right, but the box lines up with the Hebrew around it. */
+.stock-search:lang(he) .search-row input { text-align: right; }
 
 @media (max-width: 720px) {
   .stock-headline { flex-direction: column; }

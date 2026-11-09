@@ -246,8 +246,6 @@ body.nav-locked { overflow: hidden; }
   .lb-actions { grid-column: 1 / -1; grid-row: 2; }
   .lb-actions button { flex: 1; padding: 0.6rem; }
 
-  .leaderboard-page > h2 { border-radius: var(--radius) var(--radius) 0 0; }
-  .leaderboard-page > .leaderboard-subtitle { border-radius: 0 0 var(--radius) var(--radius); }
 }
 
 /* ---------- Phones ---------- */

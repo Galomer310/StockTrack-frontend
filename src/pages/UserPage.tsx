@@ -9,6 +9,7 @@ import TradeJournal from "../components/trades/TradeJournal";
 import PortfolioSwitcher from "../components/portfolio/PortfolioSwitcher";
 import { MyPortfolio } from "../api/portfolios";
 import { useLanguage } from "../i18n/LanguageContext";
+import { PageBanner } from "../components/ui/PageBanner";
 
 // Define the UserPage functional component
 
@@ -91,10 +92,7 @@ const UserPage = () => {
       {/* Container with CSS class for the user page */}
       {user ? ( // If user exists, render the dashboard
         <div>
-          <section className="dashboard-info">
-            {/* Section for dashboard descriptive text */}
-            <h1>{t("dash_title")}</h1>
-          </section>
+          <PageBanner as="h1" title={t("dash_title")} />
 
           {/* Pick the book to work in. Everything below follows it. */}
           <PortfolioSwitcher

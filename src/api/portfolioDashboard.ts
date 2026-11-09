@@ -82,3 +82,60 @@ export const addFollowup = async (tradeId: number, body: string): Promise<Follow
 
 export const fetchComposition = async (portfolioId: number): Promise<Composition> =>
   (await axiosInstance.get<Composition>(`${BASE}/${portfolioId}/composition`)).data;
+
+/* ---------------------------------------------------------------------------
+   Module 5 - Performance Insights. Returns are fractions (0.05 = 5%),
+   measured on investing alone; the benchmarks share the portfolio's dates.
+   --------------------------------------------------------------------------- */
+
+export interface DatedReturn {
+  date: string;
+  value: number;
+}
+
+export interface MonthReturn {
+  month: string;
+  value: number;
+  partial: boolean;
+  in_progress: boolean;
+}
+
+export interface BenchmarkInfo {
+  key: string;
+  symbol: string;
+  name: string;
+  source: string;
+  return_type: string;
+  provisional: boolean;
+}
+
+export interface InsightsData {
+  start: string;
+  end: string;
+  sessions: number;
+  total_return: number;
+  average_monthly_return: number | null;
+  best_month: MonthReturn | null;
+  worst_month: MonthReturn | null;
+  positive_months: { positive: number; counted: number };
+  months: MonthReturn[];
+  max_drawdown: { value: number; peak_date: string | null; trough_date: string | null };
+  max_daily_gain: DatedReturn | null;
+  max_daily_loss: DatedReturn | null;
+  age_days: number;
+  benchmarks: { key: string; symbol: string; name: string; return: number | null; excess_return: number | null }[];
+  chart: ({ date: string; portfolio: number } & Record<string, number | string | null>)[];
+  estimated: boolean;
+}
+
+export type Insights = {
+  portfolio: { id: number; name: string; created_at: string };
+  status: { consistent: boolean; final_through: string | null; rebuilt_at: string } | null;
+  benchmarks: BenchmarkInfo[];
+} & (
+  | { available: true; insights: InsightsData }
+  | { available: false; reason: "no_history" | "too_new"; age_days: number }
+);
+
+export const fetchInsights = async (portfolioId: number): Promise<Insights> =>
+  (await axiosInstance.get<Insights>(`${BASE}/${portfolioId}/insights`)).data;

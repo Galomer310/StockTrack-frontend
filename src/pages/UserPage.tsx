@@ -6,6 +6,7 @@ import { RootState } from "../store"; // Import RootState for type definitions
 import Watchlist from "./Watchlist"; // Import the Watchlist component
 import TokenRefreshAlert from "../components/alerts/TokenRefreshAlert";
 import { ActivityModule } from "../components/activity/ActivityModule";
+import { InsightsModule } from "../components/insights/InsightsModule";
 import PortfolioSwitcher from "../components/portfolio/PortfolioSwitcher";
 import { MyPortfolio } from "../api/portfolios";
 import { useLanguage } from "../i18n/LanguageContext";
@@ -112,6 +113,8 @@ const UserPage = () => {
               />
               {/* Module 2: every change to the portfolio, newest first. */}
               <ActivityModule key={active.id} portfolioId={active.id} reloadKey={portfolioRefresh} />
+              {/* Module 5: the record, and the same dates against the benchmarks. */}
+              <InsightsModule key={`ins-${active.id}`} portfolioId={active.id} reloadKey={portfolioRefresh} />
             </>
           ) : (
             <p className="stock-empty">{t("dash_open_portfolio")}</p>

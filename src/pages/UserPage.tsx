@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate for naviga
 import { RootState } from "../store"; // Import RootState for type definitions
 import Watchlist from "./Watchlist"; // Import the Watchlist component
 import TokenRefreshAlert from "../components/alerts/TokenRefreshAlert";
-import TradeJournal from "../components/trades/TradeJournal";
+import { ActivityModule } from "../components/activity/ActivityModule";
 import PortfolioSwitcher from "../components/portfolio/PortfolioSwitcher";
 import { MyPortfolio } from "../api/portfolios";
 import { useLanguage } from "../i18n/LanguageContext";
@@ -110,12 +110,8 @@ const UserPage = () => {
                 portfolio={active}
                 onTraded={() => setPortfolioRefresh((k) => k + 1)}
               />
-              <section className="dashboard-journal">
-                <h3>
-                  <bdi>{active.name}</bdi> · {t("dash_journal")}
-                </h3>
-                <TradeJournal key={active.id} portfolioId={active.id} />
-              </section>
+              {/* Module 2: every change to the portfolio, newest first. */}
+              <ActivityModule key={active.id} portfolioId={active.id} reloadKey={portfolioRefresh} />
             </>
           ) : (
             <p className="stock-empty">{t("dash_open_portfolio")}</p>

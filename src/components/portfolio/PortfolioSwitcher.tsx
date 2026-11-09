@@ -13,6 +13,10 @@ import { useLanguage } from "../../i18n/LanguageContext";
 import { fill, serverMessage } from "../../i18n/fill";
 import { requestProgressionCheck } from "../../api/progression";
 import { DAILY_REWARDS_CHANGED } from "../../api/dailyRewards";
+import { Sparkline } from "../charts/Sparkline";
+
+// Whole days since the portfolio opened.
+const ageDays = (createdAt: string) => Math.max(0, Math.floor((Date.now() - Date.parse(createdAt)) / 86_400_000));
 
 /* ===========================================================================
    Choosing which portfolio you are working in.
@@ -36,7 +40,7 @@ interface Props {
 const PortfolioSwitcher: React.FC<Props> = ({ refreshKey = 0, onPortfolioChange }) => {
   const dispatch = useDispatch();
   const toast = useToast();
-  const { t, lang } = useLanguage();
+  const { t, lang, locale } = useLanguage();
   const activeId = useSelector((state: RootState) => state.portfolio.activeId);
 
   const [portfolios, setPortfolios] = useState<MyPortfolio[]>([]);
@@ -149,17 +153,19 @@ const PortfolioSwitcher: React.FC<Props> = ({ refreshKey = 0, onPortfolioChange 
               {p.name}
               {p.id === activeId && <span className="lb-you">{t("pf_open_badge")}</span>}
             </span>
-            <span className="portfolio-card-equity">{money(p.equity)}</span>
-            <span
-              className={`portfolio-card-return ${p.return_pct >= 0 ? "gain" : "loss"}`}
-            >
+            {/* All-time return: the genuine one, capital rewards excluded. */}
+            <span className={`portfolio-card-return-big ${p.return_pct >= 0 ? "gain" : "loss"}`}>
               <bdi dir="ltr">{percent(p.return_pct)}</bdi>
             </span>
+            <Sparkline values={p.sparkline ?? []} />
+            <span className="portfolio-card-meta">
+              <span className={`portfolio-status is-${p.status ?? "active"}`}>
+                {t(p.status === "closed" ? "pf_status_closed" : "pf_status_active")}
+              </span>
+              <span>{fill(t(ageDays(p.created_at) === 1 ? "pf_age_one" : "pf_age"), { n: ageDays(p.created_at) })}</span>
+            </span>
             <span className="portfolio-card-cash">
-              {fill(t(p.holdings_count === 1 ? "pf_cash_one" : "pf_cash_other"), {
-                cash: money(p.cash),
-                n: p.holdings_count,
-              })}
+              {fill(t("pf_updated"), { date: new Date(p.last_updated ?? p.created_at).toLocaleDateString(locale) })}
             </span>
           </button>
         ))}

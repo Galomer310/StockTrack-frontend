@@ -3,12 +3,12 @@ import axiosInstance from "../api/axiosInstance";
 import { useSelector } from "react-redux"; // Import useSelector to access Redux state
 import { RootState } from "../store"; // Import RootState for type definitions
 import { useNavigate, Link } from "react-router-dom"; // Import useNavigate for navigation
-import StockDistributionPieChart from "../components/charts/StockDistributionPieChart"; // Import StockDistributionPieChart component
 import PortfolioPerformanceChart from "../components/charts/PortfolioPerformanceChart"; // Import PortfolioPerformanceChart component
 import { useToast } from "../components/ui/ToastProvider";
 import TradeNoteModal, { TradeSubmission } from "../components/trades/TradeNoteModal";
 import { MyPortfolio } from "../api/portfolios";
 import { DAILY_REWARDS_CHANGED } from "../api/dailyRewards";
+import { AllocationModule } from "../components/allocation/AllocationModule";
 import { money } from "../api/social";
 import PortfolioPerformance from "../components/performance/PortfolioPerformance";
 import { useLanguage } from "../i18n/LanguageContext";
@@ -368,12 +368,8 @@ const Watchlist = ({ portfolio, onTraded }: Props) => {
           />
         </div>
       </div>{" "}
-      {/* The whole book: positions at today's prices, plus the cash left. */}
-      <StockDistributionPieChart
-        watchlist={watchlist}
-        cash={cash}
-        latestPrices={latestPrices}
-      />{" "}
+      {/* Module 1: the whole book at today's prices, cash included. */}
+      <AllocationModule portfolioId={portfolio.id} reloadKey={reloadKey} />{" "}
       <PortfolioPerformanceChart
         watchlist={watchlist} // Pass watchlist data to the performance chart
         latestPrices={latestPrices} // Pass latest prices to the performance chart

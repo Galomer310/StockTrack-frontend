@@ -58,6 +58,13 @@ Players also choose their username there (checked for availability as it is
 typed; rules in `src/api/nickname.ts`, enforced by the server). Uploaded
 pictures follow once there is storage.
 
+**Portfolio Dashboard.** The portfolio switcher is now the spec's carousel
+(return, status, age, last updated, sparkline). Module 1, Portfolio
+Allocation (`components/allocation`), replaces the old pie: Top 5 + Other +
+Cash, a panel per holding, the expanded allocation dashboard and Portfolio
+History (the composition matrix, newest on the left). All figures come from
+the server.
+
 **Daily rewards.** `DailyRewardsWatcher` checks in whenever the app opens
 (the server decides the day), shows the day's XP and streak, and opens the
 capital boost dialog on milestone days: the player picks one portfolio and

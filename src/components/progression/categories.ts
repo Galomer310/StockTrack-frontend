@@ -18,7 +18,6 @@ export const categoryName = (id: string): string =>
   categoryOf(id)?.name ?? id.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
 export const WAITS_FOR: Record<Dependency, MessageKey> = {
-  nicknames: "ach_waits_nicknames",
   follows: "ach_waits_follows",
   subscriptions: "ach_waits_subscriptions",
   competitions: "ach_waits_competitions",

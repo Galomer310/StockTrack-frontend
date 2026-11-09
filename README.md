@@ -54,8 +54,9 @@ id and accepts only the ids in its own list, so add new avatars to both).
 The chosen picture also appears beside the player's name in the feed and
 its replies, the leaderboard, the portfolio page and the follow lists
 (`PlayerAvatar`, which falls back to the initial).
-The nickname and uploaded pictures follow once their rules and storage are
-decided.
+Players also choose their username there (checked for availability as it is
+typed; rules in `src/api/nickname.ts`, enforced by the server). Uploaded
+pictures follow once there is storage.
 
 **Titles and achievements** (Part 5 of the spec document). The active title
 sits under the player's level, and "My Title Collection" lists all 60 titles

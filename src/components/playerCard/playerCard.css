@@ -170,11 +170,23 @@
 .pc-divider { width: 1px; align-self: stretch; background: linear-gradient(180deg, transparent, var(--pc-gold), transparent); }
 
 .pc-identity { display: grid; gap: 6px; justify-items: start; min-width: 0; }
+/* A username may be Hebrew: Cormorant has no Hebrew letters, so they come
+   from Frank Ruhl Libre rather than whatever serif the system has. */
 .pc-nickname {
-  margin: 0; font-family: var(--pc-display-en); font-weight: 700; line-height: 1.05;
+  margin: 0; font-family: "Cormorant Garamond", "Frank Ruhl Libre", Georgia, serif; font-weight: 700; line-height: 1.05;
   font-size: clamp(2rem, 4.2vw, 3.1rem); color: var(--pc-cream); overflow-wrap: anywhere;
 }
 .pc-nickname.is-missing { font-family: var(--pc-body); font-size: 1.15rem; font-weight: 500; color: var(--pc-muted); }
+.pc-nickname-cta { font-size: 1rem; }
+
+/* Username field in edit mode: the rules, then the live check. */
+.pc-hint { margin: -4px 0 4px; font-size: 0.78rem; line-height: 1.5; color: var(--pc-muted); }
+.pc-nickname-status { min-height: 1.3em; margin: 0 0 10px; font-size: 0.82rem; }
+.pc-nickname-status.is-checking { color: var(--pc-muted); }
+.pc-nickname-status.is-available { color: var(--pc-pos); }
+.pc-nickname-status.is-refused { color: #F0A7A1; }
+.pc-field input[aria-invalid="true"] { border-color: rgba(229, 84, 75, 0.7); }
+.pc-field input[readonly] { opacity: 0.6; cursor: not-allowed; }
 .pc-first-name { color: var(--pc-muted); font-size: 1.05rem; }
 .pc-avatar-silhouette { width: 55%; height: 55%; color: var(--pc-gold-deep); }
 

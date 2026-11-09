@@ -871,11 +871,18 @@ body.nav-locked { overflow: hidden; }
 }
 .switcher-limit { margin-top: 0.6rem; }
 
+/* The portfolio carousel (spec Part 1): one horizontal row that scrolls,
+   snapping card by card. Selecting a card updates everything below it. */
 .portfolio-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  display: flex;
   gap: 0.75rem;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  padding-block-end: 0.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
 }
+.portfolio-cards > .portfolio-card { flex: 0 0 14.5rem; scroll-snap-align: start; }
 
 .portfolio-card {
   display: flex;
@@ -911,6 +918,16 @@ body.nav-locked { overflow: hidden; }
   color: var(--text);
 }
 .portfolio-card-return { font-family: var(--font-num); font-weight: 600; font-size: 0.9rem; }
+.portfolio-card-return-big { font-family: var(--font-num); font-size: 1.3rem; font-weight: 700; }
+.portfolio-card-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.6rem; font-size: 0.78rem; color: var(--text-muted); }
+.portfolio-status { padding: 0.05rem 0.5rem; border: 1px solid var(--border-strong); border-radius: 999px; font-size: 0.7rem; }
+.portfolio-status.is-active { border-color: color-mix(in srgb, var(--gain) 55%, transparent); color: var(--gain); }
+.sparkline { display: block; }
+.sparkline polyline { stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
+.sparkline.is-up polyline { stroke: var(--gain); }
+.sparkline.is-down polyline { stroke: var(--loss); }
+.sparkline-base { stroke: var(--border-strong); stroke-width: 1; stroke-dasharray: 2 3; }
+.sparkline.is-empty { display: block; border-block-end: 1px dashed var(--border); }
 .portfolio-card-cash { font-size: 0.74rem; color: var(--text-faint); }
 
 /* Opening another book. */

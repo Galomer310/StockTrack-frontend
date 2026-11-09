@@ -1,0 +1,99 @@
+/* ===========================================================================
+   Portfolio Allocation, its expanded dashboard and Portfolio History.
+   Built on the dashboard's own tokens (style.css): surfaces, border, gold,
+   gain/loss. Logical properties throughout, so Hebrew mirrors it.
+   =========================================================================== */
+
+.al-module {
+  margin-block: 24px; padding: 20px; border: 1px solid var(--border); border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+}
+.al-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 12px; margin-block-end: 14px; }
+.al-head h3 { margin: 0; }
+.al-note { margin: 4px 0 0; color: var(--text-muted); font-size: 0.86rem; }
+.al-open {
+  min-block-size: 38px; padding: 6px 16px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--gold-line); background: var(--gold-wash); color: var(--gold-bright); font: inherit; font-size: 0.86rem;
+}
+.al-open:hover { border-color: var(--gold); }
+
+.al-body { display: grid; grid-template-columns: minmax(200px, 280px) minmax(180px, 1fr) minmax(220px, 300px); gap: 20px; align-items: start; }
+.al-chart { position: relative; block-size: 240px; }
+.al-table { inline-size: 100%; border-collapse: collapse; font-size: 0.92rem; }
+.al-table td { padding: 7px 6px; border-block-end: 1px solid var(--border); }
+.al-table tr.is-selected td { background: var(--gold-wash); }
+.al-num { text-align: end; font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.al-swatch { display: inline-block; inline-size: 10px; block-size: 10px; border-radius: 50%; margin-inline-end: 8px; vertical-align: middle; }
+.al-symbol {
+  padding: 0; border: 0; background: none; color: var(--text); font: inherit; font-weight: 600; cursor: pointer;
+  text-decoration: underline; text-decoration-color: var(--gold-line); text-underline-offset: 3px;
+}
+.al-symbol:hover, .al-symbol[aria-pressed="true"] { color: var(--gold-bright); }
+
+.al-panel {
+  padding: 14px 16px; border: 1px solid var(--gold-line); border-radius: var(--radius);
+  background: var(--bg-raised); box-shadow: var(--shadow-md);
+}
+.al-panel header { display: flex; align-items: center; justify-content: space-between; margin-block-end: 8px; }
+.al-panel h4 { margin: 0; font-size: 1.1rem; }
+.al-panel dl { display: grid; gap: 8px; margin: 0; }
+.al-panel dl > div { display: flex; justify-content: space-between; gap: 12px; }
+.al-panel dt { color: var(--text-muted); font-size: 0.86rem; }
+.al-panel dd { margin: 0; text-align: end; font-family: var(--font-num); }
+.al-hint { display: block; font-size: 0.74rem; color: var(--text-faint); font-family: var(--font-sans); }
+.al-close {
+  inline-size: 32px; block-size: 32px; border-radius: 50%; border: 1px solid var(--border); cursor: pointer;
+  background: transparent; color: var(--text-muted); font-size: 1.1rem; line-height: 1;
+}
+.al-close:hover { color: var(--text); border-color: var(--border-strong); }
+
+/* ---------- Dialogs ---------- */
+.al-dialog {
+  inline-size: min(calc(100% - 32px), 1040px); max-block-size: calc(100vh - 48px); padding: 0;
+  border: 1px solid var(--gold-line); border-radius: var(--radius-lg); background: var(--bg-base); color: var(--text);
+  box-shadow: var(--shadow-lg);
+}
+.al-dialog::backdrop { background: rgba(4, 7, 12, 0.72); backdrop-filter: blur(3px); }
+.al-dialog-frame { padding: 22px 24px 24px; }
+.al-dialog-head { display: flex; justify-content: space-between; gap: 12px; margin-block-end: 16px; }
+.al-dialog-head h2 { margin: 0; }
+.al-summary { margin-block-end: 18px; }
+.al-subhead { margin: 18px 0 10px; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+.al-scroll { overflow-x: auto; scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
+.al-full { inline-size: 100%; border-collapse: collapse; font-size: 0.9rem; white-space: nowrap; }
+.al-full th, .al-full td { padding: 8px 10px; text-align: start; border-block-end: 1px solid var(--border); }
+.al-full thead th { font-size: 0.74rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.al-full td { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.al-actions { margin-block-start: 18px; }
+
+/* ---------- Portfolio History ---------- */
+.ph-matrix-wrap { overflow: auto; max-block-size: 420px; scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; border: 1px solid var(--border); border-radius: var(--radius); }
+.ph-matrix { border-collapse: separate; border-spacing: 0; font-size: 0.86rem; white-space: nowrap; }
+.ph-matrix th, .ph-matrix td { padding: 7px 12px; border-block-end: 1px solid var(--border); text-align: right; }
+.ph-matrix thead th { position: sticky; top: 0; z-index: 1; background: var(--bg-raised); font-weight: 500; color: var(--text-muted); font-size: 0.76rem; }
+.ph-matrix td { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.ph-matrix td.is-changed { color: var(--gold-bright); background: var(--gold-wash); }
+.ph-sticky { position: sticky; left: 0; z-index: 2; background: var(--bg-raised); text-align: left !important; font-weight: 600; }
+.ph-matrix thead .ph-sticky { z-index: 3; }
+
+.ph-actions { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.ph-action { padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius); border-inline-start: 3px solid var(--border-strong); background: var(--bg-surface); }
+.ph-action.is-added, .ph-action.is-increased { border-inline-start-color: var(--gain); }
+.ph-action.is-reduced, .ph-action.is-removed { border-inline-start-color: var(--gold); }
+.ph-action-top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; font-size: 0.88rem; }
+.ph-action time { color: var(--text-muted); }
+.ph-kind { font-weight: 600; }
+.ph-symbol { font-weight: 700; }
+.ph-exposure, .ph-price { color: var(--text-muted); }
+.ph-note { margin: 6px 0 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+@media (max-width: 960px) {
+  .al-body { grid-template-columns: minmax(180px, 240px) 1fr; }
+  .al-panel { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  .al-module { padding: 16px; }
+  .al-body { grid-template-columns: 1fr; }
+  .al-chart { block-size: 220px; }
+  .al-dialog-frame { padding: 16px; }
+}

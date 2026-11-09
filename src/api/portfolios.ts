@@ -20,6 +20,12 @@ export interface MyPortfolio {
   holdings_count: number;
   cash_weight_pct: number;
   created_at: string;
+  /** active or closed (archived is not defined yet). */
+  status?: "active" | "closed";
+  /** The latest trade, or the opening when there is none. */
+  last_updated?: string;
+  /** Genuine performance index, thinned for the card's sparkline. */
+  sparkline?: number[];
 }
 
 export interface PortfolioList {

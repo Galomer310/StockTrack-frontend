@@ -4,6 +4,7 @@ import {
   announceDailyRewardsChanged,
   CapitalReward,
   checkIn,
+  DAILY_CHECKIN_REQUEST,
   OPEN_CAPITAL_BOOST,
   TIER_ACCENT,
 } from "../../api/dailyRewards";
@@ -68,9 +69,11 @@ export const DailyRewardsWatcher = () => {
     const onVisible = () => document.visibilityState === "visible" && run();
     document.addEventListener("visibilitychange", onVisible);
     const timer = window.setInterval(run, RECHECK_MS);
+    window.addEventListener(DAILY_CHECKIN_REQUEST, run);
     return () => {
       document.removeEventListener("visibilitychange", onVisible);
       window.clearInterval(timer);
+      window.removeEventListener(DAILY_CHECKIN_REQUEST, run);
     };
   }, [run]);
 

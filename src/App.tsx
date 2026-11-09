@@ -44,6 +44,7 @@ const ComparePortfolios = lazy(() => import("./pages/ComparePortfolios"));
 const PlayerCard = lazy(() => import("./pages/PlayerCard"));
 const AchievementCollection = lazy(() => import("./pages/AchievementCollection"));
 const DailyRewardsPage = lazy(() => import("./pages/DailyRewardsPage"));
+const TestToolsPage = lazy(() => import("./pages/TestToolsPage"));
 
 // Shown while a route chunk is in flight. Deliberately quiet: on a fast
 // connection the chunk arrives in a few frames, and a spinner that appears
@@ -79,6 +80,7 @@ const App = () => {
           <Route path="/player" element={guarded(<PlayerCard />)} />
           <Route path="/player/achievements" element={guarded(<AchievementCollection />)} />
           <Route path="/player/rewards" element={guarded(<DailyRewardsPage />)} />
+          <Route path="/test-tools" element={guarded(<TestToolsPage />)} />
           <Route path="/search" element={guarded(<StockSearch />)} />
           <Route path="/leaderboard" element={guarded(<Leaderboard />)} />
           <Route path="/feed" element={guarded(<Feed />)} />

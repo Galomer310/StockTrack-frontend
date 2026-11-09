@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Award, fetchPlayerCard, PlayerCardResult, ProfileUpdate, saveProfile } from "../api/playerCard";
 import { PROGRESSION_CHANGED, requestProgressionCheck, TitleCollection } from "../api/progression";
 import { ArtDefs, CornerChart, TitleOrnament } from "../components/playerCard/art";
@@ -10,6 +10,7 @@ import { CompetitionsPanel, PerformancePanel, ProgressionPanel } from "../compon
 import { TitleCollectionDialog } from "../components/progression/TitleCollectionDialog";
 import { FollowListsDialog } from "../components/social/FollowListsDialog";
 import { DailyRewardsPanel } from "../components/dailyRewards/DailyRewardsPanel";
+import { fetchTesterState } from "../api/testTools";
 import { useLanguage } from "../i18n/LanguageContext";
 import "../components/playerCard/playerCard.css";
 import "../components/progression/progression.css";
@@ -48,6 +49,13 @@ const PlayerCard = () => {
   const [open, setOpen] = useState<{ award: Award; kind: AwardKind } | null>(null);
   const [titlesOpen, setTitlesOpen] = useState(false);
   const [followsOpen, setFollowsOpen] = useState(false);
+  // The test panel's entry point, shown only to the test account.
+  const [isTester, setIsTester] = useState(false);
+  useEffect(() => {
+    fetchTesterState()
+      .then((s) => setIsTester(s !== null))
+      .catch(() => setIsTester(false));
+  }, []);
 
   useEffect(() => {
     let live = true;
@@ -145,6 +153,11 @@ const PlayerCard = () => {
             </div>
             {/* Daily rewards are the signed-in player's own; demo data has none. */}
             {!result.demo && <DailyRewardsPanel compact />}
+            {isTester && !result.demo && (
+              <Link className="pc-btn pc-test-link" to="/test-tools">
+                {t("tt_open")}
+              </Link>
+            )}
           </>
         )}
       </div>

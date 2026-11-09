@@ -390,3 +390,6 @@
 @media (prefers-reduced-motion: reduce) {
   .pc *, .pc *::before, .pc *::after { transition: none !important; }
 }
+
+/* The test panel entry, for the test account only. */
+.pc .pc-test-link { display: flex; justify-content: center; inline-size: fit-content; margin: 18px auto 0; text-decoration: none; }

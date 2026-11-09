@@ -58,6 +58,18 @@ Players also choose their username there (checked for availability as it is
 typed; rules in `src/api/nickname.ts`, enforced by the server). Uploaded
 pictures follow once there is storage.
 
+**The look.** `src/theme.css`, loaded last, gives every page the Player
+Card's style: near-black grounds lit by soft gold light, champagne-gold
+frames, cream type, Cormorant Garamond / Frank Ruhl Libre headings, and a
+gold glow around a card, a header link or a button under the pointer. Dark
+mode only; light mode keeps its own palette.
+
+**Test panel.** `/test-tools`, for the account named in the server's
+`TEST_PLAYER_EMAILS` only (a "test panel" button appears on its Player
+Card). After each tool the app checks for news as for a player, so the
+daily notice, capital boost, achievement notices and title ceremony appear
+as a player would see them.
+
 **Portfolio Dashboard.** The portfolio switcher is now the spec's carousel
 (return, status, age, last updated, sparkline). Module 1, Portfolio
 Allocation (`components/allocation`), replaces the old pie: Top 5 + Other +

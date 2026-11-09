@@ -65,6 +65,18 @@ export interface Award {
   xp: number;
   /** ISO date. */
   earned_at: string;
+  /** Professional medals only: what the medal itself shows. */
+  medal?: {
+    medal_id: string;
+    period_key: string;
+    tier: number;
+    decoration: number;
+    subtitle: string | null;
+    figure: number | null;
+    figure_kind: "outperformance" | "return" | "months" | "quarters";
+    period_label: Localized | null;
+    current_streak: number | null;
+  };
 }
 
 export interface TopPortfolio {

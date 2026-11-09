@@ -1,0 +1,84 @@
+/* Professional medals (spec 5.2-5.3): the aura of each tier.
+   Bronze: a light reflection. Silver: a soft shimmer. Gold: a warm,
+   slowly breathing glow. Platinum: a double halo turning very slowly.
+   Sovereign: a champagne halo with slow-moving light and a few motes.
+   Everything is still under prefers-reduced-motion. */
+
+.medal { position: relative; display: inline-block; flex: none; line-height: 0; isolation: isolate; }
+.medal svg { position: relative; z-index: 1; display: block; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.45)); }
+
+/* The halo sits behind the medal's disc (centre at 64% of the height). */
+.medal.has-aura::before,
+.medal.has-aura::after {
+  content: ""; position: absolute; z-index: 0; inset-inline-start: 50%; inset-block-start: 64%;
+  inline-size: 104%; aspect-ratio: 1; border-radius: 50%; translate: -50% -50%; pointer-events: none;
+}
+[dir="rtl"] .medal.has-aura::before, [dir="rtl"] .medal.has-aura::after { translate: 50% -50%; }
+
+/* A band of light passing across the disc. */
+.medal-sheen {
+  position: absolute; z-index: 2; inset-inline-start: 8.4%; inset-block-start: 30.6%;
+  inline-size: 83.2%; aspect-ratio: 1; border-radius: 50%; overflow: hidden; pointer-events: none;
+  mix-blend-mode: screen; opacity: 0.35;
+}
+.medal-sheen::after {
+  content: ""; position: absolute; inset: -20%;
+  background: linear-gradient(115deg, transparent 42%, rgba(255, 255, 255, 0.55) 50%, transparent 58%);
+  translate: -70% 0; animation: medal-sheen 9s ease-in-out infinite;
+}
+@keyframes medal-sheen { 0%, 70% { translate: -70% 0; } 100% { translate: 70% 0; } }
+
+.medal.tier-1 .medal-sheen { opacity: 0.22; }
+.medal.tier-2 .medal-sheen { opacity: 0.4; }
+.medal.tier-2 .medal-sheen::after { animation-duration: 6.5s; }
+.medal.tier-2.has-aura::before { background: radial-gradient(circle, rgba(220, 228, 236, 0.18), transparent 66%); }
+
+.medal.tier-3.has-aura::before {
+  background: radial-gradient(circle, rgba(244, 213, 140, 0.34), rgba(217, 169, 78, 0.08) 52%, transparent 68%);
+  animation: medal-breathe 5.5s ease-in-out infinite;
+}
+@keyframes medal-breathe { 0%, 100% { opacity: 0.65; scale: 0.97; } 50% { opacity: 1; scale: 1.03; } }
+
+.medal.tier-4.has-aura::before {
+  background: radial-gradient(circle, rgba(226, 234, 240, 0.26), transparent 64%);
+}
+.medal.tier-4.has-aura::after {
+  inline-size: 118%;
+  background: conic-gradient(from 0deg, transparent 0 20%, rgba(230, 238, 244, 0.32) 25%, transparent 32% 70%, rgba(230, 238, 244, 0.24) 75%, transparent 82%);
+  -webkit-mask: radial-gradient(circle, transparent 60%, #000 61%, #000 66%, transparent 67%, transparent 72%, #000 73%, #000 75%, transparent 76%);
+  mask: radial-gradient(circle, transparent 60%, #000 61%, #000 66%, transparent 67%, transparent 72%, #000 73%, #000 75%, transparent 76%);
+  animation: medal-turn 22s linear infinite;
+}
+
+.medal.tier-5.has-aura::before {
+  inline-size: 120%;
+  background: radial-gradient(circle, rgba(255, 236, 190, 0.42), rgba(231, 200, 134, 0.14) 48%, transparent 68%);
+  animation: medal-breathe 6.5s ease-in-out infinite;
+}
+.medal.tier-5.has-aura::after {
+  inline-size: 128%;
+  background:
+    radial-gradient(circle at 50% 4%, rgba(255, 244, 214, 0.95) 0 1.2%, transparent 1.8%),
+    radial-gradient(circle at 92% 62%, rgba(255, 244, 214, 0.8) 0 0.9%, transparent 1.5%),
+    radial-gradient(circle at 14% 74%, rgba(255, 244, 214, 0.7) 0 0.8%, transparent 1.4%),
+    conic-gradient(from 0deg, transparent 0 15%, rgba(255, 236, 190, 0.38) 22%, transparent 30% 65%, rgba(255, 236, 190, 0.28) 72%, transparent 80%);
+  -webkit-mask: radial-gradient(circle, transparent 56%, #000 58%, #000 72%, transparent 76%);
+  mask: radial-gradient(circle, transparent 56%, #000 58%, #000 72%, transparent 76%);
+  animation: medal-turn 16s linear infinite;
+}
+.medal.tier-5 .medal-sheen { opacity: 0.5; }
+.medal.tier-5 .medal-sheen::after { animation-duration: 7s; }
+@keyframes medal-turn { to { rotate: 360deg; } }
+
+/* An upgrade: light passes once and the new finish settles (spec 37). */
+.medal.is-upgrading svg { animation: medal-arrive 1.4s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.medal.is-upgrading .medal-sheen::after { animation: medal-sheen-once 1.6s ease-out 0.3s both; }
+@keyframes medal-arrive { from { opacity: 0; scale: 0.86; filter: brightness(1.6) drop-shadow(0 6px 10px rgba(0, 0, 0, 0.45)); } to { opacity: 1; scale: 1; } }
+@keyframes medal-sheen-once { from { translate: -70% 0; } to { translate: 70% 0; } }
+
+/* A medal not earned yet: an engraved outline, no metal, no aura. */
+.medal.is-locked svg { filter: grayscale(1) brightness(0.45); opacity: 0.55; }
+
+@media (prefers-reduced-motion: reduce) {
+  .medal *, .medal::before, .medal::after, .medal-sheen::after { animation: none !important; }
+}

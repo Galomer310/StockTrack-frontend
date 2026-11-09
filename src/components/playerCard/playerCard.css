@@ -393,3 +393,15 @@
 
 /* The test panel entry, for the test account only. */
 .pc .pc-test-link { display: flex; justify-content: center; inline-size: fit-content; margin: 18px auto 0; text-decoration: none; }
+
+/* Professional medals in the panel and dialog (components/medals). */
+.pc .pc-award .medal, .pc-dialog .medal { line-height: 0; }
+.pc-award .medal svg { max-width: none; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.5)); }
+.pc-award .medal-sheen { font-size: 0; }
+.pc-award .pc-award-tier { font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--pc-gold, #D9A94E); }
+:lang(he) .pc-award .pc-award-tier { letter-spacing: normal; }
+.pc-medal-caption { display: grid; justify-items: center; gap: 2px; margin: 0 0 10px; }
+.pc-medal-caption > span:first-child { font-size: 0.74rem; letter-spacing: 0.2em; text-transform: uppercase; color: #D9A94E; }
+:lang(he) .pc-medal-caption > span:first-child { letter-spacing: normal; }
+.pc-medal-figure { font-family: "Cormorant Garamond", "Frank Ruhl Libre", serif; font-size: 1.6rem; color: #F4D58C; }
+.pc-medal-subtitle { font-size: 0.72rem; letter-spacing: 0.24em; color: #E8DEC8; }

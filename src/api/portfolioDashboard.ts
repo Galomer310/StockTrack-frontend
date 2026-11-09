@@ -54,6 +54,14 @@ export interface CompositionEvent {
   before: Record<string, number>;
   after: Record<string, number>;
   note: string | null;
+  /** The author's dated additions to the rationale, oldest first. */
+  followups: Followup[];
+}
+
+export interface Followup {
+  id: number;
+  body: string;
+  created_at: string;
 }
 
 export interface Composition {
@@ -67,6 +75,10 @@ export const CASH_KEY = "CASH";
 
 export const fetchAllocation = async (portfolioId: number): Promise<Allocation> =>
   (await axiosInstance.get<Allocation>(`${BASE}/${portfolioId}/allocation`)).data;
+
+/** The trade's author adds a dated follow-up to its rationale. */
+export const addFollowup = async (tradeId: number, body: string): Promise<Followup> =>
+  (await axiosInstance.post<{ followup: Followup }>(`${import.meta.env.VITE_BACKEND_API_URL}/feed/${tradeId}/followups`, { body })).data.followup;
 
 export const fetchComposition = async (portfolioId: number): Promise<Composition> =>
   (await axiosInstance.get<Composition>(`${BASE}/${portfolioId}/composition`)).data;

@@ -1,0 +1,27 @@
+/* Module 2 - Portfolio Activity. Builds on allocation.css (modules, dialogs,
+   the composition table) and the dashboard tokens. */
+.act-table { inline-size: 100%; border-collapse: collapse; font-size: 0.9rem; white-space: nowrap; }
+.act-table th, .act-table td { padding: 8px 10px; text-align: start; border-block-end: 1px solid var(--border); }
+.act-table thead th { font-size: 0.74rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.act-table tbody th { background: transparent; color: var(--text); font-size: 0.9rem; font-weight: 700; letter-spacing: 0.02em; text-transform: none; }
+.act-table tbody tr { transition: background-color 0.2s ease; }
+.act-table tbody tr:hover { background: var(--gold-wash); }
+.act-num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.act-kind { display: inline-block; padding: 0.05rem 0.55rem; border-radius: 999px; font-size: 0.76rem; font-weight: 600; border: 1px solid var(--border-strong); }
+.act-kind.is-added, .act-kind.is-increased { color: var(--gain); border-color: color-mix(in srgb, var(--gain) 50%, transparent); }
+.act-kind.is-reduced, .act-kind.is-removed { color: var(--gold-bright); border-color: var(--gold-line); }
+
+.act-tabs { display: inline-flex; gap: 4px; padding: 4px; margin-block-end: 16px; border: 1px solid var(--border); border-radius: 999px; }
+.act-tabs button { min-block-size: 34px; padding: 4px 16px; border-radius: 999px; border-color: transparent; font-size: 0.86rem; }
+.act-tabs button.is-on { background: var(--gold-wash); border-color: var(--gold-line); color: var(--gold-bright); }
+
+.act-followups { display: grid; gap: 6px; margin: 8px 0 0; padding: 0; list-style: none; }
+.act-followups li { padding: 8px 10px; border-inline-start: 2px solid var(--gold-line); background: var(--gold-wash); border-radius: 0 6px 6px 0; }
+[dir="rtl"] .act-followups li { border-radius: 6px 0 0 6px; }
+.act-followup-label { display: block; font-size: 0.74rem; color: var(--gold-bright); letter-spacing: 0.04em; }
+.act-followups p { margin: 2px 0 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.act-add { margin-block-start: 6px; font-size: 0.84rem; }
+.act-write { display: grid; gap: 8px; margin-block-start: 8px; }
+.act-write textarea { inline-size: 100%; min-block-size: 80px; padding: 8px 10px; font: inherit; resize: vertical; }
+.act-write-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.act-hint { font-size: 0.76rem; color: var(--text-faint); }

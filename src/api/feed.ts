@@ -43,6 +43,8 @@ export interface FeedPost {
   reactions: Record<string, number>;
   my_reaction: string | null;
   comments: FeedComment[];
+  /** The author's dated additions to the rationale, oldest first. */
+  followups?: { id: number; body: string; created_at: string }[];
 }
 
 export interface FeedPage {

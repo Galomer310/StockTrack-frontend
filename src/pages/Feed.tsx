@@ -171,6 +171,19 @@ const PostCard = ({
       </header>
 
       <p className="feed-note" dir="auto">{post.note}</p>
+      {/* The author's later additions. The rationale above is never rewritten. */}
+      {post.followups && post.followups.length > 0 && (
+        <ol className="feed-followups">
+          {post.followups.map((f) => (
+            <li key={f.id}>
+              <span className="feed-followup-label">
+                {t("act_followup")} · <time dateTime={f.created_at}>{dateTime(f.created_at, locale)}</time>
+              </span>
+              <p dir="auto">{f.body}</p>
+            </li>
+          ))}
+        </ol>
+      )}
 
       <div className="feed-reactions">
         {REACTIONS.map((r) => {

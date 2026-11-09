@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { CASH_KEY, Composition, CompositionEvent, fetchComposition } from "../../api/portfolioDashboard";
+import { Composition, fetchComposition } from "../../api/portfolioDashboard";
 import { money } from "../../api/social";
 import { useLanguage } from "../../i18n/LanguageContext";
-import { MessageKey } from "../../i18n/messages";
+import { CompositionMatrix } from "../activity/CompositionMatrix";
+import { exposure as pct, KIND_LABEL as KIND, whenShort } from "../activity/format";
 
 /* ===========================================================================
    Portfolio History (spec Part 1, Module 1; the matrix is also Module 2's
@@ -15,15 +16,6 @@ import { MessageKey } from "../../i18n/messages";
    told apart by their time. Below it, every action with its previous and
    new exposure, price and rationale.
    =========================================================================== */
-
-const KIND: Record<CompositionEvent["kind"], MessageKey> = {
-  added: "ph_added",
-  increased: "ph_increased",
-  reduced: "ph_reduced",
-  removed: "ph_removed",
-};
-
-const pct = (w: number | undefined) => (w && w > 0.00005 ? `${(w * 100).toFixed(1)}%` : "—");
 
 export const PortfolioHistory = ({
   open,
@@ -52,11 +44,7 @@ export const PortfolioHistory = ({
     if (!open && d.open) d.close();
   }, [open, portfolioId]);
 
-  const when = (at: string) =>
-    new Date(at).toLocaleString(locale, { day: "numeric", month: "short", year: "2-digit", hour: "2-digit", minute: "2-digit" });
-
-  // Symbols that ever had a weight, then cash last.
-  const rows = data ? [...data.symbols, CASH_KEY] : [];
+  const when = (at: string) => whenShort(at, locale);
 
   return (
     <dialog
@@ -90,29 +78,7 @@ export const PortfolioHistory = ({
         {data && data.events.length > 0 && (
           <>
             <h3 className="al-subhead">{t("ph_composition")}</h3>
-            {/* dir="ltr": the newest action stays on the left in both languages. */}
-            <div className="ph-matrix-wrap" dir="ltr">
-              <table className="ph-matrix">
-                <thead>
-                  <tr>
-                    <th scope="col" className="ph-sticky"> </th>
-                    {data.events.map((e) => (
-                      <th scope="col" key={e.trade_id}>{when(e.at)}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((s) => (
-                    <tr key={s}>
-                      <th scope="row" className="ph-sticky">{s === CASH_KEY ? <span lang={lang}>{t("al_cash")}</span> : s}</th>
-                      {data.events.map((e) => (
-                        <td key={e.trade_id} className={e.symbol === s ? "is-changed" : ""}>{pct(e.after[s])}</td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <CompositionMatrix data={data} />
 
             <h3 className="al-subhead">{t("ph_actions")}</h3>
             <ol className="ph-actions">

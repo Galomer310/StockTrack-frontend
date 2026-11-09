@@ -77,6 +77,11 @@ Cash, a panel per holding, the expanded allocation dashboard and Portfolio
 History (the composition matrix, newest on the left). All figures come from
 the server.
 
+**Portfolio Activity** (`components/activity`), Module 2: the newest actions
+on the dashboard, and an expanded view with the detailed activity (where
+the author adds dated follow-ups; the original rationale never changes)
+and the composition table. Follow-ups also show in the feed.
+
 **Daily rewards.** `DailyRewardsWatcher` checks in whenever the app opens
 (the server decides the day), shows the day's XP and streak, and opens the
 capital boost dialog on milestone days: the player picks one portfolio and

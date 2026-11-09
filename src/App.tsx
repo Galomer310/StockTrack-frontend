@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "./store";
 import Navbar from "./components/layout/Navbar";
 import { ProgressionWatcher } from "./components/progression/ProgressionWatcher";
+import { DailyRewardsWatcher } from "./components/dailyRewards/DailyRewardsWatcher";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 
@@ -42,6 +43,7 @@ const StockPage = lazy(() => import("./pages/StockPage"));
 const ComparePortfolios = lazy(() => import("./pages/ComparePortfolios"));
 const PlayerCard = lazy(() => import("./pages/PlayerCard"));
 const AchievementCollection = lazy(() => import("./pages/AchievementCollection"));
+const DailyRewardsPage = lazy(() => import("./pages/DailyRewardsPage"));
 
 // Shown while a route chunk is in flight. Deliberately quiet: on a fast
 // connection the chunk arrives in a few frames, and a spinner that appears
@@ -66,6 +68,7 @@ const App = () => {
       <Navbar />
       {/* Unlock notices and the title ceremony, for whoever is signed in. */}
       {user && <ProgressionWatcher />}
+      {user && <DailyRewardsWatcher />}
       <Suspense fallback={<RouteFallback />}>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -75,6 +78,7 @@ const App = () => {
           <Route path="/user" element={guarded(<UserPage />)} />
           <Route path="/player" element={guarded(<PlayerCard />)} />
           <Route path="/player/achievements" element={guarded(<AchievementCollection />)} />
+          <Route path="/player/rewards" element={guarded(<DailyRewardsPage />)} />
           <Route path="/search" element={guarded(<StockSearch />)} />
           <Route path="/leaderboard" element={guarded(<Leaderboard />)} />
           <Route path="/feed" element={guarded(<Feed />)} />

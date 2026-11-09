@@ -58,6 +58,13 @@ Players also choose their username there (checked for availability as it is
 typed; rules in `src/api/nickname.ts`, enforced by the server). Uploaded
 pictures follow once there is storage.
 
+**Daily rewards.** `DailyRewardsWatcher` checks in whenever the app opens
+(the server decides the day), shows the day's XP and streak, and opens the
+capital boost dialog on milestone days: the player picks one portfolio and
+sees its value and return before and after (the return does not change).
+The Player Card shows the streak, the next milestones and pending rewards;
+`/player/rewards` adds the full history.
+
 **Titles and achievements** (Part 5 of the spec document). The active title
 sits under the player's level, and "My Title Collection" lists all 60 titles
 by category, unlocked and locked. When a new title tier is reached, the

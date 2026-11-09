@@ -10,6 +10,8 @@ export interface MyPortfolio {
   id: number;
   name: string;
   starting_balance: number;
+  /** starting_balance grown by capital growth rewards; the return is measured against it. */
+  capital_base: number;
   cash: number;
   positions_value: number;
   equity: number;

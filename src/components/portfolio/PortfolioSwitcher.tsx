@@ -12,6 +12,7 @@ import { useToast } from "../ui/ToastProvider";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { fill, serverMessage } from "../../i18n/fill";
 import { requestProgressionCheck } from "../../api/progression";
+import { DAILY_REWARDS_CHANGED } from "../../api/dailyRewards";
 
 /* ===========================================================================
    Choosing which portfolio you are working in.
@@ -46,6 +47,14 @@ const PortfolioSwitcher: React.FC<Props> = ({ refreshKey = 0, onPortfolioChange 
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  // Bumped when a capital growth reward changes a portfolio, to reload the list.
+  const [reloadTick, setReloadTick] = useState(0);
+
+  useEffect(() => {
+    const bump = () => setReloadTick((n) => n + 1);
+    window.addEventListener(DAILY_REWARDS_CHANGED, bump);
+    return () => window.removeEventListener(DAILY_REWARDS_CHANGED, bump);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -76,10 +85,11 @@ const PortfolioSwitcher: React.FC<Props> = ({ refreshKey = 0, onPortfolioChange 
     return () => {
       cancelled = true;
     };
+    // reloadTick: a capital growth reward changed a portfolio.
     // activeId is deliberately not a dependency: selecting a portfolio should
     // not refetch the list, and the selection is reconciled above on load.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, refreshKey]);
+  }, [dispatch, refreshKey, reloadTick]);
 
   const select = (portfolio: MyPortfolio) => {
     if (portfolio.id === activeId) return;

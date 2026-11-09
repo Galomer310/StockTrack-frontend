@@ -9,6 +9,7 @@ import { StatsRow } from "../components/playerCard/StatsRow";
 import { CompetitionsPanel, PerformancePanel, ProgressionPanel } from "../components/playerCard/TablePanels";
 import { TitleCollectionDialog } from "../components/progression/TitleCollectionDialog";
 import { FollowListsDialog } from "../components/social/FollowListsDialog";
+import { DailyRewardsPanel } from "../components/dailyRewards/DailyRewardsPanel";
 import { useLanguage } from "../i18n/LanguageContext";
 import "../components/playerCard/playerCard.css";
 import "../components/progression/progression.css";
@@ -142,6 +143,8 @@ const PlayerCard = () => {
               <ProgressionPanel progression={result.data.progression} />
               <PerformancePanel stats={result.data.stats} />
             </div>
+            {/* Daily rewards are the signed-in player's own; demo data has none. */}
+            {!result.demo && <DailyRewardsPanel compact />}
           </>
         )}
       </div>

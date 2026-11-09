@@ -44,3 +44,6 @@
 .ix-dates { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; inline-size: 100%; }
 .ix-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-block: 12px; }
 @media (max-width: 600px) { .ix-summary { grid-template-columns: 1fr; } }
+
+.ins-stat dt { display: flex; align-items: center; gap: 4px; }
+.ins-stat.is-open { grid-column: 1 / -1; border-color: var(--gold-line); }

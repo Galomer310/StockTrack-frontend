@@ -10,12 +10,21 @@ import {
 import { money, percent } from "../../api/social";
 import { useToast } from "../ui/ToastProvider";
 import { useLanguage } from "../../i18n/LanguageContext";
+import { MessageKey } from "../../i18n/messages";
 import { fill, serverMessage } from "../../i18n/fill";
 import { requestProgressionCheck } from "../../api/progression";
 import { DAILY_REWARDS_CHANGED } from "../../api/dailyRewards";
 import { Sparkline } from "../charts/Sparkline";
 
 // Whole days since the portfolio opened.
+const RISK_BAND: Record<NonNullable<MyPortfolio["risk"]>["band"], MessageKey> = {
+  "Very Low": "prof_band_very_low",
+  Low: "prof_band_low",
+  Medium: "prof_band_medium",
+  High: "prof_band_high",
+  "Very High": "prof_band_very_high",
+};
+
 const ageDays = (createdAt: string) => Math.max(0, Math.floor((Date.now() - Date.parse(createdAt)) / 86_400_000));
 
 /* ===========================================================================
@@ -163,6 +172,10 @@ const PortfolioSwitcher: React.FC<Props> = ({ refreshKey = 0, onPortfolioChange 
                 {t(p.status === "closed" ? "pf_status_closed" : "pf_status_active")}
               </span>
               <span>{fill(t(ageDays(p.created_at) === 1 ? "pf_age_one" : "pf_age"), { n: ageDays(p.created_at) })}</span>
+            </span>
+            {/* Risk Level, from the Investment Profile (spec: carousel card). */}
+            <span className="portfolio-card-risk">
+              {t("pf_risk")}: {p.risk ? t(RISK_BAND[p.risk.band]) : t("pf_risk_pending")}
             </span>
             <span className="portfolio-card-cash">
               {fill(t("pf_updated"), { date: new Date(p.last_updated ?? p.created_at).toLocaleDateString(locale) })}

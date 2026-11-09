@@ -26,6 +26,8 @@ export interface MyPortfolio {
   last_updated?: string;
   /** Genuine performance index, thinned for the card's sparkline. */
   sparkline?: number[];
+  /** The Investment Profile's Risk Score; null while it cannot be computed. */
+  risk?: { score: number; band: "Very Low" | "Low" | "Medium" | "High" | "Very High" } | null;
 }
 
 export interface PortfolioList {

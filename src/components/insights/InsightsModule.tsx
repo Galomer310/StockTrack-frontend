@@ -1,5 +1,5 @@
 import { CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Tooltip } from "chart.js";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Line } from "react-chartjs-2";
 import { DAILY_REWARDS_CHANGED } from "../../api/dailyRewards";
@@ -8,7 +8,9 @@ import { NEUTRAL, SERIES } from "../../charts/chartTheme";
 import { useIsLightMode } from "../../charts/useIsLightMode";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { fill, ltr } from "../../i18n/fill";
+import { MessageKey } from "../../i18n/messages";
 import "../allocation/allocation.css";
+import "../profile/profile.css";
 import "./insights.css";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
@@ -34,27 +36,63 @@ const asDate = (d: string) => new Date(`${d}T00:00:00`);
 
 // Numbers stay left to right; a value that is a phrase ("1 of 2", "69 days")
 // follows the page, or Hebrew would read it backwards.
+type Metric = "total" | "avg_month" | "best_month" | "worst_month" | "positive_months" | "drawdown" | "daily_gain" | "daily_loss" | "age";
+
 const Stat = ({
+  metric,
   label,
   value,
   sub,
   valueTone = "",
   phrase = false,
 }: {
+  metric: Metric;
   label: string;
   value: string;
   sub?: string;
   valueTone?: string;
   phrase?: boolean;
-}) => (
-  <div className="ins-stat">
-    <dt>{label}</dt>
-    <dd>
-      <bdi dir={phrase ? undefined : "ltr"} className={`ins-value ${valueTone}`}>{value}</bdi>
-      {sub && <span className="ins-sub">{sub}</span>}
-    </dd>
-  </div>
-);
+}) => {
+  const { t } = useLanguage();
+  const [open, setOpen] = useState(false);
+  const panel = useId();
+  return (
+    <div className={`ins-stat${open ? " is-open" : ""}`}>
+      <dt>
+        {label}
+        <button
+          type="button"
+          className="prof-info"
+          aria-expanded={open}
+          aria-controls={panel}
+          aria-label={`${t("prof_about")}: ${label}`}
+          title={t(`pi_${metric}_what` as MessageKey)}
+          onClick={() => setOpen((o) => !o)}
+        >
+          ⓘ
+        </button>
+      </dt>
+      <dd>
+        {/* Numbers stay left to right; a phrase ("1 of 2") follows the page. */}
+        <bdi dir={phrase ? undefined : "ltr"} className={`ins-value ${valueTone}`}>{value}</bdi>
+        {sub && <span className="ins-sub">{sub}</span>}
+        {open && (
+          <div className="prof-about" id={panel}>
+            <h4>{t("prof_about")}</h4>
+            <dl>
+              <dt>{t("prof_what")}</dt>
+              <dd>{t(`pi_${metric}_what` as MessageKey)}</dd>
+              <dt>{t("prof_how")}</dt>
+              <dd>{t(`pi_${metric}_how` as MessageKey)}</dd>
+              <dt>{t("prof_read")}</dt>
+              <dd>{t(`pi_${metric}_read` as MessageKey)}</dd>
+            </dl>
+          </div>
+        )}
+      </dd>
+    </div>
+  );
+};
 
 const Body = ({ data, meta }: { data: InsightsData; meta: Insights }) => {
   const { t, dir, locale } = useLanguage();
@@ -115,50 +153,50 @@ const Body = ({ data, meta }: { data: InsightsData; meta: Insights }) => {
   return (
     <>
       <dl className="ins-grid">
-        <Stat label={t("pi_total")} value={signedPct(data.total_return)} valueTone={tone(data.total_return)} />
+        <Stat metric="total" label={t("pi_total")} value={signedPct(data.total_return)} valueTone={tone(data.total_return)} />
         <Stat
-          label={t("pi_avg_month")}
+          metric="avg_month" label={t("pi_avg_month")}
           value={data.average_monthly_return === null ? "—" : signedPct(data.average_monthly_return)}
           valueTone={tone(data.average_monthly_return)}
           sub={counted ? fill(t("pi_months_counted"), { n: counted }) : t("pi_no_months")}
         />
         <Stat
-          label={t("pi_best_month")}
+          metric="best_month" label={t("pi_best_month")}
           value={data.best_month ? signedPct(data.best_month.value) : "—"}
           valueTone={tone(data.best_month?.value)}
           sub={data.best_month ? monthName(data.best_month) : t("pi_no_months")}
         />
         <Stat
-          label={t("pi_worst_month")}
+          metric="worst_month" label={t("pi_worst_month")}
           value={data.worst_month ? signedPct(data.worst_month.value) : "—"}
           valueTone={tone(data.worst_month?.value)}
           sub={data.worst_month ? monthName(data.worst_month) : t("pi_no_months")}
         />
         <Stat
-          label={t("pi_positive_months")}
+          metric="positive_months" label={t("pi_positive_months")}
           value={counted ? fill(t("pi_positive_of"), { n: data.positive_months.positive, total: counted }) : "—"}
           phrase
           sub={counted ? undefined : t("pi_no_months")}
         />
         <Stat
-          label={t("pi_drawdown")}
+          metric="drawdown" label={t("pi_drawdown")}
           value={signedPct(dd.value)}
           valueTone={tone(dd.value)}
           sub={dd.peak_date && dd.trough_date ? `${day(dd.peak_date)} – ${day(dd.trough_date)}` : t("pi_no_drawdown")}
         />
         <Stat
-          label={t("pi_daily_gain")}
+          metric="daily_gain" label={t("pi_daily_gain")}
           value={data.max_daily_gain ? signedPct(data.max_daily_gain.value) : "—"}
           valueTone={tone(data.max_daily_gain?.value)}
           sub={data.max_daily_gain ? day(data.max_daily_gain.date) : undefined}
         />
         <Stat
-          label={t("pi_daily_loss")}
+          metric="daily_loss" label={t("pi_daily_loss")}
           value={data.max_daily_loss ? signedPct(data.max_daily_loss.value) : "—"}
           valueTone={tone(data.max_daily_loss?.value)}
           sub={data.max_daily_loss ? day(data.max_daily_loss.date) : undefined}
         />
-        <Stat label={t("pi_age")} value={fill(t("pi_age_days"), { n: data.age_days })} phrase />
+        <Stat metric="age" label={t("pi_age")} value={fill(t("pi_age_days"), { n: data.age_days })} phrase />
       </dl>
 
       <h4 className="ins-subtitle">{t("pi_vs_title")}</h4>

@@ -45,7 +45,7 @@ export interface TitleCollection {
 }
 
 // Systems some achievements wait for. They do not exist yet.
-export type Dependency = "nicknames" | "follows" | "subscriptions" | "competitions";
+export type Dependency = "follows" | "subscriptions" | "competitions";
 
 export interface Achievement {
   id: string;

@@ -58,6 +58,7 @@ const momentumRider: Title = {
 const established: PlayerCardData = {
   player: {
     nickname: "growthhunter",
+    nickname_next_change_at: null,
     first_name: "Roee",
     avatar_url: null,
     avatar_id: "investor",
@@ -148,6 +149,7 @@ const established: PlayerCardData = {
 const newcomer: PlayerCardData = {
   player: {
     nickname: "newinvestor",
+    nickname_next_change_at: null,
     first_name: null,
     avatar_url: null,
     avatar_id: null,

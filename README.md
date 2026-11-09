@@ -51,8 +51,9 @@ reason, rather than invented. Players can edit their first name, bio and
 picture from the card. The picture comes from the avatar gallery in
 `src/components/avatars` (standalone SVGs; the server stores only the chosen
 id and accepts only the ids in its own list, so add new avatars to both).
-The nickname and uploaded pictures follow once their rules and storage are
-decided.
+Players also choose their username there (checked for availability as it is
+typed; rules in `src/api/nickname.ts`, enforced by the server). Uploaded
+pictures follow once there is storage.
 
 **Titles and achievements** (Part 5 of the spec document). The active title
 sits under the player's level, and "My Title Collection" lists all 60 titles

@@ -116,6 +116,7 @@ const PlayerCard = () => {
               player={result.data.player}
               progression={result.data.progression}
               canEdit
+              canCheckNickname={!result.demo}
               onSave={saveEdit}
               onOpenTitles={() => setTitlesOpen(true)}
             />

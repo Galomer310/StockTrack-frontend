@@ -15,6 +15,7 @@
 
 import axiosInstance from "./axiosInstance";
 import type { Title } from "./progression";
+import { cleanNickname, NICKNAME_ERROR_CODES, NicknameErrorCode, nicknameRuleError } from "./nickname";
 import { DEMO_PLAYER_CARDS, DemoScenario } from "../features/playerCard/demoData";
 
 const BASE = `${import.meta.env.VITE_BACKEND_API_URL}/players`;
@@ -92,8 +93,10 @@ export interface Progression {
 
 export interface PlayerCardData {
   player: {
-    /** null until the player has chosen one. */
+    /** The username; null until the player has chosen one. */
     nickname: string | null;
+    /** When the username may next change (once every 30 days); null when it may change now. */
+    nickname_next_change_at: string | null;
     first_name: string | null;
     avatar_url: string | null;
     /** A gallery avatar's id (components/avatars), or null for the default picture. */
@@ -133,20 +136,23 @@ export const FIRST_NAME_MAX_LENGTH = 50;
 // Counts characters as a person does, so a Hebrew letter or an emoji is one.
 export const bioLength = (text: string): number => [...text].length;
 
-// What the player may change about themselves. The nickname is not editable
-// yet (its rules are still to be decided), and pictures cannot be uploaded:
-// the avatar is chosen from the built-in gallery.
+// What the player may change about themselves. Pictures cannot be uploaded:
+// the avatar is chosen from the built-in gallery. The username's rules are in
+// ./nickname.ts.
 export interface ProfileUpdate {
   bio?: string;
   /** null removes it; the first name is optional. */
   first_name?: string | null;
   /** A gallery id, or null to return to the default picture. */
   avatar_id?: string | null;
+  /** The username; once chosen it can be changed but not removed. */
+  nickname?: string;
 }
 
 // Reasons the server gives for refusing an edit, so the page can explain
 // them in the reader's language.
 export type ProfileErrorCode =
+  | NicknameErrorCode
   | "BIO_TOO_LONG"
   | "FIRST_NAME_TOO_LONG"
   | "INVALID_CHARACTERS"
@@ -173,9 +179,10 @@ const KNOWN_CODES: ProfileErrorCode[] = [
   "INVALID_CHARACTERS",
   "NOT_EDITABLE",
   "INVALID_AVATAR",
+  ...NICKNAME_ERROR_CODES,
 ];
 
-// Saves the player's own bio, first name and/or avatar with PATCH /players/me and
+// Saves the player's own bio, first name, avatar and/or username with PATCH /players/me and
 // returns their identity as it now stands. On demo data nothing is sent: the
 // edit is applied locally and lasts until the page is reloaded.
 export const saveProfile = async (
@@ -188,11 +195,14 @@ export const saveProfile = async (
     const firstName = update.first_name?.trim();
     if (bio !== undefined && bioLength(bio) > BIO_MAX_LENGTH) throw new ProfileSaveError("BIO_TOO_LONG");
     if (firstName && bioLength(firstName) > FIRST_NAME_MAX_LENGTH) throw new ProfileSaveError("FIRST_NAME_TOO_LONG");
+    const nicknameError = update.nickname !== undefined ? nicknameRuleError(update.nickname) : null;
+    if (nicknameError) throw new ProfileSaveError(nicknameError);
     return {
       ...current,
       ...(bio !== undefined ? { bio } : {}),
       ...("first_name" in update ? { first_name: firstName || null } : {}),
       ...("avatar_id" in update ? { avatar_id: update.avatar_id ?? null } : {}),
+      ...(update.nickname !== undefined ? { nickname: cleanNickname(update.nickname) } : {}),
     };
   }
   try {

@@ -33,11 +33,16 @@ export const figureText = (t: T, f: MedalFacts) => {
   if (f.figure === null) return null;
   if (f.figure_kind === "months") return fill(t("pro_months"), { n: f.figure });
   if (f.figure_kind === "return") return `${Math.round(f.figure * 100)}%`;
+  if (f.figure_kind === "quarters") return fill(t("pro_quarters_protected"), { n: f.figure });
   return signedPct(f.figure);
 };
 
 /** ANNUAL CHAMPION, CALENDAR SWEEP, COMBO TWO QUARTERS. */
+const PHOENIX: MessageKey[] = ["pro_phoenix_1", "pro_phoenix_2", "pro_phoenix_3", "pro_phoenix_4", "pro_phoenix_5"];
+
 export const subtitleText = (t: T, lang: string, f: MedalFacts) => {
+  // Each Phoenix tier has its own name (spec 25.2).
+  if (f.medal_id === "phoenix_recovery") return t(PHOENIX[Math.min(5, Math.max(1, f.tier)) - 1]);
   if (f.subtitle === "annual_champion") return t("pro_annual_champion");
   if (f.subtitle === "calendar_sweep") return t("pro_calendar_sweep");
   if (f.subtitle === "combo" && f.current_streak && f.current_streak >= 2) {

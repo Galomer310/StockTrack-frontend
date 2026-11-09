@@ -101,6 +101,8 @@ classic circular medals in five metals with a restrained aura per tier
 (still under reduced motion), on the Player Card (automatic or the
 player's choice of four) and in the full collection at /player/medals,
 with every professional achievement by category and what is in progress.
+Risk & Discipline adds the Capital Protector (shield) and Phoenix Recovery
+(phoenix) medals; Phoenix never shows the depth of a fall.
 New unlocks and upgrades arrive as one notice, the best medal first.
 
 **Sign-out after inactivity** (`session/idle.ts`, `components/session/IdleWatcher`):

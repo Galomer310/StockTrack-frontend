@@ -22,7 +22,18 @@ export interface ProRecord {
   qualifying_value: number | null;
   benchmark_value: number | null;
   outperformance: number | null;
-  details: { partial?: boolean; from?: string; medal_eligible?: boolean; via_grace?: boolean; window_start?: string };
+  details: {
+    partial?: boolean;
+    from?: string;
+    medal_eligible?: boolean;
+    via_grace?: boolean;
+    window_start?: string;
+    /** Risk & Discipline: lowest point from the period's opening value, both sides. */
+    portfolio_downside?: number;
+    benchmark_downside?: number;
+    /** Recoveries: the lowest return before the recovery (evidence only). */
+    low?: number;
+  };
   xp_awarded: number;
   /** null: the XP for this achievement has not been decided yet. */
   xp_configured: number | null;

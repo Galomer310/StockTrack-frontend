@@ -18,7 +18,7 @@ export const REACTIONS = [
 
 export interface FeedComment {
   id: number;
-  user: { id: number; display_name: string };
+  user: { id: number; display_name: string; avatar_id?: string | null };
   body: string;
   created_at: string;
   is_mine: boolean;
@@ -29,7 +29,7 @@ export interface FeedComment {
 // and how it has aged, not the size of the cheque.
 export interface FeedPost {
   id: number;
-  user: { id: number; display_name: string };
+  user: { id: number; display_name: string; avatar_id?: string | null };
   is_mine: boolean;
   /** Which of the user's books the trade was made in */
   portfolio: { id: number; name: string } | null;

@@ -14,6 +14,7 @@ import {
 import { useLanguage } from "../i18n/LanguageContext";
 import { MessageKey } from "../i18n/messages";
 import { fill, ltr } from "../i18n/fill";
+import PlayerAvatar from "../components/avatars/PlayerAvatar";
 
 /* ===========================================================================
    Read-only view of one investor's portfolio, reached from the leaderboard.
@@ -73,6 +74,7 @@ const InvestorPortfolio = () => {
         {is_self && <span className="lb-you">{t("you_badge")}</span>}
       </h2>
       <p className="investor-since">
+        <PlayerAvatar className="investor-avatar" name={owner.display_name} avatarId={owner.avatar_id} />
         {fill(t("inv_owner_opened"), {
           name: iso(owner.display_name),
           date: new Date(portfolio.created_at).toLocaleDateString(locale),

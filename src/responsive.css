@@ -1123,6 +1123,39 @@ body.nav-locked { overflow: hidden; }
 .lb-owner { display: block; font-size: 0.72rem; color: var(--text-faint); }
 .lb-cash { display: block; font-size: 0.7rem; color: var(--text-faint); }
 
+/* ---------- Player pictures in lists (components/avatars/PlayerAvatar) ----------
+   The chosen gallery avatar, or the first letter of the name when there is
+   none. The artwork carries its own gold ring, so the letter's ring and wash
+   are dropped once there is a picture. */
+.player-avatar {
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  overflow: hidden;
+  line-height: 1;
+}
+.player-avatar img { display: block; inline-size: 100%; block-size: 100%; border-radius: 50%; }
+.player-avatar.has-art { background: transparent; border-color: transparent; }
+
+/* Small sizes: a reply, a leaderboard owner, the portfolio page byline. */
+.feed-comment-avatar,
+.lb-owner-avatar,
+.investor-avatar {
+  background: var(--gold-wash);
+  border: 1px solid var(--gold-line);
+  color: var(--gold-bright);
+  font-weight: 700;
+}
+.feed-comment-avatar {
+  inline-size: 1.35rem; block-size: 1.35rem; font-size: 0.66rem;
+  vertical-align: middle; margin-inline-end: 0.4rem;
+}
+.lb-owner { display: flex; align-items: center; gap: 0.35rem; margin-block-start: 0.15rem; }
+.lb-owner-avatar { inline-size: 1.3rem; block-size: 1.3rem; font-size: 0.62rem; }
+.investor-since { display: flex; align-items: center; gap: 0.5rem; }
+.investor-avatar { inline-size: 1.9rem; block-size: 1.9rem; font-size: 0.8rem; }
+
 /* ===========================================================================
    Market
    ---------------------------------------------------------------------------

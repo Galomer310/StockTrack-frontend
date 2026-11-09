@@ -21,7 +21,7 @@ export interface LeaderboardEntry {
   rank: number;
   id: number;
   name: string;
-  owner: { id: number; display_name: string };
+  owner: { id: number; display_name: string; avatar_id?: string | null };
   is_mine: boolean;
   return_pct: number;
   holdings_count: number;
@@ -81,7 +81,7 @@ export interface PortfolioSummary {
 // Response shape of GET /social/portfolios/:id.
 export interface PortfolioResponse {
   portfolio: { id: number; name: string; created_at: string };
-  owner: { id: number; display_name: string };
+  owner: { id: number; display_name: string; avatar_id?: string | null };
   is_self: boolean;
   summary: PortfolioSummary;
   holdings: Holding[];

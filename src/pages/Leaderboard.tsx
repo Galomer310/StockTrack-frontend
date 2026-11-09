@@ -7,6 +7,7 @@ import {
 } from "../api/social";
 import { useLanguage } from "../i18n/LanguageContext";
 import { fill } from "../i18n/fill";
+import PlayerAvatar from "../components/avatars/PlayerAvatar";
 
 // Ranks every portfolio by percentage return since it was opened, so a
 // cautious book can out-rank a large one on skill rather than capital.
@@ -66,7 +67,10 @@ const Leaderboard = () => {
             <div className="lb-name">
               <span className="lb-portfolio"><bdi>{entry.name}</bdi></span>
               {entry.is_mine && <span className="lb-you">{t("you_badge")}</span>}
-              <span className="lb-owner"><bdi>{entry.owner.display_name}</bdi></span>
+              <span className="lb-owner">
+                <PlayerAvatar className="lb-owner-avatar" name={entry.owner.display_name} avatarId={entry.owner.avatar_id} />
+                <bdi>{entry.owner.display_name}</bdi>
+              </span>
             </div>
             <div className="lb-holdings">
               {entry.holdings_count}

@@ -14,6 +14,7 @@ import { useToast } from "../components/ui/ToastProvider";
 import { useLanguage } from "../i18n/LanguageContext";
 import { MessageKey } from "../i18n/messages";
 import { fill, ltr } from "../i18n/fill";
+import PlayerAvatar from "../components/avatars/PlayerAvatar";
 
 /* ===========================================================================
    The feed.
@@ -123,9 +124,7 @@ const PostCard = ({
   return (
     <article className={`feed-post feed-${post.action}`}>
       <header className="feed-post-head">
-        <div className="feed-avatar" aria-hidden="true">
-          {post.user.display_name.charAt(0).toUpperCase()}
-        </div>
+        <PlayerAvatar className="feed-avatar" name={post.user.display_name} avatarId={post.user.avatar_id} />
 
         <div className="feed-byline">
           <span className="feed-author">
@@ -207,6 +206,7 @@ const PostCard = ({
               {/* The name is isolated inside the span, so the gap after it follows
                   the page's direction rather than the name's. */}
               <span className="feed-comment-author">
+                <PlayerAvatar className="feed-comment-avatar" name={c.user.display_name} avatarId={c.user.avatar_id} />
                 <bdi>{c.user.display_name}</bdi>
               </span>
               <span className="feed-comment-body" dir="auto">{c.body}</span>

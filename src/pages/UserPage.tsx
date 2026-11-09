@@ -8,6 +8,7 @@ import TokenRefreshAlert from "../components/alerts/TokenRefreshAlert";
 import { ActivityModule } from "../components/activity/ActivityModule";
 import { InsightsModule } from "../components/insights/InsightsModule";
 import { ProfileModule } from "../components/profile/ProfileModule";
+import { ExposureModule } from "../components/exposure/ExposureModule";
 import PortfolioSwitcher from "../components/portfolio/PortfolioSwitcher";
 import { MyPortfolio } from "../api/portfolios";
 import { useLanguage } from "../i18n/LanguageContext";
@@ -116,6 +117,8 @@ const UserPage = () => {
               <ActivityModule key={active.id} portfolioId={active.id} reloadKey={portfolioRefresh} />
               {/* Module 3: risk, volatility, diversification, horizon, turnover. */}
               <ProfileModule key={`prof-${active.id}`} portfolioId={active.id} reloadKey={portfolioRefresh} />
+              {/* Module 4: what kind of companies the money sits in. */}
+              <ExposureModule key={`exp-${active.id}`} portfolioId={active.id} reloadKey={portfolioRefresh} />
               {/* Module 5: the record, and the same dates against the benchmarks. */}
               <InsightsModule key={`ins-${active.id}`} portfolioId={active.id} reloadKey={portfolioRefresh} />
             </>

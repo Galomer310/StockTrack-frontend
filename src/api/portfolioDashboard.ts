@@ -226,3 +226,39 @@ export type IndexComparisonResult = {
 
 export const fetchIndexComparison = async (portfolioId: number, q: { index: string; from?: string; to?: string }) =>
   (await axiosInstance.get<IndexComparisonResult>(`${BASE}/${portfolioId}/compare-index`, { params: q })).data;
+
+/* ---------------------------------------------------------------------------
+   Module 4 - Exposure & Characteristics. Shares of the whole portfolio
+   (cash included); `unclassified` is the share that could not be judged.
+   --------------------------------------------------------------------------- */
+
+export interface ExposureValue {
+  value: number;
+  unclassified: number;
+}
+
+export interface ExposureData {
+  portfolio: { id: number; name: string };
+  micro_cap: ExposureValue;
+  small_cap: ExposureValue;
+  low_volume: ExposureValue;
+  tech: ExposureValue;
+  momentum: ExposureValue;
+  cash: number;
+  threshold_usd: number;
+  holdings: {
+    symbol: string;
+    weight: number;
+    market_cap: number | null;
+    cap: "micro" | "small" | null;
+    dollar_volume: number | null;
+    low_liquidity: boolean | null;
+    tech: boolean | null;
+    momentum: boolean | null;
+    industry: string | null;
+  }[];
+  not_available: string[];
+}
+
+export const fetchExposures = async (portfolioId: number): Promise<ExposureData> =>
+  (await axiosInstance.get<ExposureData>(`${BASE}/${portfolioId}/exposures`)).data;

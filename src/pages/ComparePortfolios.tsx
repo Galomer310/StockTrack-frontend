@@ -136,6 +136,7 @@ const ComparePortfolios = () => {
       </button>
 
       <h2>{fill(t("cmp_vs"), { a: iso(mine.portfolio.name), b: iso(theirs.portfolio.name) })}</h2>
+      <Link className="ix-link" to="/compare/market">{t("ix_open")}</Link>
       <p className={`compare-verdict ${diffPct >= 0 ? "gain" : "loss"}`}>
         {fill(t(diffPct >= 0 ? "cmp_ahead" : "cmp_behind"), { n: Math.abs(diffPct).toFixed(2) })}
       </p>

@@ -199,3 +199,30 @@ export interface InvestmentProfile {
 
 export const fetchProfile = async (portfolioId: number): Promise<InvestmentProfile> =>
   (await axiosInstance.get<InvestmentProfile>(`${BASE}/${portfolioId}/profile`)).data;
+
+/* ---------------------------------------------------------------------------
+   Comparing a portfolio with a market index (spec 41). Fractions; the
+   chart starts both at 100; never affects Beat the Market.
+   --------------------------------------------------------------------------- */
+
+export type IndexComparisonResult = {
+  portfolio: { id: number; name: string };
+  index: { key: string; symbol: string; name: string; source: string; return_type: string; provisional: boolean };
+  indices: { key: string; symbol: string; name: string }[];
+  range: { earliest: string; latest: string | null };
+} & (
+  | {
+      ok: true;
+      start: string;
+      end: string;
+      portfolio_return: number;
+      index_return: number;
+      excess_return: number;
+      chart: { date: string; portfolio: number; index: number }[];
+      estimated: boolean;
+    }
+  | { ok: false; reason: "no_history" | "no_index_data" | "too_short" }
+);
+
+export const fetchIndexComparison = async (portfolioId: number, q: { index: string; from?: string; to?: string }) =>
+  (await axiosInstance.get<IndexComparisonResult>(`${BASE}/${portfolioId}/compare-index`, { params: q })).data;

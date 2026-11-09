@@ -43,6 +43,7 @@ const Market = lazy(() => import("./pages/Market"));
 const InvestorPortfolio = lazy(() => import("./pages/InvestorPortfolio"));
 const StockPage = lazy(() => import("./pages/StockPage"));
 const ComparePortfolios = lazy(() => import("./pages/ComparePortfolios"));
+const IndexComparison = lazy(() => import("./pages/IndexComparison"));
 const PlayerCard = lazy(() => import("./pages/PlayerCard"));
 const AchievementCollection = lazy(() => import("./pages/AchievementCollection"));
 const DailyRewardsPage = lazy(() => import("./pages/DailyRewardsPage"));
@@ -95,6 +96,7 @@ const App = () => {
           <Route path="/market" element={guarded(<Market />)} />
           <Route path="/investor/:id" element={guarded(<InvestorPortfolio />)} />
           <Route path="/stock/:ticker" element={guarded(<StockPage />)} />
+          <Route path="/compare/market" element={guarded(<IndexComparison />)} />
           <Route path="/compare/:id" element={guarded(<ComparePortfolios />)} />
 
           {/* Performance moved onto the dashboard, under the over-time chart.

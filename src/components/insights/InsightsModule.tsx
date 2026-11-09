@@ -1,5 +1,6 @@
 import { CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Tooltip } from "chart.js";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { Line } from "react-chartjs-2";
 import { DAILY_REWARDS_CHANGED } from "../../api/dailyRewards";
 import { fetchInsights, Insights, InsightsData, MonthReturn } from "../../api/portfolioDashboard";
@@ -204,6 +205,7 @@ const Body = ({ data, meta }: { data: InsightsData; meta: Insights }) => {
         {fill(t("pi_proxy_note"), { symbols: ltr(meta.benchmarks.map((b) => b.symbol).join(" / ")) })}
       </p>
       {data.estimated && <p className="ins-foot">{t("pi_estimated")}</p>}
+      <Link className="ix-link" to="/compare/market">{t("ix_open")}</Link>
     </>
   );
 };

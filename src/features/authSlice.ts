@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'; // Import createSlice and PayloadAction from Redux Toolkit
+import { idleRemaining, noteIdleSignOut } from '../session/idle';
 
 // Key under which the auth slice is mirrored into localStorage, so that a page
 // refresh does not drop the session and bounce the user back to /login.
@@ -26,6 +27,13 @@ const loadAuthState = (): AuthState => {
     if (!raw) return emptyState;
     const parsed = JSON.parse(raw);
     if (!parsed?.user?.id || !parsed?.user?.email || !parsed?.accessToken) {
+      return emptyState;
+    }
+    // Away longer than the inactivity limit (browser closed, laptop asleep):
+    // the session ended while nobody was here, so it is not restored.
+    if (idleRemaining() <= 0) {
+      localStorage.removeItem(STORAGE_KEY);
+      noteIdleSignOut();
       return emptyState;
     }
     return {

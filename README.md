@@ -89,6 +89,14 @@ months, drawdown, best and worst days, age - and the S&P 500 and NASDAQ-100
 that starts every series at 100. Every figure comes from
 `GET /portfolios/:id/insights`.
 
+**Sign-out after inactivity** (`session/idle.ts`, `components/session/IdleWatcher`):
+15 minutes without any pointer, key, scroll or touch input in any tab signs
+the player out and opens the login page, which says why. A warning counts
+down the last minute; any input or "I'm still here" keeps the session. The
+moment of the last input is shared by every tab and kept across a browser
+restart, so coming back after more than 15 minutes finds the session
+already over. Signing out in one tab signs out the others.
+
 **Daily rewards.** `DailyRewardsWatcher` checks in whenever the app opens
 (the server decides the day), shows the day's XP and streak, and opens the
 capital boost dialog on milestone days: the player picks one portfolio and

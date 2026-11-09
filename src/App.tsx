@@ -10,6 +10,7 @@ import { RootState } from "./store";
 import Navbar from "./components/layout/Navbar";
 import { ProgressionWatcher } from "./components/progression/ProgressionWatcher";
 import { DailyRewardsWatcher } from "./components/dailyRewards/DailyRewardsWatcher";
+import { IdleWatcher } from "./components/session/IdleWatcher";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 
@@ -70,6 +71,8 @@ const App = () => {
       {/* Unlock notices and the title ceremony, for whoever is signed in. */}
       {user && <ProgressionWatcher />}
       {user && <DailyRewardsWatcher />}
+      {/* Signs out after 15 minutes without activity. */}
+      {user && <IdleWatcher />}
       <Suspense fallback={<RouteFallback />}>
         <Routes>
           <Route path="/" element={<Home />} />

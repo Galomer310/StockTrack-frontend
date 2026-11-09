@@ -1425,3 +1425,6 @@ body.nav-locked { overflow: hidden; }
 .feed-followups li { padding: 0.45rem 0.7rem; border-inline-start: 2px solid var(--gold-line); background: var(--gold-wash); border-start-end-radius: 6px; border-end-end-radius: 6px; }
 .feed-followup-label { display: block; font-size: 0.74rem; color: var(--gold-bright); }
 .feed-followups p { margin: 0.15rem 0 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* Carousel card: the Investment Profile's Risk Level. */
+.portfolio-card-risk { display: block; font-size: 0.78rem; color: var(--text-muted); }

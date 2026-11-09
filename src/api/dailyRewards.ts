@@ -118,6 +118,9 @@ export const redeemReward = async (rewardId: number, portfolioId: number): Promi
 // so every panel on screen reloads, and the portfolio screens too.
 export const DAILY_REWARDS_CHANGED = "daily-rewards:changed";
 export const announceDailyRewardsChanged = () => window.dispatchEvent(new Event(DAILY_REWARDS_CHANGED));
+// Asks the watcher to check in now (the test tools use it after moving days).
+export const DAILY_CHECKIN_REQUEST = "daily-rewards:check-in";
+export const requestDailyCheckIn = () => window.dispatchEvent(new Event(DAILY_CHECKIN_REQUEST));
 // Opens the capital boost dialog for one reward from anywhere in the app.
 export const OPEN_CAPITAL_BOOST = "daily-rewards:open-boost";
 export const openCapitalBoost = (reward: CapitalReward) =>

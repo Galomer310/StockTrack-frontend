@@ -1,0 +1,39 @@
+/* The test player's panel. Built on the progression tokens (.prg). */
+.tt-account { margin: 0; color: var(--prg-gold); }
+.tt-denied { padding-block: 60px; }
+.tt-state {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px;
+  max-inline-size: 1000px; margin: 0 auto 10px;
+}
+.tt-state > div {
+  display: grid; gap: 2px; padding: 12px 14px; border: 1px solid var(--prg-line); border-radius: 6px; background: var(--prg-surface);
+}
+.tt-state span { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--prg-muted); }
+.tt-state strong { font-family: var(--prg-serif-en); font-size: 1.6rem; color: var(--prg-ivory); line-height: 1.1; }
+.tt-state em { font-style: normal; font-size: 0.74rem; color: var(--prg-muted); }
+.tt-status { max-inline-size: 1000px; min-block-size: 1.4em; margin: 6px auto 12px; text-align: center; font-size: 0.92rem; }
+.tt-status.is-ok { color: #7FC79A; }
+.tt-status.is-error { color: #E08A80; }
+.tt-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; max-inline-size: 1000px; margin: 0 auto; }
+.tt-card {
+  display: grid; align-content: start; gap: 10px; padding: 18px; border: 1px solid var(--prg-line); border-radius: 6px;
+  background: linear-gradient(160deg, var(--prg-surface-2), var(--prg-surface));
+}
+.tt-card h2 { margin: 0; font-family: var(--prg-serif-en); font-size: 1.4rem; color: var(--prg-ivory); }
+:lang(he) .tt-card h2 { font-family: var(--prg-serif-he); }
+.tt-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; }
+.tt-field { display: grid; gap: 4px; font-size: 0.8rem; color: var(--prg-muted); }
+.tt-field input {
+  inline-size: 110px; min-block-size: 38px; padding: 6px 10px; border: 1px solid var(--prg-line); border-radius: 6px;
+  background: var(--prg-bg); color: var(--prg-ivory); font: inherit;
+}
+.prg .tt-btn, .prg .tt-chip {
+  min-block-size: 38px; padding: 6px 14px; border: 1px solid var(--prg-line); border-radius: 999px; cursor: pointer;
+  background: transparent; color: var(--prg-ivory); font: inherit; font-size: 0.86rem;
+}
+.prg .tt-chip { min-block-size: 32px; padding: 4px 12px; font-size: 0.78rem; }
+.prg .tt-btn:hover:not(:disabled), .prg .tt-chip:hover:not(:disabled) { border-color: var(--prg-gold); }
+.prg .tt-btn.is-primary { border-color: var(--prg-gold); color: var(--prg-bg); background: var(--prg-gold); }
+.prg .tt-btn.is-danger { border-color: rgba(224, 138, 128, 0.6); color: #E08A80; }
+.prg .tt-btn:disabled, .prg .tt-chip:disabled { opacity: 0.55; cursor: progress; }
+.tt-danger { padding-block-start: 8px; border-block-start: 1px dashed var(--prg-line); }

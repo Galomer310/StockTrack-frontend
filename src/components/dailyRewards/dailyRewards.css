@@ -1,0 +1,146 @@
+/* ===========================================================================
+   Daily rewards (spec section 14). Built on the progression tokens in
+   progression.css (.prg: obsidian, navy, slate, steel, champagne gold,
+   ivory). Each capital tier has its own accent, set as --accent inline:
+   weekly blue, monthly purple, quarterly champagne gold - each a little more
+   ceremonial than the last, never louder than the card around it.
+   =========================================================================== */
+
+.dr-accent { color: var(--accent, var(--prg-gold)); }
+
+/* ---------- The daily notice: top corner, so it never meets the
+   achievement notices in the bottom corner. ---------- */
+.dr-notices {
+  position: fixed; z-index: 1200; inset-block-start: 84px; inset-inline-end: 20px;
+  inline-size: min(340px, calc(100vw - 32px)); pointer-events: none;
+}
+
+/* ---------- Panel ---------- */
+.prg.dr-panel {
+  display: grid; gap: 16px; padding: 20px 22px; border: 1px solid var(--prg-line); border-radius: 6px;
+  background: linear-gradient(160deg, var(--prg-surface-2), var(--prg-surface)); color: var(--prg-ivory);
+  font-family: var(--prg-body);
+}
+.dr-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.prg .dr-link { color: var(--prg-gold); font-size: 0.84rem; text-decoration: none; }
+.prg .dr-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+.dr-panel-grid { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 22px; }
+.dr-streak {
+  display: grid; justify-items: center; gap: 2px; padding: 10px 18px; min-inline-size: 110px;
+  border-inline-end: 1px solid var(--prg-line);
+}
+.dr-streak-value { font-size: 3.2rem; line-height: 1; color: var(--prg-gold); }
+.dr-streak-label { font-size: 0.78rem; letter-spacing: 0.08em; color: var(--prg-muted); text-align: center; }
+.dr-facts { display: grid; gap: 10px; margin: 0; }
+.dr-facts > div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; }
+.dr-facts dt { color: var(--prg-muted); font-size: 0.86rem; }
+.dr-facts dd { margin: 0; font-size: 0.95rem; }
+
+.dr-track-wrap { display: grid; gap: 6px; }
+.dr-track { display: flex; gap: 5px; margin: 0; padding: 0; list-style: none; }
+.dr-track li {
+  flex: 1 1 0; block-size: 6px; border-radius: 3px;
+  background: color-mix(in srgb, var(--prg-line) 85%, transparent);
+  transition: background-color 0.4s var(--prg-ease);
+}
+.dr-track li.is-done { background: var(--accent); }
+.dr-track li.is-goal { box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 70%, transparent); }
+
+.dr-subhead {
+  margin: 0 0 8px; font-family: var(--prg-body); font-size: 0.72rem; font-weight: 500;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--prg-muted);
+}
+.dr-pending-list, .dr-history-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.dr-pending-row {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px;
+  padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--prg-line)); border-radius: 4px;
+  background: color-mix(in srgb, var(--accent) 6%, var(--prg-surface));
+}
+.dr-pending-icon, .dr-boost-emblem {
+  display: grid; place-items: center; inline-size: 34px; block-size: 34px; color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent); border-radius: 50%;
+}
+.dr-pending-icon svg, .dr-boost-emblem svg { inline-size: 60%; block-size: 60%; }
+.dr-pending-text { display: grid; gap: 2px; min-inline-size: 0; }
+/* justify-self: an LTR isolate in a grid would otherwise align to its own
+   (left) start, even in a Hebrew page. */
+.dr-pending-pct { justify-self: start; font-family: var(--prg-serif-en); font-size: 1.35rem; font-weight: 700; line-height: 1; }
+
+/* ---------- Buttons ---------- */
+.prg .dr-btn {
+  min-block-size: 40px; padding: 8px 18px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--prg-line); background: transparent; color: var(--prg-ivory);
+  font: inherit; font-size: 0.88rem; font-weight: 500;
+  transition: border-color 0.2s, background-color 0.2s, color 0.2s;
+}
+.prg .dr-btn:hover:not(:disabled) { border-color: var(--accent, var(--prg-gold)); }
+.prg .dr-btn.is-primary {
+  border-color: var(--accent, var(--prg-gold)); color: var(--prg-bg);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent, var(--prg-gold)) 92%, #fff), var(--accent, var(--prg-gold)));
+}
+.prg .dr-btn.is-small { min-block-size: 34px; padding: 5px 14px; font-size: 0.8rem; color: var(--accent); border-color: color-mix(in srgb, var(--accent) 50%, transparent); }
+.prg .dr-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.dr-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-block-start: 16px; }
+
+/* ---------- Capital boost dialog ---------- */
+.prg-dialog.dr-boost { inline-size: min(calc(100% - 32px), 640px); }
+.dr-boost .prg-dialog-frame { border-block-start: 2px solid var(--accent); }
+.dr-boost-head { justify-items: start; }
+.dr-boost-head h2 { font-size: 2.1rem; }
+.dr-boost-emblem { inline-size: 46px; block-size: 46px; margin-block-end: 4px; }
+.dr-tier-quarterly .dr-boost-emblem {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 12%, transparent), 0 0 28px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.dr-tier-quarterly .prg-dialog-frame { background: radial-gradient(120% 70% at 50% 0%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 70%); }
+.dr-message {
+  margin: 6px 0 0; padding-inline-start: 12px; border-inline-start: 2px solid color-mix(in srgb, var(--accent, var(--prg-gold)) 60%, transparent);
+  font-size: 1.12rem; font-style: italic; color: var(--prg-ivory);
+}
+:lang(he) .dr-message { font-style: normal; }
+
+.dr-portfolios { display: grid; gap: 10px; min-inline-size: 0; margin: 0; padding: 0; border: 0; }
+.dr-portfolios legend { margin-block-end: 8px; padding: 0; color: var(--prg-muted); font-size: 0.86rem; }
+.dr-portfolio {
+  position: relative; display: grid; gap: 8px; padding: 12px 14px; cursor: pointer;
+  border: 1px solid var(--prg-line); border-radius: 4px; background: var(--prg-surface);
+  transition: border-color 0.2s, background-color 0.2s;
+}
+.dr-portfolio:hover { border-color: color-mix(in srgb, var(--accent) 50%, var(--prg-line)); }
+.dr-portfolio.is-chosen { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 7%, var(--prg-surface)); }
+.dr-portfolio input { position: absolute; inset-block-start: 14px; inset-inline-end: 14px; accent-color: var(--accent); }
+.dr-portfolio:has(input:focus-visible) { outline: 2px dashed var(--prg-ivory); outline-offset: 2px; }
+.dr-portfolio-name { font-weight: 600; padding-inline-end: 28px; overflow-wrap: anywhere; }
+.dr-figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(108px, 1fr)); gap: 6px 14px; margin: 0; }
+.dr-figures dt { font-size: 0.72rem; color: var(--prg-muted); }
+.dr-figures dd { margin: 0; font-size: 0.92rem; font-variant-numeric: tabular-nums; }
+.dr-figures .gain { color: #7FC79A; }
+.dr-figures .loss { color: #E08A80; }
+.dr-note { margin-block: 12px 0; }
+.dr-done { display: grid; gap: 6px; }
+.dr-done-line { margin: 0; font-size: 1.05rem; }
+
+/* ---------- Page and history ---------- */
+.dr-page .dr-panel { max-inline-size: 760px; margin-inline: auto; }
+.dr-history { max-inline-size: 760px; margin: 28px auto 0; }
+.dr-history-row {
+  display: grid; gap: 8px; padding: 12px 14px; border: 1px solid var(--prg-line); border-radius: 4px;
+  border-inline-start: 3px solid var(--accent); background: var(--prg-surface);
+}
+.dr-history-top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; }
+.dr-status { margin-inline-start: auto; }
+.dr-status.is-pending { border-color: color-mix(in srgb, var(--accent) 55%, transparent); color: var(--accent); }
+.dr-figures-history { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.dr-table { inline-size: 100%; border-collapse: collapse; font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+.dr-table th { padding: 8px 10px; text-align: start; font-size: 0.72rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--prg-muted); border-block-end: 1px solid var(--prg-line); }
+.dr-table td { padding: 8px 10px; border-block-end: 1px solid color-mix(in srgb, var(--prg-line) 55%, transparent); }
+
+@media (max-width: 560px) {
+  .prg.dr-panel { padding: 16px; }
+  .dr-panel-grid { grid-template-columns: 1fr; gap: 12px; }
+  .dr-streak { border-inline-end: 0; border-block-end: 1px solid var(--prg-line); padding: 4px 0 12px; }
+  .dr-notices { inset-inline: 16px; inline-size: auto; inset-block-start: 76px; }
+  .dr-boost-head h2 { font-size: 1.7rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dr-track li, .dr-portfolio, .prg .dr-btn { transition: none; }
+}

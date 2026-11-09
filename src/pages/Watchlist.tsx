@@ -8,6 +8,7 @@ import PortfolioPerformanceChart from "../components/charts/PortfolioPerformance
 import { useToast } from "../components/ui/ToastProvider";
 import TradeNoteModal, { TradeSubmission } from "../components/trades/TradeNoteModal";
 import { MyPortfolio } from "../api/portfolios";
+import { DAILY_REWARDS_CHANGED } from "../api/dailyRewards";
 import { money } from "../api/social";
 import PortfolioPerformance from "../components/performance/PortfolioPerformance";
 import { useLanguage } from "../i18n/LanguageContext";
@@ -34,6 +35,13 @@ const Watchlist = ({ portfolio, onTraded }: Props) => {
     [key: string]: boolean;
   }>({}); // State to track expanded groups by stock symbol
   const [reloadKey, setReloadKey] = useState(0); // bumped after a sale to refetch
+  // A capital growth reward adds cash to a portfolio: refetch, so the cash on
+  // screen is the server's.
+  useEffect(() => {
+    const bump = () => setReloadKey((k) => k + 1);
+    window.addEventListener(DAILY_REWARDS_CHANGED, bump);
+    return () => window.removeEventListener(DAILY_REWARDS_CHANGED, bump);
+  }, []);
   const [latestPrices, setLatestPrices] = useState<{
     [symbol: string]: number;
   }>({}); // State for storing the latest prices for each stock
@@ -342,6 +350,14 @@ const Watchlist = ({ portfolio, onTraded }: Props) => {
           <span className="summary-label">{t("cash_opened_with")}</span>
           <span className="summary-value">{money(portfolio.starting_balance)}</span>
         </div>
+        {/* Shown once capital growth rewards have been added: what the
+            return is now measured against. */}
+        {portfolio.capital_base > portfolio.starting_balance + 0.005 && (
+          <div className="cash-figure">
+            <span className="summary-label">{t("cash_capital_base")}</span>
+            <span className="summary-value">{money(portfolio.capital_base)}</span>
+          </div>
+        )}
         {/* How much of the book is still uninvested, drawn as a bar. */}
         <div className="cash-meter" title={fill(t("cash_meter"), { cash: money(cash), total: money(total + cash) })}>
           <span

@@ -8,6 +8,8 @@ import { Emblem } from "../progression/emblems";
 import { AwardArt } from "./art";
 import { formatDate, formatNumber } from "./format";
 import { Icon } from "./icons";
+import { Medal } from "../medals/Medal";
+import { figureText, subtitleText, tierName } from "../medals/format";
 
 /* ===========================================================================
    Areas 3 and 4 - professional medals and game achievements (spec 6, 7).
@@ -24,9 +26,12 @@ import { Icon } from "./icons";
 
 export type AwardKind = "medal" | "achievement";
 
-// A game achievement's emblem in its category colour, or a medal's drawing.
-const Art = ({ award, className }: { award: Award; className?: string }) =>
-  award.category ? (
+// A professional medal in its tier's metal, a game achievement's emblem in
+// its category colour, or (demo data) a drawn medal.
+const Art = ({ award, className, size = 64 }: { award: Award; className?: string; size?: number }) =>
+  award.medal ? (
+    <Medal icon={award.art} tier={award.medal.tier} decoration={award.medal.decoration} size={size} className={className} />
+  ) : award.category ? (
     <span
       className={`pc-ach-emblem is-${award.rarity ?? "basic"}${className ? ` ${className}` : ""}`}
       style={{ "--accent": award.accent_color } as CSSProperties}
@@ -69,6 +74,7 @@ export const AwardsPanel = ({
               <button type="button" className={`pc-award pc-award--${kind}`} onClick={() => onOpen(a)}>
                 <Art award={a} />
                 <span dir="auto">{a.name[lang]}</span>
+                {a.medal && <span className="pc-award-tier">{tierName(t, a.medal.tier, a.medal.decoration, a.medal.medal_id)}</span>}
               </button>
             </li>
           ))}
@@ -76,13 +82,22 @@ export const AwardsPanel = ({
       ) : (
         <p className="pc-empty">{t(isMedal ? "medals_empty" : "achievements_empty")}</p>
       )}
-      {!isMedal && (
+      {!isMedal ? (
         <div className="pc-awards-foot">
           <span>{fill(t("prg_unlocked_n"), { n: new Intl.NumberFormat(locale).format(total) })}</span>
           <Link className="pc-awards-link" to={`/player/achievements${demo != null ? `?demo=${demo}` : ""}`}>
             {t("prg_view_all")}
           </Link>
         </div>
+      ) : (
+        demo == null && (
+          <div className="pc-awards-foot">
+            <span>{fill(t("prg_unlocked_n"), { n: new Intl.NumberFormat(locale).format(total) })}</span>
+            <Link className="pc-awards-link" to="/player/medals">
+              {t("pro_view_collection")}
+            </Link>
+          </div>
+        )
       )}
     </section>
   );
@@ -119,8 +134,16 @@ export const AwardDialog = ({
       {award && (
         <div className="pc-dialog-body">
           <span className="pc-dialog-kind">{t(kind === "medal" ? "award_medal" : "award_achievement")}</span>
-          <Art award={award} className="pc-dialog-art" />
+          <Art award={award} className="pc-dialog-art" size={120} />
           <h3 id="pc-dialog-title" dir="auto">{award.name[lang]}</h3>
+          {award.medal && (
+            <p className="pc-medal-caption">
+              <span>{tierName(t, award.medal.tier, award.medal.decoration, award.medal.medal_id)}</span>
+              {award.medal.period_label && <bdi>{award.medal.period_label[lang]}</bdi>}
+              {figureText(t, award.medal) && <bdi dir="ltr" className="pc-medal-figure">{figureText(t, award.medal)}</bdi>}
+              {subtitleText(t, lang, award.medal) && <span className="pc-medal-subtitle">{subtitleText(t, lang, award.medal)}</span>}
+            </p>
+          )}
           <p>{award.description[lang]}</p>
           <dl className="pc-facts">
             <div>
@@ -134,17 +157,22 @@ export const AwardDialog = ({
             <div>
               <dt>{t(kind === "medal" ? "award_prestige" : "award_importance")}</dt>
               <dd>
-                {award.rarity ? (
+                {award.medal ? (
+                  tierName(t, award.medal.tier, award.medal.decoration, award.medal.medal_id)
+                ) : award.rarity ? (
                   t(RARITY_TEXT[award.rarity] ?? "rarity_basic")
                 ) : (
                   <bdi dir="ltr">{formatNumber(award.rank, locale)}</bdi>
                 )}
               </dd>
             </div>
-            <div>
-              <dt>XP</dt>
-              <dd><bdi dir="ltr">+{formatNumber(award.xp, locale)}</bdi></dd>
-            </div>
+            {/* A medal carries no XP of its own; its achievements do. */}
+            {!award.medal && (
+              <div>
+                <dt>XP</dt>
+                <dd><bdi dir="ltr">+{formatNumber(award.xp, locale)}</bdi></dd>
+              </div>
+            )}
           </dl>
           <button type="button" className="pc-btn" onClick={onClose} autoFocus>
             {t("close")}

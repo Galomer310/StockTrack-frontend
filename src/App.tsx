@@ -11,6 +11,7 @@ import Navbar from "./components/layout/Navbar";
 import { ProgressionWatcher } from "./components/progression/ProgressionWatcher";
 import { DailyRewardsWatcher } from "./components/dailyRewards/DailyRewardsWatcher";
 import { IdleWatcher } from "./components/session/IdleWatcher";
+import { ProfessionalWatcher } from "./components/medals/ProfessionalWatcher";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 
@@ -46,6 +47,7 @@ const PlayerCard = lazy(() => import("./pages/PlayerCard"));
 const AchievementCollection = lazy(() => import("./pages/AchievementCollection"));
 const DailyRewardsPage = lazy(() => import("./pages/DailyRewardsPage"));
 const TestToolsPage = lazy(() => import("./pages/TestToolsPage"));
+const ProfessionalPage = lazy(() => import("./pages/ProfessionalPage"));
 
 // Shown while a route chunk is in flight. Deliberately quiet: on a fast
 // connection the chunk arrives in a few frames, and a spinner that appears
@@ -71,6 +73,8 @@ const App = () => {
       {/* Unlock notices and the title ceremony, for whoever is signed in. */}
       {user && <ProgressionWatcher />}
       {user && <DailyRewardsWatcher />}
+      {/* Professional achievements and medal upgrades. */}
+      {user && <ProfessionalWatcher />}
       {/* Signs out after 15 minutes without activity. */}
       {user && <IdleWatcher />}
       <Suspense fallback={<RouteFallback />}>
@@ -82,6 +86,7 @@ const App = () => {
           <Route path="/user" element={guarded(<UserPage />)} />
           <Route path="/player" element={guarded(<PlayerCard />)} />
           <Route path="/player/achievements" element={guarded(<AchievementCollection />)} />
+          <Route path="/player/medals" element={guarded(<ProfessionalPage />)} />
           <Route path="/player/rewards" element={guarded(<DailyRewardsPage />)} />
           <Route path="/test-tools" element={guarded(<TestToolsPage />)} />
           <Route path="/search" element={guarded(<StockSearch />)} />

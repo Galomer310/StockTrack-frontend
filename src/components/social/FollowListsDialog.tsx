@@ -10,6 +10,7 @@ import { requestProgressionCheck } from "../../api/progression";
 import { fill } from "../../i18n/fill";
 import { useLanguage } from "../../i18n/LanguageContext";
 import "../progression/progression.css";
+import PlayerAvatar from "../avatars/PlayerAvatar";
 
 /* ===========================================================================
    Your followers and the players you follow (Player Card).
@@ -131,9 +132,7 @@ export const FollowListsDialog = ({
           <ul className="prg-title-list prg-follow-list" role="tabpanel">
             {rows.map((p) => (
               <li key={p.id} className="prg-follow-row">
-                <span className="prg-follow-avatar" aria-hidden="true">
-                  {p.display_name.charAt(0).toUpperCase()}
-                </span>
+                <PlayerAvatar className="prg-follow-avatar" name={p.display_name} avatarId={p.avatar_id} />
                 <span className="prg-follow-main">
                   <bdi className="prg-follow-name">{p.display_name}</bdi>
                   <span className="prg-follow-since">{fill(t("follow_since"), { date: date(p.since) })}</span>

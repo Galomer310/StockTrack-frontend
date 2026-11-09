@@ -51,6 +51,9 @@ reason, rather than invented. Players can edit their first name, bio and
 picture from the card. The picture comes from the avatar gallery in
 `src/components/avatars` (standalone SVGs; the server stores only the chosen
 id and accepts only the ids in its own list, so add new avatars to both).
+The chosen picture also appears beside the player's name in the feed and
+its replies, the leaderboard, the portfolio page and the follow lists
+(`PlayerAvatar`, which falls back to the initial).
 The nickname and uploaded pictures follow once their rules and storage are
 decided.
 

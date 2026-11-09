@@ -21,6 +21,8 @@ export interface FollowListEntry {
   id: number;
   display_name: string;
   nickname: string | null;
+  /** Gallery avatar id, null until the player chooses one. */
+  avatar_id?: string | null;
   /** When the follow began. */
   since: string;
   /** Whether you follow this player (true for everyone in your Following list). */

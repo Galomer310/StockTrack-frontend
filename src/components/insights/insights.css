@@ -1,0 +1,34 @@
+/* Module 5 - Performance Insights. Builds on allocation.css (the module
+   frame) and the dashboard tokens. */
+.ins-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; margin: 0 0 18px; }
+.ins-stat { padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+.ins-stat:hover { border-color: var(--gold-line); box-shadow: 0 0 18px var(--gold-wash); }
+.ins-stat dt { font-size: 0.74rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+:lang(he) .ins-stat dt { text-transform: none; letter-spacing: normal; }
+.ins-stat dd { margin: 4px 0 0; display: grid; gap: 2px; }
+.ins-value { font-family: var(--font-num); font-variant-numeric: tabular-nums; font-size: 1.25rem; font-weight: 700; color: var(--text); }
+.ins-sub { font-size: 0.78rem; color: var(--text-faint); overflow-wrap: anywhere; }
+.is-up { color: var(--gain); }
+.is-down { color: var(--loss); }
+.ins-value.is-up { color: var(--gain); }
+.ins-value.is-down { color: var(--loss); }
+
+.ins-subtitle { margin: 6px 0 2px; font-size: 1rem; }
+.ins-table { inline-size: 100%; border-collapse: collapse; font-size: 0.9rem; white-space: nowrap; }
+.ins-table th, .ins-table td { padding: 8px 10px; text-align: start; border-block-end: 1px solid var(--border); }
+.ins-table thead th { font-size: 0.74rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.ins-table tbody th { background: transparent; color: var(--text); font-weight: 600; text-transform: none; letter-spacing: normal; }
+.ins-table td { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.ins-table tr.is-portfolio th { color: var(--gold-bright); }
+.ins-symbol { color: var(--text-faint); font-weight: 400; }
+.ins-missing { color: var(--text-faint); font-family: inherit; }
+
+.ins-chart { position: relative; block-size: 280px; margin-block: 16px 8px; }
+.ins-foot { margin: 6px 0 0; font-size: 0.78rem; color: var(--text-faint); }
+.ins-warn { padding: 8px 12px; border: 1px solid var(--gold-line); border-radius: 8px; color: var(--gold-bright); font-size: 0.86rem; }
+
+@media (max-width: 600px) {
+  .ins-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ins-value { font-size: 1.05rem; }
+  .ins-chart { block-size: 220px; }
+}

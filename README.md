@@ -82,6 +82,13 @@ on the dashboard, and an expanded view with the detailed activity (where
 the author adds dated follow-ups; the original rationale never changes)
 and the composition table. Follow-ups also show in the feed.
 
+**Performance Insights** (`components/insights`), Module 5: the portfolio's
+record on investing alone (capital rewards are not return) - total return,
+months, drawdown, best and worst days, age - and the S&P 500 and NASDAQ-100
+(through the SPY and QQQ funds) over exactly the same dates, with a chart
+that starts every series at 100. Every figure comes from
+`GET /portfolios/:id/insights`.
+
 **Daily rewards.** `DailyRewardsWatcher` checks in whenever the app opens
 (the server decides the day), shows the day's XP and streak, and opens the
 capital boost dialog on milestone days: the player picks one portfolio and

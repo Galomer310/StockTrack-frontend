@@ -1,10 +1,11 @@
-import React, { useState } from "react"; // Import React and useState hook
+import React, { useEffect, useState } from "react"; // Import React and useState hook
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import { useDispatch } from "react-redux"; // Import useDispatch for Redux actions
 import { setUser } from "../features/authSlice"; // Import setUser action from authSlice
 import { useToast } from "../components/ui/ToastProvider";
 import { useLanguage } from "../i18n/LanguageContext";
 import { errorBodyMessage } from "../i18n/fill";
+import { takeIdleSignOutNote } from "../session/idle";
 
 // Define the Login functional component
 const Login = () => {
@@ -14,6 +15,14 @@ const Login = () => {
   const navigate = useNavigate(); // Initialize navigate for redirection
   const toast = useToast();
   const { t, dir, lang } = useLanguage();
+
+  // Sent here by the inactivity sign-out: say why, once.
+  const [idleNote] = useState(takeIdleSignOutNote);
+  useEffect(() => {
+    if (idleNote) toast.info(t("idle_signed_out"), t("idle_signed_out_title"));
+    // Once, on arrival.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // The server's refusals, by error code, for the Hebrew screen
   const errorsByCode = {

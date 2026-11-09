@@ -156,6 +156,12 @@ const en = {
   session_body_one: "Your session will expire in 1 second. Click the button if you are still here.",
   session_body_other: "Your session will expire in {n} seconds. Click the button if you are still here.",
   session_still_here: "I'm still here",
+  idle_label: "Still there?",
+  idle_body_one: "There has been no activity for a while. You will be signed out in 1 second.",
+  idle_body_other: "There has been no activity for a while. You will be signed out in {n} seconds.",
+  idle_stay: "Stay signed in",
+  idle_signed_out_title: "Signed out",
+  idle_signed_out: "You were signed out after 15 minutes without activity. Sign in again to continue.",
 
   // Page
   pc_title: "Player Card",
@@ -923,6 +929,12 @@ const he: Messages = {
   session_body_one: "ההתחברות תפוג בעוד שנייה אחת. לחצו על הכפתור אם אתם עדיין כאן.",
   session_body_other: "ההתחברות תפוג בעוד {n} שניות. לחצו על הכפתור אם אתם עדיין כאן.",
   session_still_here: "אני עדיין כאן",
+  idle_label: "עדיין כאן?",
+  idle_body_one: "לא הייתה פעילות כבר זמן מה. ההתחברות תסתיים בעוד שנייה אחת.",
+  idle_body_other: "לא הייתה פעילות כבר זמן מה. ההתחברות תסתיים בעוד {n} שניות.",
+  idle_stay: "אני עדיין כאן",
+  idle_signed_out_title: "ההתחברות הסתיימה",
+  idle_signed_out: "ההתחברות הסתיימה אחרי 15 דקות ללא פעילות. יש להתחבר שוב כדי להמשיך.",
 
   pc_title: "כרטיס שחקן",
 

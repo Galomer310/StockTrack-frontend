@@ -1,0 +1,249 @@
+/* ===========================================================================
+   App theme: the Player Card's look, everywhere (Gal, 2026-11-09).
+   ---------------------------------------------------------------------------
+   The Player Card (components/playerCard/playerCard.css) is the reference:
+   near-black grounds lit by soft gold light, hairline champagne-gold frames,
+   cream type, display serifs for headings (Cormorant Garamond in English,
+   Frank Ruhl Libre in Hebrew), and a gold glow around whatever the pointer
+   is over. This file brings that to every page, the header and every
+   button, by re-pointing the app's own tokens (style.css) and adding the
+   frame and glow to the app's cards. Loaded after style.css and
+   responsive.css so it wins without !important.
+
+   Dark only: light mode keeps its own tokens (body.light-mode in style.css),
+   and the hover glow there is a softer gold.
+   =========================================================================== */
+
+:root {
+  --bg-base: #08090B;
+  --bg-surface: #111114;
+  --bg-raised: #17171B;
+  --bg-inset: #0B0B0D;
+  --border: rgba(214, 170, 88, 0.22);
+  --border-strong: rgba(214, 170, 88, 0.55);
+  --text: #E8DEC8;
+  --text-muted: #A39D90;
+  --text-faint: #75705F;
+  --gold: #D9A94E;
+  --gold-bright: #F4D58C;
+  --gold-deep: #8E6426;
+  --gold-wash: rgba(217, 169, 78, 0.08);
+  --gold-line: rgba(214, 170, 88, 0.55);
+  --gain: #4CC764;
+  --loss: #E5544B;
+  --radius: 12px;
+  --radius-lg: 14px;
+  --font-sans: "Heebo", "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-display-en: "Cormorant Garamond", Georgia, serif;
+  --font-display-he: "Frank Ruhl Libre", "David", serif;
+
+  /* The card frame, and the glow when the pointer is over it. */
+  --card-bg: linear-gradient(180deg, var(--bg-raised), var(--bg-surface));
+  --card-shadow: inset 0 1px 0 rgba(255, 230, 170, 0.06), 0 0 22px rgba(217, 169, 78, 0.10);
+  --card-glow: inset 0 1px 0 rgba(255, 230, 170, 0.10), 0 0 0 1px rgba(240, 200, 120, 0.55), 0 0 22px rgba(217, 169, 78, 0.38), 0 0 46px rgba(217, 169, 78, 0.22);
+  --card-border-hover: rgba(244, 213, 140, 0.95);
+}
+
+/* ---------- The ground: soft gold light at two corners, as on the card ---------- */
+body:not(.light-mode) {
+  background:
+    radial-gradient(1200px 600px at 85% -10%, rgba(217, 169, 78, 0.10), transparent 60%),
+    radial-gradient(900px 700px at -10% 110%, rgba(217, 169, 78, 0.06), transparent 60%),
+    var(--bg-base);
+  background-attachment: fixed;
+}
+
+/* ---------- Headings: the card's display serifs ---------- */
+h1, h2 { font-family: var(--font-display-en); font-weight: 700; letter-spacing: 0.01em; }
+:lang(he) h1, :lang(he) h2, h1:lang(he), h2:lang(he) { font-family: var(--font-display-he); letter-spacing: normal; }
+body:not(.light-mode) h1 {
+  background: linear-gradient(180deg, #FFF0C4 0%, var(--gold-bright) 30%, var(--gold) 62%, var(--gold-deep) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------- Header ---------- */
+body:not(.light-mode) .navbar {
+  background: rgba(8, 9, 11, 0.86);
+  border-block-end: 1px solid var(--border);
+  box-shadow: 0 1px 0 rgba(255, 230, 170, 0.04), 0 8px 30px rgba(0, 0, 0, 0.45);
+}
+.navbar-brand { font-family: var(--font-display-en); letter-spacing: 0.22em; }
+body:not(.light-mode) .navbar-brand {
+  background: linear-gradient(180deg, #FFF0C4 0%, var(--gold-bright) 35%, var(--gold) 70%, var(--gold-deep) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.navbar-links li a,
+.navbar-links li > span {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  transition: color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+.navbar-links li a:hover,
+.navbar-links li > span:hover,
+.navbar-links li a:focus-visible {
+  color: var(--gold-bright);
+  background: var(--gold-wash);
+  border-color: var(--gold-line);
+  box-shadow: 0 0 18px rgba(217, 169, 78, 0.25);
+  text-shadow: 0 0 12px rgba(244, 213, 140, 0.35);
+}
+
+/* ---------- Buttons: the card's gold-outlined buttons ---------- */
+button,
+.btn {
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--gold);
+  transition: color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+/* The glow, on every button: zero specificity, so a button's own hover
+   rule still decides anything else it sets. */
+:where(button, .btn):where(:hover:not(:disabled)) {
+  border-color: var(--card-border-hover);
+  box-shadow: 0 0 0 1px rgba(240, 200, 120, 0.4), 0 0 18px rgba(217, 169, 78, 0.40), 0 0 34px rgba(217, 169, 78, 0.20);
+}
+/* Brighter type only on outlined buttons: on a gold-filled one (Compare,
+   Follow, the session alert, a form's submit) it would vanish. */
+button:not(.compare-btn, .follow-btn, [type="submit"], .session-alert button):hover:not(:disabled),
+.btn:not(.btn-primary):hover {
+  color: var(--gold-bright);
+}
+/* The main action of a form or panel: filled gold, dark type. */
+button[type="submit"],
+.btn-primary {
+  border-color: var(--gold);
+  color: #17120A;
+  background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+}
+button[type="submit"]:hover:not(:disabled),
+.btn-primary:hover {
+  color: #17120A;
+  background: linear-gradient(180deg, #FFE3A6, var(--gold-bright));
+  box-shadow: 0 0 0 1px rgba(244, 213, 140, 0.45), 0 0 26px rgba(217, 169, 78, 0.40);
+}
+
+/* ---------- Cards and panels on every page: frame, and glow on hover ---------- */
+.summary-card,
+.portfolio-card,
+.al-module,
+.feed-post,
+.leaderboard-table,
+.market-card,
+.chart-container,
+.company-details,
+.company-news,
+.compare-verdict,
+.composition-chart,
+.journal-body,
+.insight,
+.cash-bar,
+.watchlist,
+.stock-panel,
+.login-container,
+.register-container,
+.modal,
+.al-panel,
+.dr-panel,
+.tt-card,
+.tt-state > div {
+  border-radius: var(--radius-lg);
+  transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+}
+body:not(.light-mode) :is(
+  .summary-card, .portfolio-card, .al-module, .feed-post, .leaderboard-table, .market-card, .chart-container,
+  .company-details, .company-news, .compare-verdict, .composition-chart, .journal-body, .insight, .cash-bar,
+  .watchlist, .stock-panel, .login-container, .register-container, .al-panel
+) {
+  background: var(--card-bg);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--card-shadow);
+}
+:is(
+  .summary-card, .portfolio-card, .al-module, .feed-post, .leaderboard-table, .market-card, .chart-container,
+  .company-details, .company-news, .compare-verdict, .composition-chart, .journal-body, .insight, .cash-bar,
+  .watchlist, .stock-panel, .login-container, .register-container, .al-panel, .dr-panel, .tt-card, .tt-state > div
+):hover {
+  border-color: var(--card-border-hover);
+  box-shadow: var(--card-glow);
+}
+body.light-mode :is(
+  .summary-card, .portfolio-card, .al-module, .feed-post, .leaderboard-table, .market-card, .chart-container,
+  .company-details, .company-news, .compare-verdict, .composition-chart, .journal-body, .insight, .cash-bar,
+  .watchlist, .stock-panel, .login-container, .register-container, .al-panel
+):hover {
+  border-color: #C99A45;
+  box-shadow: 0 0 0 1px rgba(201, 154, 69, 0.35), 0 0 22px rgba(201, 154, 69, 0.22);
+}
+/* The portfolio you have open keeps a steady glow. */
+body:not(.light-mode) .portfolio-card.is-active {
+  border-color: var(--card-border-hover);
+  background: linear-gradient(180deg, rgba(217, 169, 78, 0.10), var(--bg-surface));
+}
+
+/* Rows in long lists: a quieter version, so a table does not flash. */
+.leaderboard-row:not(.leaderboard-head),
+.al-table tr,
+.ph-action {
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.leaderboard-row:not(.leaderboard-head):hover,
+.ph-action:hover {
+  background: var(--gold-wash);
+  box-shadow: inset 2px 0 0 var(--gold);
+}
+
+/* The progression pages (achievements, rewards, test panel) keep their
+   approved navy palette, with the same glow on their cards. */
+.prg :is(.prg-cat, .prg-ach, .prg-title-row, .prg-follow-row, .dr-pending-row, .dr-history-row, .prg-summary-item) {
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.prg :is(.prg-cat, .prg-ach, .prg-title-row, .prg-follow-row, .dr-pending-row, .dr-history-row, .prg-summary-item):hover {
+  border-color: rgba(230, 190, 110, 0.8);
+  box-shadow: 0 0 0 1px rgba(230, 190, 110, 0.3), 0 0 26px rgba(217, 169, 78, 0.25);
+}
+
+/* Inputs: the card's dark wells with a gold focus. */
+body:not(.light-mode) :is(input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="search"], textarea, select) {
+  background: var(--bg-inset);
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+:is(input, textarea, select):focus-visible {
+  outline: none;
+  border-color: var(--gold-bright);
+  box-shadow: 0 0 0 1px rgba(244, 213, 140, 0.35), 0 0 16px rgba(217, 169, 78, 0.25);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button, .btn, .navbar-links li a, .navbar-links li > span,
+  .summary-card, .portfolio-card, .al-module, .feed-post, .market-card, .dr-panel, .tt-card {
+    transition: none;
+  }
+}
+
+/* The carousel scrolls, which clips anything outside it: room for the glow. */
+.portfolio-cards { padding: 12px 10px 14px; margin-inline: -10px; }
+
+/* Page titles that are h2 (Feed, Market, Search, Compare, a player's
+   portfolio) take the same gold as the Player Card's title. Not the ones set
+   on a photograph (the leaderboard banner), where cream reads better. */
+body:not(.light-mode) :is(.feed-page, .market-page, .stock-search, .compare-page, .investor-page) > h2:first-of-type {
+  background: linear-gradient(180deg, #FFF0C4 0%, var(--gold-bright) 30%, var(--gold) 62%, var(--gold-deep) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  inline-size: fit-content;
+}
+
+/* Achievement categories on a phone: the name broke mid-word ("Explorati-
+   on") in the two-column grid. The count moves under it instead. */
+@media (max-width: 560px) {
+  .prg-cat-head { flex-wrap: wrap; row-gap: 2px; }
+  .prg-cat-name { flex: 1 1 calc(100% - 44px); overflow-wrap: normal; word-break: normal; hyphens: auto; }
+  .prg-cat-count { margin-inline-start: 42px; }
+}

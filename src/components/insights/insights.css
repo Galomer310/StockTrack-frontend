@@ -32,3 +32,15 @@
   .ins-value { font-size: 1.05rem; }
   .ins-chart { block-size: 220px; }
 }
+
+/* Comparing with a market index (pages/IndexComparison). */
+.ix-link { display: inline-block; margin-block: 8px; color: var(--gold-bright); font-size: 0.9rem; }
+.ix-controls { display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: flex-end; margin-block: 14px 18px; }
+.ix-controls label { display: grid; gap: 4px; font-size: 0.8rem; color: var(--text-muted); }
+.ix-controls select, .ix-dates input { min-block-size: 38px; padding: 4px 10px; font: inherit; color: var(--text); background: var(--bg-surface, #111114); border: 1px solid var(--border); border-radius: 8px; }
+.ix-periods { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; border: 1px solid var(--border); border-radius: 14px; }
+.ix-periods button { min-block-size: 32px; padding: 3px 12px; border-radius: 999px; border-color: transparent; font-size: 0.84rem; }
+.ix-periods button.is-on { background: var(--gold-wash); border-color: var(--gold-line); color: var(--gold-bright); }
+.ix-dates { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; inline-size: 100%; }
+.ix-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-block: 12px; }
+@media (max-width: 600px) { .ix-summary { grid-template-columns: 1fr; } }

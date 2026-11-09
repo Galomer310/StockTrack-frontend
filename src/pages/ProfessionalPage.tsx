@@ -36,8 +36,20 @@ const factsOf = (m: MedalView): MedalFacts => ({
   tier: m.tier,
   decoration: m.decoration,
   subtitle: m.subtitle,
-  figure: m.medal_id === "btm_monthly_combo" || m.medal_id === "green_months" ? m.highest_streak : m.qualifying_value,
-  figure_kind: m.medal_id === "portfolio_performance" ? "return" : m.medal_id === "btm_monthly_combo" || m.medal_id === "green_months" ? "months" : "outperformance",
+  figure:
+    m.medal_id === "phoenix_recovery"
+      ? null
+      : m.medal_id === "btm_monthly_combo" || m.medal_id === "green_months" || m.medal_id === "capital_protector"
+        ? m.highest_streak
+        : m.qualifying_value,
+  figure_kind:
+    m.medal_id === "portfolio_performance"
+      ? "return"
+      : m.medal_id === "btm_monthly_combo" || m.medal_id === "green_months"
+        ? "months"
+        : m.medal_id === "capital_protector"
+          ? "quarters"
+          : "outperformance",
   current_streak: m.current_streak,
 });
 
@@ -54,7 +66,12 @@ const MedalCard = ({ m }: { m: MedalView }) => {
         <h3 dir="auto">{m.name[lang]}</h3>
         <span className="pro-tier">{tierName(t, m.tier, m.decoration, m.medal_id)}</span>
         {period && <bdi className="pro-period">{period}</bdi>}
-        {figureText(t, f) && <bdi dir="ltr" className="pro-figure">{figureText(t, f)}</bdi>}
+        {/* "+6.8%" reads left to right; "15 months" / "15 חודשים" follows the page. */}
+        {figureText(t, f) && (
+          <bdi dir={f.figure_kind === "months" || f.figure_kind === "quarters" ? undefined : "ltr"} className="pro-figure">
+            {figureText(t, f)}
+          </bdi>
+        )}
         {subtitleText(t, lang, f) && <span className="pro-subtitle">{subtitleText(t, lang, f)}</span>}
         <dl className="pro-facts">
           {streaky && (
@@ -220,7 +237,13 @@ const RecordRow = ({ a, r, medalName }: { a: ProAchievement; r: ProRecord; medal
           {r.outperformance !== null && <span> · {fill(t("pro_points_above"), { v: ltr((r.outperformance * 100).toFixed(2)) })}</span>}
         </p>
       )}
-      {a.id === "btm_quarter" && r.details.medal_eligible === false && <p className="pro-note">{t("pro_partial_quarter")}</p>}
+      {r.details.portfolio_downside !== undefined && r.details.benchmark_downside !== undefined && (
+        <p className="pro-record-result">
+          {fill(t("pro_downside"), { p: ltr(pct(r.details.portfolio_downside, 2)), b: ltr(pct(r.details.benchmark_downside, 2)) })}
+        </p>
+      )}
+      {r.details.low !== undefined && <p className="pro-note">{fill(t("pro_recovered"), { low: ltr(pct(r.details.low, 1)) })}</p>}
+      {(a.id === "btm_quarter" || a.id === "capital_protector") && r.details.medal_eligible === false && <p className="pro-note">{t("pro_partial_quarter")}</p>}
       {medalName && <p className="pro-note">{fill(t("pro_contributes"), { medal: medalName })}</p>}
     </li>
   );

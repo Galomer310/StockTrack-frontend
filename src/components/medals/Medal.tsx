@@ -65,6 +65,17 @@ const Symbol = ({ icon }: { icon: string }) => {
           <path d="M13 24 L18 19 L22 22 L28 14" />
         </>
       );
+    case "phoenix":
+      // A minimalist phoenix: wings raised, crest, a short tail. No flames.
+      return (
+        <>
+          <path d="M20 33 C17.5 28 17.5 22 20 17.5 C22.5 22 22.5 28 20 33 Z" />
+          <path d="M19 21 C14 17 9 15.5 4.5 9 C10 11 14.5 11.5 18.4 16" />
+          <path d="M21 21 C26 17 31 15.5 35.5 9 C30 11 25.5 11.5 21.6 16" />
+          <path d="M20 17.5 V12.5 M17.8 13.6 L20 11 L22.2 13.6" />
+          <path d="M20 33 L16.5 37.5 M20 33 L23.5 37.5" />
+        </>
+      );
     default:
       return <circle cx="20" cy="20" r="10" />;
   }

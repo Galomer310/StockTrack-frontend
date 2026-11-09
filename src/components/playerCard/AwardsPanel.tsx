@@ -140,7 +140,14 @@ export const AwardDialog = ({
             <p className="pc-medal-caption">
               <span>{tierName(t, award.medal.tier, award.medal.decoration, award.medal.medal_id)}</span>
               {award.medal.period_label && <bdi>{award.medal.period_label[lang]}</bdi>}
-              {figureText(t, award.medal) && <bdi dir="ltr" className="pc-medal-figure">{figureText(t, award.medal)}</bdi>}
+              {figureText(t, award.medal) && (
+                <bdi
+                  dir={award.medal.figure_kind === "months" || award.medal.figure_kind === "quarters" ? undefined : "ltr"}
+                  className="pc-medal-figure"
+                >
+                  {figureText(t, award.medal)}
+                </bdi>
+              )}
               {subtitleText(t, lang, award.medal) && <span className="pc-medal-subtitle">{subtitleText(t, lang, award.medal)}</span>}
             </p>
           )}

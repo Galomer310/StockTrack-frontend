@@ -82,6 +82,13 @@ on the dashboard, and an expanded view with the detailed activity (where
 the author adds dated follow-ups; the original rationale never changes)
 and the composition table. Follow-ups also show in the feed.
 
+**Investment Profile** (`components/profile`), Module 3: the spec's five
+dimensions - Risk, Portfolio Volatility, Diversification, Investment
+Horizon, Portfolio Turnover - each a horizontal meter with its result, and
+an info button opening "About this metric" (what it shows, how it is
+measured, how to read it) and the parts behind the number. From
+`GET /portfolios/:id/profile`.
+
 **Performance Insights** (`components/insights`), Module 5: the portfolio's
 record on investing alone (capital rewards are not return) - total return,
 months, drawdown, best and worst days, age - and the S&P 500 and NASDAQ-100

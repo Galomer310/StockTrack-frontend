@@ -139,3 +139,63 @@ export type Insights = {
 
 export const fetchInsights = async (portfolioId: number): Promise<Insights> =>
   (await axiosInstance.get<Insights>(`${BASE}/${portfolioId}/insights`)).data;
+
+/* ---------------------------------------------------------------------------
+   Module 3 - Investment Profile. Scores are 0-100; weights and returns are
+   fractions. Scales are provisional (approved 2026-11-09).
+   --------------------------------------------------------------------------- */
+
+export type Band = "Very Low" | "Low" | "Medium" | "High" | "Very High";
+export type HorizonCategory = "Very Short" | "Short" | "Medium" | "Long" | "Very Long";
+type Missing<R extends string> = { available: false; reason: R };
+
+export interface InvestmentProfile {
+  portfolio: { id: number; name: string };
+  history_built: boolean;
+  risk:
+    | {
+        available: true;
+        score: number;
+        band: Band;
+        components: { volatility: number; max_drawdown: number; concentration: number; liquidity: number; turnover: number };
+      }
+    | Missing<"too_short" | "missing_data">;
+  volatility:
+    | {
+        available: true;
+        annualized: number;
+        daily: number;
+        sessions: number;
+        full_window: boolean;
+        score: number;
+        band: Band;
+        average_positive_day: number | null;
+        average_negative_day: number | null;
+        max_daily_gain: DatedReturn | null;
+        max_daily_loss: DatedReturn | null;
+      }
+    | (Missing<"too_short"> & { sessions: number; needed: number });
+  max_drawdown: { value: number; peak_date: string | null; trough_date: string | null; score: number } | null;
+  diversification:
+    | {
+        available: true;
+        score: number;
+        band: Band;
+        concentration: number;
+        parts: {
+          effective_holdings: { value: number; holdings: number; score: number };
+          largest_position: { symbol: string; weight: number; score: number };
+          top_3: { weight: number; score: number };
+          sector: { largest: string | null; largest_weight: number; hhi: number; score: number; unclassified: string[] };
+        };
+      }
+    | Missing<"no_holdings">;
+  liquidity: { low_liquidity_weight: number; score: number; threshold_usd: number; unknown: string[] } | null;
+  turnover: { value: number; events: number; window_days: number; score: number; band: Band };
+  horizon:
+    | { available: true; median_days: number; category: HorizonCategory; meter: number; lots: number; open_lots: number }
+    | Missing<"no_holdings">;
+}
+
+export const fetchProfile = async (portfolioId: number): Promise<InvestmentProfile> =>
+  (await axiosInstance.get<InvestmentProfile>(`${BASE}/${portfolioId}/profile`)).data;

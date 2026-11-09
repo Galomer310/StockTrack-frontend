@@ -66,6 +66,9 @@ const MedalCard = ({ m }: { m: MedalView }) => {
         <h3 dir="auto">{m.name[lang]}</h3>
         <span className="pro-tier">{tierName(t, m.tier, m.decoration, m.medal_id)}</span>
         {period && <bdi className="pro-period">{period}</bdi>}
+        {m.medal_id.startsWith("special_") && (
+          <span className="pro-period">{fill(t("pro_earned_on"), { date: new Date(`${m.as_of}T00:00:00`).toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" }) })}</span>
+        )}
         {/* "+6.8%" reads left to right; "15 months" / "15 חודשים" follows the page. */}
         {figureText(t, f) && (
           <bdi dir={f.figure_kind === "months" || f.figure_kind === "quarters" ? undefined : "ltr"} className="pro-figure">
@@ -280,9 +283,20 @@ const ProfessionalPage = () => {
           <section className="pro-section" aria-labelledby="pro-medals-title">
             <h2 id="pro-medals-title">{t("pro_medals")}</h2>
             <ul className="pro-medals">
-              {data.medal_catalog.flatMap((c) => {
+              {data.medal_catalog.filter((c) => !c.is_special).flatMap((c) => {
                 const owned = data.medals.filter((m) => m.medal_id === c.id);
                 return owned.length ? owned.map((m) => <MedalCard key={refKey(m)} m={m} />) : [<LockedMedal key={c.id} c={c} />];
+              })}
+            </ul>
+          </section>
+
+          <section className="pro-section" aria-labelledby="pro-special-title">
+            <h2 id="pro-special-title">{t("pro_special_medals")}</h2>
+            <p className="pro-note">{t("pro_special_note")}</p>
+            <ul className="pro-medals">
+              {data.medal_catalog.filter((c) => c.is_special).map((c) => {
+                const owned = data.medals.find((m) => m.medal_id === c.id);
+                return owned ? <MedalCard key={c.id} m={owned} /> : <LockedMedal key={c.id} c={c} />;
               })}
             </ul>
           </section>

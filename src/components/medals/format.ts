@@ -11,6 +11,8 @@ const WORDS = ["", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT
 const ROMAN = ["", "", "II", "III", "IV", "V", "VI"];
 
 export const tierName = (t: T, tier: number, decoration = 0, medalId = "") => {
+  // A special medal is one-time: it has no tier to name (spec 28).
+  if (medalId.startsWith("special_")) return t("pro_special_medal");
   const base = t(TIER_KEYS[Math.min(5, Math.max(1, tier))] as MessageKey);
   // Sovereign II / III are evolutions of the fifth tier (portfolio performance).
   return tier === 5 && decoration >= 2 && medalId === "portfolio_performance" ? `${base} ${ROMAN[decoration] ?? decoration}` : base;

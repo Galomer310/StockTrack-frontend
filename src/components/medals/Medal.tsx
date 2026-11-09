@@ -65,6 +65,54 @@ const Symbol = ({ icon }: { icon: string }) => {
           <path d="M13 24 L18 19 L22 22 L28 14" />
         </>
       );
+    case "first_laurel":
+      // A laurel around a numeral one: the first on the platform.
+      return (
+        <>
+          <path d="M11 31 C6 26 5 18 9 11 M29 31 C34 26 35 18 31 11" />
+          <path d="M8.5 25 l-3 -1.5 M7.5 19 l-3 -0.5 M9 13.5 l-2.5 -2 M31.5 25 l3 -1.5 M32.5 19 l3 -0.5 M31 13.5 l2.5 -2" />
+          <path d="M17 15 L21 12 V30 M17 30 H25" />
+        </>
+      );
+    case "three_lines":
+      // Three portfolios rising above the benchmark's dashed line.
+      return (
+        <>
+          <path d="M4 27 H36" strokeDasharray="2.5 3" />
+          <path d="M12 35 V15 M20 35 V8 M28 35 V12" strokeWidth="4.2" />
+        </>
+      );
+    case "five_lines":
+      // Five portfolios above the benchmark.
+      return (
+        <>
+          <path d="M3 27 H37" strokeDasharray="2.5 3" />
+          <path d="M8 35 V17 M14 35 V11 M20 35 V7 M26 35 V12 M32 35 V16" strokeWidth="3.2" />
+        </>
+      );
+    case "crowned_chart":
+      return (
+        <>
+          <path d="M12 12 L14 6 L18 10 L20 5 L22 10 L26 6 L28 12 Z" />
+          <path d="M6 35 H34 M10 35 V28 M17 35 V23 M24 35 V19 M31 35 V15" strokeWidth="3.2" />
+        </>
+      );
+    case "five_stars":
+      return (
+        <>
+          {[[20, 9], [9, 18], [31, 18], [13, 30], [27, 30]].map(([x, y]) => (
+            <path key={`${x}-${y}`} d={`M${x} ${y - 4.5} L${x + 1.4} ${y - 1.4} L${x + 4.5} ${y - 1.1} L${x + 2.1} ${y + 1} L${x + 2.8} ${y + 4.2} L${x} ${y + 2.5} L${x - 2.8} ${y + 4.2} L${x - 2.1} ${y + 1} L${x - 4.5} ${y - 1.1} L${x - 1.4} ${y - 1.4} Z`} />
+          ))}
+        </>
+      );
+    case "alpha":
+      // The Greek alpha, with three marks for three portfolios.
+      return (
+        <>
+          <path d="M27 14 C25 22 22 29 16 29 C11 29 9 25 9 21.5 C9 17 12 13.5 16 13.5 C21 13.5 23 20 25 25 C26 28 28 29.5 31 29" />
+          <path d="M14 34 h2 M19 34 h2 M24 34 h2" strokeWidth="2.6" />
+        </>
+      );
     case "phoenix":
       // A minimalist phoenix: wings raised, crest, a short tail. No flames.
       return (

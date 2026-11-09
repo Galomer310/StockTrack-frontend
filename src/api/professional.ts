@@ -95,7 +95,7 @@ export interface ProfessionalView {
     }[];
     portfolios: { portfolio: { id: number; name: string }; final_through: string | null; btm_month_streak: number; green_streak: number; btm_quarter_streak: number }[];
   };
-  medal_catalog: { id: string; track: string; icon: string; is_historical: boolean; name: Localized; description: Localized }[];
+  medal_catalog: { id: string; track: string; icon: string; is_historical: boolean; is_special: boolean; name: Localized; description: Localized }[];
   medals: MedalView[];
   display: { automatic: boolean; shown: MedalRef[] };
   xp_configured: boolean;

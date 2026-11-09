@@ -464,19 +464,6 @@ body.light-mode .register-container { background: rgba(255, 255, 255, 0.92); }
   padding: clamp(1.25rem, 3vw, 2.25rem);
 }
 
-.dashboard-info {
-  padding-bottom: 1.25rem;
-  margin-bottom: 1.5rem;
-  border-bottom: 1px solid var(--border);
-}
-.dashboard-info h1 {
-  font-size: clamp(1.6rem, 3.5vw, 2.25rem);
-  background: linear-gradient(120deg, var(--text) 25%, var(--gold-bright));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
 /* Section headings get a small gold tick */
 .portfolio-performance h3,
 .investor-page h3,
@@ -831,65 +818,9 @@ tbody tr:hover { background: var(--gold-wash); }
   color: #17130A;
 }
 
-/* ---------- Section banners ---------- */
-/* Photography used as a deep, heavily-scrimmed ground so it reads as texture
-   behind the type rather than as a picture competing with it. */
-.dashboard-info {
-  position: relative;
-  padding: clamp(1.75rem, 4vw, 2.75rem);
-  margin-bottom: 1.75rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  border-bottom: 1px solid var(--border);
-  overflow: hidden;
-  background-image:
-    linear-gradient(100deg, rgba(8, 11, 17, 0.96) 0%, rgba(8, 11, 17, 0.80) 45%, rgba(8, 11, 17, 0.58) 100%),
-    url('./images/market-globe.jpg');
-  background-size: cover;
-  background-position: center 30%;
-}
-.dashboard-info::after {
-  content: "";
-  position: absolute;
-  inset-inline-start: 0; inset-inline-end: 0; bottom: 0;
-  height: 1px;
-  background: linear-gradient(90deg, var(--gold-line), transparent 70%);
-}
-
-.leaderboard-page > h2 {
-  position: relative;
-  padding: clamp(1.5rem, 4vw, 2.5rem);
-  margin-bottom: 0;
-  border: 1px solid var(--border);
-  border-bottom: none;
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  overflow: hidden;
-  background-image:
-    linear-gradient(100deg, rgba(8, 11, 17, 0.95) 0%, rgba(8, 11, 17, 0.78) 50%, rgba(8, 11, 17, 0.60) 100%),
-    url('./images/trading-floor.jpg');
-  background-size: cover;
-  background-position: center;
-}
-
-.leaderboard-page > .leaderboard-subtitle {
-  padding: 0.9rem clamp(1.5rem, 4vw, 2.5rem) 1.1rem;
-  margin-bottom: 0;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-top: none;
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-}
-
-body.light-mode .dashboard-info,
-body.light-mode .leaderboard-page > h2 {
-  background-image:
-    linear-gradient(100deg, rgba(8, 11, 17, 0.90) 0%, rgba(8, 11, 17, 0.72) 50%, rgba(8, 11, 17, 0.55) 100%),
-    url('./images/market-globe.jpg');
-  color: #fff;
-}
-body.light-mode .leaderboard-page > h2 { background-image:
-    linear-gradient(100deg, rgba(8, 11, 17, 0.90) 0%, rgba(8, 11, 17, 0.72) 50%, rgba(8, 11, 17, 0.55) 100%),
-    url('./images/trading-floor.jpg'); }
+/* ---------- Section banners ----------
+   The Dashboard and Leaderboard titles use PageBanner
+   (components/ui/PageBanner), drawn in the Player Card's language. */
 
 /* ---------- Toasts ----------
    Logical offsets put the stack top-right in English and top-left in Hebrew

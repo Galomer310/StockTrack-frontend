@@ -7,6 +7,7 @@ import {
 } from "../api/social";
 import { useLanguage } from "../i18n/LanguageContext";
 import { fill } from "../i18n/fill";
+import { PageBanner } from "../components/ui/PageBanner";
 import PlayerAvatar from "../components/avatars/PlayerAvatar";
 
 // Ranks every portfolio by percentage return since it was opened, so a
@@ -46,8 +47,7 @@ const Leaderboard = () => {
 
   return (
     <div className="leaderboard-page" dir={dir} lang={lang}>
-      <h2>{t("lb_title")}</h2>
-      <p className="leaderboard-subtitle">{t("lb_subtitle")}</p>
+      <PageBanner title={t("lb_title")} subtitle={t("lb_subtitle")} />
 
       <div className="leaderboard-table">
         <div className="leaderboard-row leaderboard-head">

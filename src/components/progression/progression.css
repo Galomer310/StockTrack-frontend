@@ -21,7 +21,7 @@
   --prg-gold: #D9BE89;
   --prg-ivory: #F2EADC;
   --prg-muted: #8995A7;
-  --prg-serif-en: "Cormorant Garamond", Georgia, serif;
+  --prg-serif-en: var(--font-display);
   --prg-serif-he: "Frank Ruhl Libre", "David", serif;
   --prg-body: "Heebo", "Arial Hebrew", "Segoe UI", system-ui, sans-serif;
   --prg-ease: cubic-bezier(0.22, 0.61, 0.36, 1);

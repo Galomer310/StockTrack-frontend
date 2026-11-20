@@ -53,7 +53,7 @@
 .page-banner-text { position: relative; max-inline-size: 60%; }
 .page-banner-title {
   margin: 0;
-  font-family: "Cormorant Garamond", Georgia, serif;
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: clamp(1.9rem, 4.4vw, 3rem);
   line-height: 1.1;

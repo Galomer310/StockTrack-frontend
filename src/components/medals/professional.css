@@ -20,7 +20,7 @@
 .pro-medal.tier-2 .pro-tier { color: #D5DBE1; }
 .pro-medal.tier-4 .pro-tier { color: #E3EBF1; }
 .pro-period { color: var(--text-muted, #A39D90); font-size: 0.85rem; }
-.pro-figure { font-family: "Cormorant Garamond", "Frank Ruhl Libre", serif; font-size: 1.5rem; line-height: 1.1; color: #F4D58C; }
+.pro-figure { font-family: var(--font-display); font-size: 1.5rem; line-height: 1.1; color: #F4D58C; }
 .pro-subtitle { font-size: 0.7rem; letter-spacing: 0.22em; color: var(--text, #E8DEC8); }
 .pro-locked { font-size: 0.78rem; color: var(--text-faint, #75705F); }
 .pro-how { margin: 2px 0 0; font-size: 0.8rem; line-height: 1.5; color: var(--text-muted, #A39D90); }

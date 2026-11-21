@@ -115,10 +115,13 @@ const UserPage = () => {
               />
               {/* Module 2: every change to the portfolio, newest first. */}
               <ActivityModule key={active.id} portfolioId={active.id} reloadKey={portfolioRefresh} />
-              {/* Module 3: risk, volatility, diversification, horizon, turnover. */}
-              <ProfileModule key={`prof-${active.id}`} portfolioId={active.id} reloadKey={portfolioRefresh} />
-              {/* Module 4: what kind of companies the money sits in. */}
-              <ExposureModule key={`exp-${active.id}`} portfolioId={active.id} reloadKey={portfolioRefresh} />
+              {/* Modules 3 and 4 side by side (approved design): risk,
+                  volatility, diversification, horizon, turnover; and what
+                  kind of companies the money sits in. */}
+              <div className="dash-grid2">
+                <ProfileModule key={`prof-${active.id}`} portfolioId={active.id} reloadKey={portfolioRefresh} />
+                <ExposureModule key={`exp-${active.id}`} portfolioId={active.id} reloadKey={portfolioRefresh} />
+              </div>
               {/* Module 5: the record, and the same dates against the benchmarks. */}
               <InsightsModule key={`ins-${active.id}`} portfolioId={active.id} reloadKey={portfolioRefresh} />
             </>

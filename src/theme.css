@@ -248,3 +248,20 @@ body:not(.light-mode) :is(.feed-page, .market-page, .stock-search, .compare-page
   .prg-cat-name { flex: 1 1 calc(100% - 44px); overflow-wrap: normal; word-break: normal; hyphens: auto; }
   .prg-cat-count { margin-inline-start: 42px; }
 }
+
+/* Dashboard: two modules side by side, stacked on narrow screens. */
+.dash-grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.dash-grid2 > .al-module { margin-block: 0; }
+@media (max-width: 900px) { .dash-grid2 { grid-template-columns: minmax(0, 1fr); } }
+
+/* Numbers in the UI face with tabular figures, never a monospace. */
+:root { --font-num: var(--font-ui); --font-sans: var(--font-ui); }
+
+/* Insight tiles (approved design): a tone, not a frame; centred. */
+.ins-stat { border: 0; background: var(--ink-2); border-radius: 12px; box-shadow: none; text-align: center; }
+.ins-stat:hover, .ins-stat.is-open { border: 0; box-shadow: none; background: var(--ink-3); }
+.ins-stat dt { justify-content: center; }
+.ins-value { font-family: var(--font-ui); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* Summary cards: no gold rule on top (tone, not ornament). */
+.summary-card::before { display: none; }

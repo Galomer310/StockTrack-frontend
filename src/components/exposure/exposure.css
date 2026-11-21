@@ -13,3 +13,10 @@
   background: repeating-linear-gradient(135deg, rgba(232, 222, 200, 0.18) 0 4px, transparent 4px 8px);
 }
 .exp-value { min-inline-size: 4.2em; text-align: end; font-variant-numeric: tabular-nums; font-weight: 700; color: var(--text); }
+
+/* Redesign 2026-11: hairline rows; exposure bars in the allocation blue. */
+.exp-row { padding: 12px 4px; border: 0; border-block-end: 1px solid var(--line); border-radius: 0; box-shadow: none; }
+.exp-row:last-child { border-block-end: 0; }
+.exp-row:hover, .exp-row.is-open { border-color: var(--line); box-shadow: none; }
+.exp-track { background: var(--ink-3); box-shadow: none; block-size: 8px; }
+.exp-fill, [dir="rtl"] .exp-fill { background: #7F9CC0; }

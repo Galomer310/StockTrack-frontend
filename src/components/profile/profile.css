@@ -44,3 +44,12 @@
 @media (max-width: 600px) {
   .prof-result { margin-inline-start: 0; inline-size: 100%; text-align: start; }
 }
+
+/* Redesign 2026-11: rows separated by hairlines, not boxes; one quiet fill. */
+.prof-list { gap: 0; }
+.prof-row { padding: 12px 4px; border: 0; border-block-end: 1px solid var(--line); border-radius: 0; box-shadow: none; }
+.prof-row:last-child { border-block-end: 0; }
+.prof-row:hover, .prof-row.is-open { border-color: var(--line); box-shadow: none; background: transparent; }
+.prof-meter, [dir="rtl"] .prof-meter { background: var(--ink-3); box-shadow: none; border: 0; }
+.prof-fill, [dir="rtl"] .prof-fill { background: var(--cream); box-shadow: none; }
+.prof-mark { background: var(--cream); box-shadow: none; border-color: var(--ink-1); }

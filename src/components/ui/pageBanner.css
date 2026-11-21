@@ -86,3 +86,22 @@ body.light-mode .page-banner-subtitle { color: #C9C2B2; }
 @media (prefers-reduced-motion: reduce) {
   .page-banner { transition: none; }
 }
+
+/* Redesign 2026-11: a page title is plain type on the page, centred; no
+   frame, no gradient, no art. */
+.page-banner, [dir="rtl"] .page-banner {
+  min-block-size: 0; margin-block-end: 16px; padding: 12px 0 4px; justify-content: center; text-align: center;
+  border: 0; border-radius: 0; background: none; box-shadow: none;
+}
+.page-banner:hover { border: 0; box-shadow: none; }
+.page-banner::after, .page-banner-art { display: none; }
+.page-banner-text { max-inline-size: 100%; }
+.page-banner-title, :lang(he) .page-banner-title {
+  background: none; -webkit-background-clip: border-box; background-clip: border-box; color: var(--cream);
+  font-family: var(--font-display); font-weight: 700; font-size: clamp(1.8rem, 4vw, 2.4rem);
+}
+.page-banner-subtitle { color: var(--muted); }
+@media (max-width: 560px) {
+  .page-banner { min-block-size: 0; align-items: center; }
+  .page-banner-text::before { display: none; }
+}

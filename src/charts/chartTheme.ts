@@ -64,8 +64,12 @@ export const SERIES = {
    Six is the ceiling. A seventh category folds into "Other" - a generated or
    recycled hue would be indistinguishable from an existing slot under CVD.
    --------------------------------------------------------------------------- */
+// Redesign 2026-11: the dark set is the approved prototype's muted palette
+// (champagne, steel blue, terracotta, sage, lavender, sand). Muted hues sit
+// closer together, so every chart using them must print its values as text
+// too (legend with percentages), as the light set already requires.
 export const CATEGORICAL = {
-  dark: ["#3987e5", "#d95926", "#199e70", "#c98500", "#d55181", "#008300"],
+  dark: ["#CFAE6E", "#7F9CC0", "#C98F7A", "#8FAE96", "#9A8FB0", "#B9A98A"],
   light: ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300"],
 };
 
@@ -74,7 +78,7 @@ export const CATEGORICAL = {
 // holding. Grey fails the chroma floor by design - that is what marks it out as
 // "not a series" - and both steps clear 3:1 against their own surface.
 export const NEUTRAL = {
-  dark: "#8D97AC",
+  dark: "#5A564C",
   light: "#5C6679",
 };
 

@@ -1,17 +1,17 @@
+import type { CSSProperties } from "react";
 import type { PlayerCardData } from "../../api/playerCard";
+import { fill } from "../../i18n/fill";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { formatNumber } from "../playerCard/format";
 import { reasonKey } from "../playerCard/reasons";
-import { Emblem, Ornament } from "./emblems";
-import { TitlePlate } from "./TitlePlate";
+import { Emblem } from "./emblems";
 
 /* ===========================================================================
-   Level, then the active title directly beneath it (Player Title spec 8).
-   ---------------------------------------------------------------------------
-   INVESTOR LEVEL, the number, a gold ornament, the title plate with its
-   category, and the way into the title collection. Takes the place of the
-   header's old level and title badges, from the same progression value the
-   progress panel reads, so the two can never disagree.
+   Level and active title, as two quiet chips under the player's name
+   (redesign 2026-11). The title chip carries its path's colour, a tint
+   rather than a frame; the link beside them opens the title collection.
+   Read from the same progression value as the progress panel, so the two
+   can never disagree.
    =========================================================================== */
 
 export const PlayerStanding = ({
@@ -23,26 +23,22 @@ export const PlayerStanding = ({
 }) => {
   const { t, locale } = useLanguage();
   const p = progression.state === "available" ? progression.value : null;
+  if (!p) {
+    return <span className="pc-chip pc-chip--muted">{t(reasonKey(progression) ?? "unavailable_missing")}</span>;
+  }
+  const title = p.active_title;
   return (
-    <div className="prg prg-standing">
-      <span className="prg-eyebrow">{t("prg_investor_level")}</span>
-      {p ? (
-        <span className="prg-level prg-serif">
-          <bdi>{formatNumber(p.level, locale)}</bdi>
+    <div className="pc-chips">
+      <span className="pc-chip">{fill(t("prg_level_n"), { n: formatNumber(p.level, locale) })}</span>
+      {title && (
+        <span className="pc-chip pc-chip--path" style={{ "--path": title.accent_color } as CSSProperties}>
+          <Emblem name={title.icon} />
+          <bdi dir="ltr">{title.name}</bdi>
         </span>
-      ) : (
-        <span className="prg-level-missing">{t(reasonKey(progression) ?? "unavailable_missing")}</span>
       )}
-      <Ornament className="prg-ornament" />
-      {p && (
-        <>
-          <TitlePlate title={p.active_title} />
-          <button type="button" className="prg-link" onClick={onOpenCollection}>
-            <Emblem name="crown" />
-            {t(p.active_title ? "prg_my_titles" : "prg_choose_title")}
-          </button>
-        </>
-      )}
+      <button type="button" className="pc-chip-link" onClick={onOpenCollection}>
+        {t(title ? "prg_my_titles" : "prg_choose_title")}
+      </button>
     </div>
   );
 };

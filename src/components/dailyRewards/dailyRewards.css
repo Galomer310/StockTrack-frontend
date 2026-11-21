@@ -144,3 +144,6 @@
 @media (prefers-reduced-motion: reduce) {
   .dr-track li, .dr-portfolio, .prg .dr-btn { transition: none; }
 }
+
+/* Redesign 2026-11: a panel like every other, told apart by tone. */
+.prg.dr-panel { border: 0; border-radius: var(--r, 16px); background: var(--ink-1); }

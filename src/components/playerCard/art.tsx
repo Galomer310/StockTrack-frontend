@@ -139,13 +139,26 @@ export const AwardArt = ({ art, className }: { art: AwardArtName; className?: st
 
 // The level emblem shows the current level number inside it: the spec
 // requires the level in the progression area, which the image leaves out.
-export const LevelEmblem = ({ level }: { level: string }) => (
-  <svg className="pc-emblem" viewBox="0 0 120 132" aria-hidden="true" focusable="false">
-    <polygon points="60,4 112,34 112,98 60,128 8,98 8,34" fill="url(#pcGoldRim)" />
-    <polygon points="60,13 104,38.5 104,93.5 60,119 16,93.5 16,38.5" fill="url(#pcDark)" />
-    <polygon points="60,20 98,42 98,90 60,112 22,90 22,42" fill="none" stroke="url(#pcGold)" strokeWidth="1.5" opacity=".7" />
-    <polygon points={starPoints(60, 56, 22)} fill="url(#pcGold)" />
-    <text x="60" y="100" textAnchor="middle" fontFamily="Heebo, sans-serif" fontWeight="800" fontSize="19" fill="#F4D58C">{level}</text>
+// Redesign 2026-11: a dark hexagon in a fine gold rim, the word and the number.
+export const LevelEmblem = ({ level, label }: { level: string; label?: string }) => (
+  <svg className="pc-emblem" viewBox="0 0 100 112" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="pcLvlRim" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stopColor="#F6DFA6" />
+        <stop offset=".5" stopColor="#A7843F" />
+        <stop offset="1" stopColor="#E7C680" />
+      </linearGradient>
+      <radialGradient id="pcLvlDisc" cx="50%" cy="35%" r="70%">
+        <stop offset="0" stopColor="#202026" />
+        <stop offset="1" stopColor="#101013" />
+      </radialGradient>
+    </defs>
+    <path d="M50 4 L92 28 V84 L50 108 L8 84 V28 Z" fill="url(#pcLvlDisc)" stroke="url(#pcLvlRim)" strokeWidth="3" />
+    <path d="M50 14 L83 33 V79 L50 98 L17 79 V33 Z" fill="none" stroke="rgba(217,180,106,.35)" strokeWidth="1" />
+    {label && (
+      <text x="50" y="50" textAnchor="middle" fill="#A9A293" fontSize="11" fontFamily="Heebo, sans-serif">{label}</text>
+    )}
+    <text x="50" y={label ? 78 : 66} textAnchor="middle" fill="#ECE3D0" fontSize="30" fontWeight="600" fontFamily="Heebo, sans-serif">{level}</text>
   </svg>
 );
 

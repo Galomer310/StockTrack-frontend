@@ -392,3 +392,150 @@
 :lang(he) .pc-medal-caption > span:first-child { letter-spacing: normal; }
 .pc-medal-figure { font-family: var(--font-display); font-size: 1.6rem; color: #F4D58C; }
 .pc-medal-subtitle { font-size: 0.72rem; letter-spacing: 0.24em; color: #E8DEC8; }
+
+/* ===========================================================================
+   Redesign 2026-11 (approved prototype, "#card"). One palette, no glow
+   except medals, areas told apart by surface tone rather than gold frames,
+   champagne only for the primary action, the current choice and what was
+   earned. Tokens come from theme.css; the old --pc-* names are re-pointed
+   so every rule above follows.
+   =========================================================================== */
+.pc {
+  --pc-bg: var(--ink-0);
+  --pc-surface: var(--ink-1);
+  --pc-surface-hi: var(--ink-1);
+  --pc-line: var(--line-2);
+  --pc-line-soft: var(--line);
+  --pc-gold: var(--muted);
+  --pc-gold-bright: var(--champ);
+  --pc-gold-deep: var(--quiet);
+  --pc-cream: var(--cream);
+  --pc-muted: var(--muted);
+  --pc-pos: var(--gain-c);
+  --pc-neg: var(--loss-c);
+  --pc-xp: var(--cream);
+  --pc-glow: none;
+  --pc-glow-hi: none;
+  --pc-display-he: var(--font-display);
+  --pc-body: var(--font-ui);
+  --pc-radius: var(--r, 16px);
+  background: var(--ink-0);
+  padding-block: 28px 64px;
+}
+.pc-wrap { display: grid; gap: 16px; }
+.pc-gold-text { background: none; color: var(--cream); -webkit-text-fill-color: currentColor; }
+.pc-flat { color: var(--cream); }
+
+/* The player's name is the page's headline; the generic title is for
+   screen readers only. */
+.pc-head { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; padding: 0; }
+
+.pc-card { background: var(--ink-1); border: 0; box-shadow: none; }
+.pc-card:hover { background: var(--ink-1); border-color: transparent; box-shadow: none; }
+
+.pc-panel { padding: 20px; }
+.pc-panel-title {
+  justify-content: flex-start; padding: 0 0 16px; color: var(--cream);
+  font-family: var(--font-display); font-size: 1.3rem; font-weight: 700;
+}
+.pc:lang(en) .pc-panel-title { font-size: 1.3rem; letter-spacing: normal; }
+.pc-panel-title > svg { display: none; }
+.pc-panel:has(.pc-awards--achievement) .pc-panel-title { justify-content: center; }
+
+.pc .pc-btn { color: var(--cream); border-color: var(--line-2); border-radius: 10px; }
+.pc .pc-btn:hover { color: var(--cream); background: var(--ink-2); border-color: rgba(236, 227, 208, 0.28); }
+
+/* Area 1: picture and name at the start, the bio at the end. */
+.pc-profile { grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1.2fr); gap: 0 26px; padding: 28px; }
+.pc-profile .pc-avatar { order: 1; }
+.pc-profile .pc-identity { order: 2; }
+.pc-profile .pc-divider { order: 3; background: var(--line); }
+.pc-profile .pc-bio { order: 4; }
+.pc-bio h2 { color: var(--muted); font-family: var(--font-ui); font-size: 0.85rem; font-weight: 500; }
+.pc-bio h2 svg { display: none; }
+.pc-bio p { color: var(--muted); }
+.pc-avatar { width: 112px; padding: 2px; background: var(--champ); box-shadow: none; }
+.pc-avatar-default { background: var(--ink-2); }
+.pc-nickname { font-size: clamp(1.9rem, 4vw, 2.6rem); }
+.pc-bio textarea, .pc-field input { background: var(--ink-0); border-color: var(--line-2); }
+
+/* Area 2: six figures in one band, hairlines between them. */
+.pc-stats { gap: 0; margin: 0; background: var(--ink-1); border-radius: var(--r, 16px); overflow: hidden; }
+.pc-stats > .pc-card { background: transparent; border-radius: 0; }
+.pc-stat { min-height: 0; padding: 18px 14px; gap: 4px; }
+.pc-stat + .pc-stat { border-inline-start: 1px solid var(--line); }
+.pc-stat-title { order: -1; min-height: 0; padding-inline: 18px; font-size: 0.82rem; color: var(--muted); }
+.pc-stat-icon { display: none; }
+.pc-stat-value { color: var(--cream); font-size: clamp(1.5rem, 2.4vw, 1.9rem); font-weight: 600; }
+.pc-locked svg { color: var(--quiet); }
+
+/* Areas 3-7. */
+.pc-row3 { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 0.9fr); gap: 16px; }
+.pc-row2 { gap: 16px; margin: 0; }
+.pc .pc-award:hover { border-color: transparent; background: var(--ink-2); transform: none; }
+.pc-award span { color: var(--cream); }
+.pc-award .pc-award-tier { color: var(--quiet); }
+.pc-awards-foot { justify-content: center; gap: 16px; border-block-start: 0; padding-block-start: 4px; color: var(--quiet); }
+.pc .pc-awards-link { color: var(--muted); }
+.pc .pc-awards-link:hover { color: var(--cream); }
+
+.pc-table { border: 0; border-radius: 0; background: none; }
+.pc-row { grid-template-columns: minmax(0, 1fr) auto; padding: 11px 0; border-block-end-color: var(--line); }
+.pc-row > svg { display: none; }
+.pc-row-label { color: var(--muted); }
+.pc-row-value { color: var(--cream); font-weight: 600; }
+.pc-row-value.pc-pos { color: var(--gain-c); }
+.pc-row-value.pc-neg { color: var(--loss-c); }
+.pc-performance .pc-row { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); }
+.pc-performance .pc-row-value { border-inline-start: 0; text-align: end; }
+
+.pc-xp-label { color: var(--muted); font-size: 1rem; font-weight: 500; }
+.pc-xp-now { color: var(--cream); font-weight: 600; }
+.pc-bar { height: 8px; padding: 0; border: 0; background: var(--ink-3); }
+.pc-bar > div, .pc[dir="rtl"] .pc-bar > div { background: var(--champ); box-shadow: none; }
+
+.pc-dialog { background: var(--ink-1); border: 0; }
+.pc-dialog h3 { color: var(--cream); }
+.pc-facts { border: 0; }
+.pc-facts div { border-block-end-color: var(--line); }
+.pc-facts dd { color: var(--cream); }
+.pc-medal-caption > span:first-child { color: var(--champ); }
+.pc-medal-figure { color: var(--cream); }
+.pc-medal-subtitle { color: var(--muted); }
+
+@media (max-width: 1080px) {
+  .pc-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .pc-stat:nth-child(3n + 1) { border-inline-start: 0; }
+  .pc-stat:nth-child(n + 4) { border-block-start: 1px solid var(--line); }
+  .pc-row3 { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  .pc { padding-block-start: 16px; }
+  .pc-profile { padding: 20px; }
+  .pc-avatar { width: 88px; }
+}
+@media (max-width: 560px) {
+  .pc-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; }
+  .pc-stat:nth-child(3n + 1) { border-inline-start: 1px solid var(--line); }
+  .pc-stat:nth-child(2n + 1) { border-inline-start: 0; }
+  .pc-stat:nth-child(n + 3) { border-block-start: 1px solid var(--line); }
+}
+
+/* Level and title chips under the name (PlayerStanding). */
+.pc-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-block-start: 10px; }
+.pc-chip {
+  display: inline-flex; align-items: center; gap: 6px; block-size: 32px; padding-inline: 12px;
+  border-radius: 99px; background: var(--ink-2); color: var(--cream); font-size: 0.9rem; font-weight: 500;
+}
+.pc-chip svg { inline-size: 16px; block-size: 16px; }
+.pc-chip--path { color: var(--path, var(--cream)); background: color-mix(in srgb, var(--path, #ECE3D0) 10%, var(--ink-2)); }
+.pc-chip--muted { color: var(--muted); }
+.pc .pc-chip-link {
+  min-height: 32px; padding: 0 4px; border: 0; background: none; cursor: pointer;
+  color: var(--muted); font-size: 0.82rem; text-decoration: underline; text-underline-offset: 3px;
+}
+.pc .pc-chip-link:hover { color: var(--cream); background: none; }
+.pc-row2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.pc-emblem { width: 104px; }
+@media (max-width: 1080px) { .pc-row2 { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) { .pc-chips { justify-content: center; } }

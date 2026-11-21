@@ -108,7 +108,7 @@ export const ProgressionPanel = ({ progression }: { progression: PlayerCardData[
         <InfoTip text={t("t_progress")} inline />
       </h2>
       <div className="pc-progress">
-        <LevelEmblem level={p ? formatNumber(p.level, locale) : "—"} />
+        <LevelEmblem level={p ? formatNumber(p.level, locale) : "—"} label={t("prg_level_word")} />
         <div className="pc-progress-main">
           <p className="pc-xp">
             {p ? (

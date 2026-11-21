@@ -433,3 +433,17 @@
 @media (prefers-reduced-motion: reduce) {
   .prg *, .prg *::before, .prg *::after, .prg { animation: none !important; transition: none !important; }
 }
+
+/* Redesign 2026-11: the navy palette gives way to the app's one palette
+   (theme.css). Every rule above follows through these tokens. */
+.prg {
+  --prg-bg: var(--ink-0);
+  --prg-surface: var(--ink-1);
+  --prg-surface-2: var(--ink-1);
+  --prg-line: var(--line-2);
+  --prg-gold: var(--champ);
+  --prg-ivory: var(--cream);
+  --prg-muted: var(--muted);
+  --prg-serif-he: var(--font-display);
+  --prg-body: var(--font-ui);
+}

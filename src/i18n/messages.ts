@@ -408,6 +408,7 @@ const en = {
 
   // Player titles and game achievements (progression)
   prg_investor_level: "Investor Level",
+  prg_level_word: "Level",
   prg_no_title: "No title chosen yet",
   prg_my_titles: "My Title Collection",
   prg_choose_title: "Choose your title",
@@ -1430,6 +1431,7 @@ const he: Messages = {
   sentiment_neutral: "ניטרלי",
 
   prg_investor_level: "רמת משקיע",
+  prg_level_word: "רמה",
   prg_no_title: "עדיין לא נבחר כינוי",
   prg_my_titles: "אוסף הכינויים שלי",
   prg_choose_title: "בחירת כינוי",

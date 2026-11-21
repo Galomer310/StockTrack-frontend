@@ -131,8 +131,15 @@ const PlayerCard = () => {
             />
             {/* Who follows you is yours alone, and demo data has no real lists. */}
             <StatsRow data={result.data} onOpenFollows={result.demo ? undefined : () => setFollowsOpen(true)} />
+            {/* Reading order of the approved design: medals, achievements,
+                competitions; then performance beside progress. */}
             <div className="pc-row3">
-              <CompetitionsPanel competitions={result.data.competitions} />
+              <AwardsPanel
+                kind="medal"
+                awards={result.data.medals.top}
+                total={result.data.medals.total}
+                onOpen={(award) => setOpen({ award, kind: "medal" })}
+              />
               <AwardsPanel
                 kind="achievement"
                 awards={result.data.achievements.top}
@@ -140,16 +147,11 @@ const PlayerCard = () => {
                 demo={demoParam}
                 onOpen={(award) => setOpen({ award, kind: "achievement" })}
               />
-              <AwardsPanel
-                kind="medal"
-                awards={result.data.medals.top}
-                total={result.data.medals.total}
-                onOpen={(award) => setOpen({ award, kind: "medal" })}
-              />
+              <CompetitionsPanel competitions={result.data.competitions} />
             </div>
             <div className="pc-row2">
-              <ProgressionPanel progression={result.data.progression} />
               <PerformancePanel stats={result.data.stats} />
+              <ProgressionPanel progression={result.data.progression} />
             </div>
             {/* Daily rewards are the signed-in player's own; demo data has none. */}
             {!result.demo && <DailyRewardsPanel compact />}

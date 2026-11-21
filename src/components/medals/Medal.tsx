@@ -54,14 +54,6 @@ export const medalShape = (icon: string, medalId?: string): Shape => {
   }
 };
 
-// Points of a regular (or alternating) polygon around (cx, cy).
-const ring = (n: number, r: number, rot: number, r2?: number, cx = 50, cy = 52) =>
-  Array.from({ length: n }, (_, i) => {
-    const a = rot + (i * 2 * Math.PI) / n;
-    const rr = r2 && i % 2 ? r2 : r;
-    return `${(cx + rr * Math.cos(a)).toFixed(1)},${(cy + rr * Math.sin(a)).toFixed(1)}`;
-  }).join(" ");
-
 const sparkle = (x: number, y: number) =>
   `M${x} ${y - 4} L${x + 1} ${y - 1} L${x + 4} ${y} L${x + 1} ${y + 1} L${x} ${y + 4} L${x - 1} ${y + 1} L${x - 4} ${y} L${x - 1} ${y - 1}Z`;
 

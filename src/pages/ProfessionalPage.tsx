@@ -61,7 +61,7 @@ const MedalCard = ({ m }: { m: MedalView }) => {
   const streaky = m.medal_id === "btm_monthly_combo" || m.medal_id === "green_months";
   return (
     <li className={`pro-medal tier-${m.tier}`}>
-      <Medal icon={m.icon} tier={m.tier} decoration={m.decoration} size={104} label={`${m.name[lang]}, ${tierName(t, m.tier, m.decoration, m.medal_id)}`} />
+      <Medal icon={m.icon} medalId={m.medal_id} year={m.period_key || undefined} tier={m.tier} decoration={m.decoration} size={104} label={`${m.name[lang]}, ${tierName(t, m.tier, m.decoration, m.medal_id)}`} />
       <div className="pro-medal-text">
         <h3 dir="auto">{m.name[lang]}</h3>
         <span className="pro-tier">{tierName(t, m.tier, m.decoration, m.medal_id)}</span>
@@ -109,7 +109,7 @@ const LockedMedal = ({ c }: { c: ProfessionalView["medal_catalog"][number] }) =>
   const { t, lang } = useLanguage();
   return (
     <li className="pro-medal is-locked">
-      <Medal icon={c.icon} tier={3} aura={false} size={104} className="is-locked" />
+      <Medal icon={c.icon} medalId={c.id} tier={3} aura={false} size={104} className="is-locked" />
       <div className="pro-medal-text">
         <h3 dir="auto">{c.name[lang]}</h3>
         <span className="pro-locked">{t("pro_locked")}</span>

@@ -2,136 +2,82 @@ import { useId } from "react";
 import "./medals.css";
 
 /* ===========================================================================
-   A professional medal (spec 5): a classic circular medal on a short
-   ribbon, in the metal of its tier, with the track's engraved symbol.
+   A professional medal, design B: "by meaning". Each track has its own
+   shape, so the medal says what was achieved before its name is read.
    ---------------------------------------------------------------------------
-   Tiers: 1 Bronze, 2 Silver, 3 Gold, 4 Platinum, 5 Sovereign (champagne gold
-   with royal detailing). `decoration` engraves small marks under the symbol
-   for the evolutions of the fifth tier (Sovereign II / III, Green Months'
-   years). The aura is CSS (medals.css): restrained, slower and richer as the
-   tier rises, and still when the viewer asks for reduced motion.
+     bars      Beat the Market, quarterly: the rim cut into four quarters,
+               the last bar breaks through the market's dashed line.
+     calendar  Beat the Market, annual / monthly combo: a watch bezel with
+               twelve months, the year engraved.
+     trend     Portfolio performance: the arrow breaks out of the frame.
+     cal12     Green months: a dot per month; every tier lights more.
+     shield    Capital protector: a shield; the line never touches the floor.
+     phoenix   Phoenix recovery: wings that grow with every tier.
+     gem       The special, platform-wide medals: a cut gem.
+
+   Tiers: 1 Bronze, 2 Silver, 3 Gold, 4 Platinum, 5 Sovereign. Each tier
+   has its own effect, stronger as the tier rises (medals.css); still when
+   the viewer asks for reduced motion. `decoration` adds small marks for the
+   evolutions beyond the fifth tier.
    =========================================================================== */
 
-type Metal = { hi: string; mid: string; lo: string; edge: string };
+type Metal = { name: string; c: string; stops: [string, string, string] };
 
 const METALS: Record<number, Metal> = {
-  1: { hi: "#F0C29C", mid: "#B97A4C", lo: "#6A3E22", edge: "#4A2A16" },
-  2: { hi: "#F7F9FB", mid: "#C3C9D0", lo: "#727982", edge: "#4D535A" },
-  3: { hi: "#FCEAB0", mid: "#D9A94E", lo: "#8A6420", edge: "#5E4313" },
-  4: { hi: "#F2F7FB", mid: "#C4D3DE", lo: "#76899A", edge: "#4A5C6B" },
-  5: { hi: "#FFF4D6", mid: "#E7C886", lo: "#A07C3C", edge: "#6B5022" },
+  1: { name: "bronze", c: "#D9A07A", stops: ["#E7B08A", "#9C6440", "#D49A70"] },
+  2: { name: "silver", c: "#E3E7EC", stops: ["#F4F6F9", "#8E959F", "#DDE1E7"] },
+  3: { name: "gold", c: "#EBCB86", stops: ["#F6DFA6", "#A7843F", "#E7C680"] },
+  4: { name: "platinum", c: "#CFE0F5", stops: ["#F0F5FC", "#7F97B8", "#CFE0F5"] },
+  5: { name: "sovereign", c: "#F6DC9C", stops: ["#FFEDBE", "#B98F3E", "#F3D58E"] },
 };
 
-// Engraved symbols, drawn in a 40 x 40 box centred on the medal.
-const Symbol = ({ icon }: { icon: string }) => {
+type Shape = "bars" | "calendar" | "trend" | "cal12" | "shield" | "phoenix" | "gem";
+
+// The server's medal icon (and, where two tracks share an icon, its id).
+export const medalShape = (icon: string, medalId?: string): Shape => {
+  if (medalId === "btm_annual" || medalId === "btm_monthly_combo") return "calendar";
   switch (icon) {
     case "line_over_benchmark":
-      return (
-        <>
-          <path d="M4 28 H36" strokeDasharray="3 3" />
-          <path d="M4 32 L14 24 L21 27 L36 9" />
-          <path d="M29 9 H36 V16" />
-        </>
-      );
+      return "bars";
     case "calendar_over_benchmark":
-      return (
-        <>
-          <rect x="6" y="9" width="28" height="24" rx="2" />
-          <path d="M6 15 H34 M13 6 V11 M27 6 V11" />
-          <path d="M10 29 L17 23 L22 25 L30 18" />
-        </>
-      );
+      return "calendar";
     case "upward_chart":
-      return (
-        <>
-          <path d="M5 34 H35" />
-          <path d="M9 34 V27 M16 34 V22 M23 34 V16 M30 34 V10" strokeWidth="3.4" />
-          <path d="M7 20 L30 5 M24 5 H30 V11" />
-        </>
-      );
+      return "trend";
     case "green_calendar":
-      return (
-        <>
-          <rect x="6" y="9" width="28" height="24" rx="2" />
-          <path d="M6 15 H34 M13 6 V11 M27 6 V11" />
-          <path d="M11 20 h4 M18 20 h4 M25 20 h4 M11 26 h4 M18 26 h4" strokeWidth="3" />
-          <path d="M25 27 l2.5 2.5 l5 -6" />
-        </>
-      );
+      return "cal12";
     case "shield_growth":
-      return (
-        <>
-          <path d="M20 4 L33 9 V19 C33 27 27 33 20 36 C13 33 7 27 7 19 V9 Z" />
-          <path d="M13 24 L18 19 L22 22 L28 14" />
-        </>
-      );
-    case "first_laurel":
-      // A laurel around a numeral one: the first on the platform.
-      return (
-        <>
-          <path d="M11 31 C6 26 5 18 9 11 M29 31 C34 26 35 18 31 11" />
-          <path d="M8.5 25 l-3 -1.5 M7.5 19 l-3 -0.5 M9 13.5 l-2.5 -2 M31.5 25 l3 -1.5 M32.5 19 l3 -0.5 M31 13.5 l2.5 -2" />
-          <path d="M17 15 L21 12 V30 M17 30 H25" />
-        </>
-      );
-    case "three_lines":
-      // Three portfolios rising above the benchmark's dashed line.
-      return (
-        <>
-          <path d="M4 27 H36" strokeDasharray="2.5 3" />
-          <path d="M12 35 V15 M20 35 V8 M28 35 V12" strokeWidth="4.2" />
-        </>
-      );
-    case "five_lines":
-      // Five portfolios above the benchmark.
-      return (
-        <>
-          <path d="M3 27 H37" strokeDasharray="2.5 3" />
-          <path d="M8 35 V17 M14 35 V11 M20 35 V7 M26 35 V12 M32 35 V16" strokeWidth="3.2" />
-        </>
-      );
-    case "crowned_chart":
-      return (
-        <>
-          <path d="M12 12 L14 6 L18 10 L20 5 L22 10 L26 6 L28 12 Z" />
-          <path d="M6 35 H34 M10 35 V28 M17 35 V23 M24 35 V19 M31 35 V15" strokeWidth="3.2" />
-        </>
-      );
-    case "five_stars":
-      return (
-        <>
-          {[[20, 9], [9, 18], [31, 18], [13, 30], [27, 30]].map(([x, y]) => (
-            <path key={`${x}-${y}`} d={`M${x} ${y - 4.5} L${x + 1.4} ${y - 1.4} L${x + 4.5} ${y - 1.1} L${x + 2.1} ${y + 1} L${x + 2.8} ${y + 4.2} L${x} ${y + 2.5} L${x - 2.8} ${y + 4.2} L${x - 2.1} ${y + 1} L${x - 4.5} ${y - 1.1} L${x - 1.4} ${y - 1.4} Z`} />
-          ))}
-        </>
-      );
-    case "alpha":
-      // The Greek alpha, with three marks for three portfolios.
-      return (
-        <>
-          <path d="M27 14 C25 22 22 29 16 29 C11 29 9 25 9 21.5 C9 17 12 13.5 16 13.5 C21 13.5 23 20 25 25 C26 28 28 29.5 31 29" />
-          <path d="M14 34 h2 M19 34 h2 M24 34 h2" strokeWidth="2.6" />
-        </>
-      );
+      return "shield";
     case "phoenix":
-      // A minimalist phoenix: wings raised, crest, a short tail. No flames.
-      return (
-        <>
-          <path d="M20 33 C17.5 28 17.5 22 20 17.5 C22.5 22 22.5 28 20 33 Z" />
-          <path d="M19 21 C14 17 9 15.5 4.5 9 C10 11 14.5 11.5 18.4 16" />
-          <path d="M21 21 C26 17 31 15.5 35.5 9 C30 11 25.5 11.5 21.6 16" />
-          <path d="M20 17.5 V12.5 M17.8 13.6 L20 11 L22.2 13.6" />
-          <path d="M20 33 L16.5 37.5 M20 33 L23.5 37.5" />
-        </>
-      );
+      return "phoenix";
     default:
-      return <circle cx="20" cy="20" r="10" />;
+      return "gem";
   }
 };
+
+// Points of a regular (or alternating) polygon around (cx, cy).
+const ring = (n: number, r: number, rot: number, r2?: number, cx = 50, cy = 52) =>
+  Array.from({ length: n }, (_, i) => {
+    const a = rot + (i * 2 * Math.PI) / n;
+    const rr = r2 && i % 2 ? r2 : r;
+    return `${(cx + rr * Math.cos(a)).toFixed(1)},${(cy + rr * Math.sin(a)).toFixed(1)}`;
+  }).join(" ");
+
+const sparkle = (x: number, y: number) =>
+  `M${x} ${y - 4} L${x + 1} ${y - 1} L${x + 4} ${y} L${x + 1} ${y + 1} L${x} ${y + 4} L${x - 1} ${y + 1} L${x - 4} ${y} L${x - 1} ${y - 1}Z`;
+
+const CROWN = "M3 18l2-10 5 5 2-7 2 7 5-5 2 10z";
+const LIT: Record<number, number> = { 1: 1, 2: 3, 3: 6, 4: 9, 5: 12 };
+const WING: Record<number, number> = { 1: 0.55, 2: 0.7, 3: 0.85, 4: 1, 5: 1.12 };
+const WING_PATH =
+  "M0 0 C-6 -5 -13 -13 -18 -26 C-16 -16 -18 -13 -22 -10 C-16 -6 -13 -3 -11 0 C-18 0 -21 3 -24 8 C-16 8 -8 6 0 5 Z";
+
+const line = { fill: "none", strokeLinecap: "round", strokeLinejoin: "round" } as const;
 
 export const Medal = ({
   icon,
   tier,
+  medalId,
+  year,
   decoration = 0,
   size = 96,
   aura = true,
@@ -140,6 +86,10 @@ export const Medal = ({
 }: {
   icon: string;
   tier: number;
+  /** The track's id, where two tracks share an icon. */
+  medalId?: string;
+  /** The year engraved on the annual medal; omitted, the bezel shows "12". */
+  year?: string;
   decoration?: number;
   size?: number;
   aura?: boolean;
@@ -148,71 +98,164 @@ export const Medal = ({
   className?: string;
 }) => {
   const id = useId().replace(/:/g, "");
-  const m = METALS[Math.min(5, Math.max(1, tier))];
+  const level = Math.min(5, Math.max(1, tier));
+  const m = METALS[level];
+  const c = m.c;
+  const metal = `url(#mt${id})`;
+  const disc = `url(#dc${id})`;
+  const shape = medalShape(icon, medalId);
+  // Only a plain year is engraved; other period keys stay off the metal.
+  const engraved = year && /^\d{4}$/.test(year) ? year : undefined;
   const marks = Math.min(6, decoration);
+  const rim = (r: number) => <circle cx="50" cy="52" r={r} fill={disc} stroke={metal} strokeWidth="5" />;
+
+  let body: JSX.Element;
+  switch (shape) {
+    case "bars":
+      body = (
+        <>
+          <circle cx="50" cy="52" r="43" fill={disc} />
+          <circle cx="50" cy="52" r="43" fill="none" stroke={metal} strokeWidth="5" strokeDasharray="60.5 7" strokeDashoffset="-3.5" transform="rotate(-90 50 52)" />
+          <path d="M24 72 H76" stroke={c} strokeWidth="1" opacity=".4" />
+          <path d="M22 56 H78" stroke={c} strokeWidth="1.2" strokeDasharray="3 3" opacity=".65" />
+          {[[28, 9], [38, 13], [48, 11]].map(([x, h]) => (
+            <rect key={x} x={x} y={72 - h} width="7" height={h} rx="1" fill={c} opacity=".7" />
+          ))}
+          <rect x="60" y="30" width="8" height="42" rx="1" fill={c} />
+        </>
+      );
+      break;
+    case "calendar":
+      body = (
+        <>
+          {rim(43)}
+          <circle cx="50" cy="52" r="33" fill="none" stroke={c} strokeWidth=".8" opacity=".4" />
+          {Array.from({ length: 12 }, (_, i) => {
+            const a = ((i * 30 - 90) * Math.PI) / 180;
+            const r1 = i % 3 === 0 ? 33.5 : 35.5;
+            return (
+              <line
+                key={i}
+                x1={(50 + r1 * Math.cos(a)).toFixed(1)}
+                y1={(52 + r1 * Math.sin(a)).toFixed(1)}
+                x2={(50 + 39 * Math.cos(a)).toFixed(1)}
+                y2={(52 + 39 * Math.sin(a)).toFixed(1)}
+                stroke={c}
+                strokeWidth={i % 3 === 0 ? 2 : 1}
+              />
+            );
+          })}
+          <text x="50" y="58" textAnchor="middle" fill={c} fontSize={engraved ? 16 : 18} fontWeight="700" fontFamily="Heebo, sans-serif">
+            {engraved ?? "12"}
+          </text>
+        </>
+      );
+      break;
+    case "trend":
+      body = (
+        <>
+          {rim(43)}
+          <polyline points="24,72 38,57 48,63 64,44 94,12" {...line} stroke="#151518" strokeWidth="9" />
+          <polyline points="24,72 38,57 48,63 64,44 94,12" {...line} stroke={c} strokeWidth="3.2" />
+          <polyline points="81,12 94,12 94,25" {...line} stroke={c} strokeWidth="3.2" />
+        </>
+      );
+      break;
+    case "cal12":
+      body = (
+        <>
+          {rim(43)}
+          {Array.from({ length: 12 }, (_, j) => {
+            const b = ((j * 30 - 90) * Math.PI) / 180;
+            const x = (50 + 34 * Math.cos(b)).toFixed(1);
+            const y = (52 + 34 * Math.sin(b)).toFixed(1);
+            return j < LIT[level] ? (
+              <circle key={j} cx={x} cy={y} r="3" fill={c} />
+            ) : (
+              <circle key={j} cx={x} cy={y} r="2.6" fill="none" stroke={c} strokeWidth=".9" opacity=".4" />
+            );
+          })}
+          <path d="M50 70 V50 M50 55 C50 46 56 41 64 41 C64 49 58 55 50 55 M50 61 C50 53 44 49 36 49 C36 57 42 61 50 61" {...line} stroke={c} strokeWidth="2" />
+        </>
+      );
+      break;
+    case "shield":
+      body = (
+        <>
+          <path d="M50 6 L86 17 V48 C86 73 70 89 50 98 C30 89 14 73 14 48 V17 Z" fill={disc} stroke={metal} strokeWidth="5" strokeLinejoin="round" />
+          <path d="M50 15 L78 24 V48 C78 68 66 81 50 89 C34 81 22 68 22 48 V24 Z" fill="none" stroke={c} strokeWidth=".8" opacity=".4" />
+          <path d="M30 68 H70" stroke={c} strokeWidth="1.4" strokeDasharray="3 3" opacity=".7" />
+          <polyline points="30,58 40,54 48,57 58,46 69,38" {...line} stroke={c} strokeWidth="2.6" />
+          <polyline points="62,38 69,38 69,45" {...line} stroke={c} strokeWidth="2.6" />
+        </>
+      );
+      break;
+    case "phoenix":
+      body = (
+        <>
+          <path d={WING_PATH} fill={metal} transform={`translate(14 48) scale(${WING[level]})`} />
+          <path d={WING_PATH} fill={metal} transform={`translate(86 48) scale(${-WING[level]} ${WING[level]})`} />
+          {rim(40)}
+          <path d="M50 74 C40 68 39 56 46 47 C46 53 49 56 52 56 C50 47 54 39 61 35 C59 43 65 50 64 60 C63 68 57 73 50 74 Z" fill="none" stroke={c} strokeWidth="2" strokeLinejoin="round" />
+          <path d="M50 70 C46 67 46 62 49 58 C50 62 53 63 54 66 C53 68 52 70 50 70 Z" fill={c} opacity=".6" />
+        </>
+      );
+      break;
+    default:
+      body = (
+        <>
+          <path d="M28 18 H72 L92 42 L50 96 L8 42 Z" fill={disc} stroke={metal} strokeWidth="4" strokeLinejoin="round" />
+          <path d="M8 42 H92 M28 18 L39 42 L50 18 L61 42 L72 18 M39 42 L50 96 L61 42" fill="none" stroke={c} strokeWidth="1" opacity=".55" />
+          <path d={sparkle(84, 14)} fill={c} />
+        </>
+      );
+  }
+
   return (
     <span
-      className={`medal tier-${tier}${aura ? " has-aura" : ""} ${className}`}
-      style={{ inlineSize: size, blockSize: size * 1.25 }}
+      className={`medal tier-${level}${aura ? " has-aura" : ""} ${className}`}
+      style={{ inlineSize: size, blockSize: size }}
       role={label ? "img" : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}
     >
-      <svg viewBox="0 0 120 150" width={size} height={size * 1.25}>
+      <svg viewBox="-16 -18 132 132" width={size} height={size} overflow="visible">
         <defs>
-          <linearGradient id={`rim${id}`} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor={m.hi} />
-            <stop offset="0.45" stopColor={m.mid} />
-            <stop offset="1" stopColor={m.lo} />
+          <linearGradient id={`mt${id}`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor={m.stops[0]} />
+            <stop offset={level === 5 ? ".45" : ".5"} stopColor={m.stops[1]} />
+            <stop offset="1" stopColor={m.stops[2]} />
           </linearGradient>
-          <radialGradient id={`face${id}`} cx="0.38" cy="0.32" r="0.8">
-            <stop offset="0" stopColor={m.hi} />
-            <stop offset="0.55" stopColor={m.mid} />
-            <stop offset="1" stopColor={m.lo} />
+          <radialGradient id={`dc${id}`} cx="50%" cy="35%" r="70%">
+            <stop offset="0" stopColor="#202026" />
+            <stop offset="1" stopColor="#101013" />
           </radialGradient>
-          <linearGradient id={`ribbon${id}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#16192A" />
-            <stop offset="1" stopColor="#0B0D16" />
-          </linearGradient>
         </defs>
 
-        {/* A short upper ribbon: two tails, one stripe in the metal. */}
-        <path d="M38 2 H58 L64 44 H46 Z" fill={`url(#ribbon${id})`} />
-        <path d="M62 2 H82 L74 44 H56 Z" fill={`url(#ribbon${id})`} />
-        <path d="M46 2 H50 L56 44 H52 Z M70 2 H74 L68 44 H64 Z" fill={m.mid} opacity="0.85" />
-
-        {/* The medal. */}
-        <circle cx="60" cy="96" r="50" fill={`url(#rim${id})`} stroke={m.edge} strokeWidth="1.2" />
-        <circle cx="60" cy="96" r="41" fill={`url(#face${id})`} stroke={m.edge} strokeWidth="0.8" />
-        <circle cx="60" cy="96" r="44.5" fill="none" stroke={m.hi} strokeOpacity="0.55" strokeWidth="0.8" />
-        {tier >= 5 && (
-          // Royal detailing: a fine beaded ring and a crown point.
-          <>
-            <circle cx="60" cy="96" r="47" fill="none" stroke={m.edge} strokeWidth="1.4" strokeDasharray="0.1 3.6" strokeLinecap="round" />
-            <path d="M54 51 L57 46 L60 50 L63 46 L66 51 Z" fill={m.hi} stroke={m.edge} strokeWidth="0.8" />
-          </>
+        {aura && level === 4 && (
+          <circle className="medal-halo" cx="50" cy="52" r="56" fill="none" stroke="#9FC0E8" strokeWidth="1.2" strokeDasharray="3 9" opacity=".7" />
         )}
-        {tier >= 4 && <circle cx="60" cy="96" r="37.5" fill="none" stroke={m.edge} strokeOpacity="0.45" strokeWidth="0.7" />}
+        {aura && level === 5 &&
+          [[-6, 14], [106, 16], [-8, 92], [108, 94]].map(([x, y]) => (
+            <path key={`${x}${y}`} className="medal-spark" d={sparkle(x, y)} fill="#F6DC9C" />
+          ))}
 
-        {/* The engraved symbol: a dark cut with a light edge below it. */}
-        <g transform="translate(40 74)" fill="none" strokeLinecap="round" strokeLinejoin="round">
-          <g stroke={m.hi} strokeOpacity="0.7" strokeWidth="2.6" transform="translate(0.6 0.8)">
-            <Symbol icon={icon} />
+        {body}
+
+        {level === 5 && (
+          <g transform="translate(36 -17) scale(1.15)">
+            <path d={CROWN} {...line} stroke={metal} strokeWidth="1.8" />
           </g>
-          <g stroke={m.edge} strokeWidth="2.4">
-            <Symbol icon={icon} />
-          </g>
-        </g>
+        )}
 
         {marks > 0 && (
-          <g fill={m.edge}>
+          <g fill={c}>
             {Array.from({ length: marks }, (_, i) => (
-              <circle key={i} cx={60 + (i - (marks - 1) / 2) * 7} cy="124" r="2" />
+              <circle key={i} cx={50 + (i - (marks - 1) / 2) * 6} cy="104" r="1.8" />
             ))}
           </g>
         )}
       </svg>
-      {aura && <span className="medal-sheen" aria-hidden="true" />}
     </span>
   );
 };

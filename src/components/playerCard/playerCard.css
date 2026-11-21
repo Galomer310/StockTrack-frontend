@@ -275,25 +275,10 @@
 .pc-award svg { width: 100%; max-width: 72px; height: auto; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.6)); }
 .pc-award span { font-size: 0.82rem; font-weight: 400; line-height: 1.3; }
 .pc-empty { margin: 0; padding: 26px 8px; text-align: center; font-size: 0.9rem; color: var(--pc-muted); }
-/* Game achievements: the category emblem in a fine diamond frame, coloured by
-   category. Rarer ones get a second frame line, never a louder colour. */
-.pc-ach-emblem {
-  position: relative; display: grid; place-items: center; width: 64px; height: 64px; margin-block: 4px;
-  color: var(--accent, var(--pc-gold));
-}
-.pc-ach-emblem::before {
-  content: ""; position: absolute; inset: 10px; transform: rotate(45deg);
-  border: 1px solid color-mix(in srgb, var(--accent, #D9BE89) 70%, transparent);
-  background: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--accent, #D9BE89) 14%, transparent), transparent 70%), #101721;
-}
-.pc-ach-emblem.is-rare::after, .pc-ach-emblem.is-epic::after, .pc-ach-emblem.is-exceptional::after {
-  content: ""; position: absolute; inset: 4px; transform: rotate(45deg);
-  border: 1px solid color-mix(in srgb, var(--accent, #D9BE89) 35%, transparent);
-}
-.pc-ach-emblem.is-exceptional::after { border-color: rgba(217, 190, 137, 0.75); }
-.pc-ach-emblem svg { position: relative; width: 26px; height: 26px; filter: none; max-width: none; }
-.pc-dialog-art.pc-ach-emblem { width: 96px; height: 96px; }
-.pc-dialog-art.pc-ach-emblem svg { width: 36px; height: 36px; }
+/* Game achievements: the patch badge (progression/Badge.tsx), four centred. */
+.pc-awards--achievement { grid-template-columns: repeat(4, minmax(0, 92px)); justify-content: center; gap: 12px; }
+.pc-award svg.pc-badge { width: 58px; max-width: none; height: 64px; filter: none; }
+.pc-dialog svg.pc-dialog-art.pc-badge { width: 96px; height: 102px; filter: none; }
 .pc-awards-foot {
   display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;
   margin-block-start: 12px; padding-block-start: 10px; border-block-start: 1px solid var(--pc-line-soft);
@@ -377,6 +362,8 @@
   .pc-field input, .pc-bio textarea { font-size: 16px; }
   .pc-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .pc-awards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pc-awards--achievement { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .pc-award svg.pc-badge { width: 52px; height: 57px; }
   .pc-progress { grid-template-columns: minmax(0, 1fr); justify-items: center; }
   .pc-progress-main { width: 100%; }
   .pc-profile { grid-template-columns: minmax(0, 1fr); grid-template-areas: "avatar" "identity" "bio"; justify-items: center; text-align: center; }

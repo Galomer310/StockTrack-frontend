@@ -1,10 +1,10 @@
-import { CSSProperties, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import type { Award, AwardArt as AwardArtName } from "../../api/playerCard";
 import { fill } from "../../i18n/fill";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { RARITY_TEXT } from "../progression/categories";
-import { Emblem } from "../progression/emblems";
+import { Badge } from "../progression/Badge";
 import { AwardArt } from "./art";
 import { formatDate, formatNumber } from "./format";
 import { Icon } from "./icons";
@@ -30,15 +30,9 @@ export type AwardKind = "medal" | "achievement";
 // its category colour, or (demo data) a drawn medal.
 const Art = ({ award, className, size = 64 }: { award: Award; className?: string; size?: number }) =>
   award.medal ? (
-    <Medal icon={award.art} tier={award.medal.tier} decoration={award.medal.decoration} size={size} className={className} />
+    <Medal icon={award.art} medalId={award.medal.medal_id} year={award.medal.period_key || undefined} tier={award.medal.tier} decoration={award.medal.decoration} size={size} className={className} />
   ) : award.category ? (
-    <span
-      className={`pc-ach-emblem is-${award.rarity ?? "basic"}${className ? ` ${className}` : ""}`}
-      style={{ "--accent": award.accent_color } as CSSProperties}
-      aria-hidden="true"
-    >
-      <Emblem name={award.art} />
-    </span>
+    <Badge id={award.id} rarity={award.rarity} earned fallbackIcon={award.art} className={`pc-badge${className ? ` ${className}` : ""}`} />
   ) : (
     <AwardArt art={award.art as AwardArtName} className={className} />
   );
@@ -68,7 +62,7 @@ export const AwardsPanel = ({
         {isMedal && <Icon name="laurel" />}
       </h2>
       {awards.length ? (
-        <ul className="pc-awards">
+        <ul className={`pc-awards pc-awards--${kind}`}>
           {awards.slice(0, 4).map((a) => (
             <li key={a.id}>
               <button type="button" className={`pc-award pc-award--${kind}`} onClick={() => onOpen(a)}>

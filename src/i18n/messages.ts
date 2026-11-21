@@ -936,6 +936,10 @@ const en = {
   rarity_rare: "Rare",
   rarity_epic: "Epic",
   rarity_exceptional: "Exceptional",
+  ach_sub: "You have unlocked {got} of {total}. Medals are for performance; achievements are for the way there: activity, community, dedication.",
+  ach_rarity_title: "Rarity",
+  ach_rarity_hint: "The colour tells how rare an achievement is, not which category it belongs to",
+  ach_of: "{n} of {total}",
 
   // Feed
   feed_title: "Feed",
@@ -1954,6 +1958,10 @@ const he: Messages = {
   rarity_rare: "נדיר",
   rarity_epic: "אפי",
   rarity_exceptional: "יוצא דופן",
+  ach_sub: "פתחת {got} מתוך {total}. מדליות הן על ביצועים. הישגים הם על הדרך: פעילות, קהילה, התמדה.",
+  ach_rarity_title: "דרגות נדירות",
+  ach_rarity_hint: "הצבע מספר כמה נדיר ההישג, לא לאיזו קטגוריה הוא שייך",
+  ach_of: "{n} מתוך {total}",
 
   feed_title: "פיד",
   feed_subtitle: "כל קנייה ומכירה ברגע שהיא קורית, של כולם. באחוזים בלבד — כמה כל משקיע שילם נשאר עניין שלו.",

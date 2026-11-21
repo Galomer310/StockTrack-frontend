@@ -67,7 +67,7 @@ export const ProfessionalWatcher = () => {
         {medal && (
           <>
             <span className="pro-notice-kicker">{medal.is_upgrade ? t("pro_notice_upgrade") : t("pro_notice_medal")}</span>
-            <Medal icon={medal.icon} tier={medal.tier} decoration={medal.decoration} size={132} className="is-upgrading" />
+            <Medal icon={medal.icon} medalId={medal.medal_id} year={medal.period_key || undefined} tier={medal.tier} decoration={medal.decoration} size={132} className="is-upgrading" />
             <h2 id="pro-notice-title" dir="auto">
               {medal.name[lang]}
               {medal.medal_id === "btm_annual" && <bdi> {medal.period_key}</bdi>}

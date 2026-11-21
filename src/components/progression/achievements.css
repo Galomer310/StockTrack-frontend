@@ -1,0 +1,46 @@
+/* Game Achievement Collection, design B (patch badges). Tokens: theme.css. */
+.ach-page { max-inline-size: 1040px; margin: 0 auto; padding: 24px 16px 72px; color: var(--cream); display: grid; gap: 16px; }
+
+.ach-head { display: grid; justify-items: center; gap: 8px; text-align: center; padding-block: 8px 4px; }
+.ach-back { justify-self: start; color: var(--muted); text-decoration: none; font-size: 0.9rem; }
+.ach-back:hover { color: var(--cream); }
+.ach-head h1 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: clamp(1.8rem, 4vw, 2.4rem); color: var(--cream); }
+.ach-sub { margin: 0; max-inline-size: 58ch; color: var(--muted); font-size: 0.95rem; line-height: 1.6; }
+.ach-muted { color: var(--muted); }
+.ach-center { text-align: center; }
+.ach-error { color: var(--loss-c); text-align: center; }
+.ach-num { font-variant-numeric: tabular-nums; }
+
+.ach-panel { background: var(--ink-1); border-radius: var(--r, 16px); padding: 20px; }
+.ach-panel-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px; margin-block-end: 16px; }
+.ach-panel-head h2 { display: flex; align-items: center; gap: 10px; margin: 0; font-family: var(--font-display); font-size: 1.2rem; font-weight: 700; color: var(--cream); }
+.ach-cat-icon { inline-size: 20px; block-size: 20px; color: var(--muted); flex: none; }
+.ach-hint, .ach-count { font-size: 0.82rem; color: var(--quiet); }
+
+.prg-badge { display: block; inline-size: 84px; block-size: 92px; overflow: visible; }
+.badge-spark { animation: badge-twinkle 3.2s ease-in-out infinite; }
+.badge-spark:nth-of-type(2n) { animation-delay: 1.4s; }
+@keyframes badge-twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+.ach-rar { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+.ach-rar li { display: grid; justify-items: center; gap: 4px; padding: 12px 6px; border-radius: 12px; background: var(--ink-2); text-align: center; }
+.ach-rar b { font-size: 0.9rem; font-weight: 600; }
+.ach-rar small { font-size: 0.75rem; color: var(--quiet); }
+
+.ach-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 14px 10px; margin: 0; padding: 0; list-style: none; }
+.ach-cell { display: grid; justify-items: center; align-content: start; gap: 6px; min-inline-size: 0; padding: 6px 2px; text-align: center; }
+.ach-cell b { font-size: 0.82rem; font-weight: 600; line-height: 1.3; }
+.ach-cell small { font-size: 0.72rem; color: var(--quiet); line-height: 1.35; }
+.ach-cell.is-locked b { color: var(--muted); font-weight: 500; }
+.ach-pg { display: block; inline-size: 64px; block-size: 4px; border-radius: 99px; background: var(--ink-3); overflow: hidden; }
+.ach-pg i { display: block; block-size: 100%; background: var(--muted); }
+
+@media (max-width: 760px) {
+  .ach-panel { padding: 16px 12px; }
+  .ach-rar { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .ach-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .prg-badge { inline-size: 72px; block-size: 79px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .badge-spark { animation: none; }
+}

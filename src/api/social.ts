@@ -100,6 +100,27 @@ export const fetchPortfolio = async (portfolioId: number): Promise<PortfolioResp
   return res.data;
 };
 
+// One entry of a portfolio's public journal (GET /social/portfolios/:id/journal).
+export interface PublicJournalEntry {
+  id: number;
+  stock_symbol: string;
+  action: "buy" | "sell";
+  note: string | null;
+  occurred_at: string;
+  created_at: string;
+  /** How the stock has moved since the trade. */
+  change_pct_since: number | null;
+  /** The same window against the S&P 500 (null before the stored price history). */
+  vs_market: { stock_pct: number; market_pct: number; edge_pct: number; through: string } | null;
+  backdated: boolean;
+  /** Owner only. */
+  quantity?: number;
+  price?: number;
+}
+
+export const fetchJournal = async (portfolioId: number): Promise<{ entries: PublicJournalEntry[]; is_self: boolean }> =>
+  (await axiosInstance.get(`${BASE}/portfolios/${portfolioId}/journal`)).data;
+
 // Money and percentage formatting, kept here so every social screen matches.
 // money() is only ever valid on your own figures.
 export const money = (n: number) =>

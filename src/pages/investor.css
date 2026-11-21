@@ -1,0 +1,45 @@
+/* One portfolio as anyone sees it (approved design, 2026-11). Tokens: theme.css. */
+.iv-page { max-inline-size: 1180px; margin: 0 auto; padding: 24px 16px 64px; display: grid; gap: 16px; color: var(--cream); }
+.iv-muted { color: var(--muted); margin: 0; }
+.iv-center { text-align: center; }
+.iv-error { color: var(--loss-c); text-align: center; }
+.iv-page .is-up { color: var(--gain-c); }
+.iv-page .is-down { color: var(--loss-c); }
+
+.iv-head { display: grid; justify-items: center; gap: 10px; text-align: center; }
+.iv-back { justify-self: start; border: 0; background: none; color: var(--muted); font: inherit; font-size: 14px; cursor: pointer; padding: 0; min-height: 32px; }
+.iv-back:hover { color: var(--cream); background: none; }
+.iv-head h1 { margin: 0; font-family: var(--font-display); font-size: clamp(1.8rem, 4vw, 2.4rem); color: var(--cream); }
+.iv-owner { display: inline-flex; align-items: center; gap: 10px; color: var(--muted); font-size: 14px; }
+.iv-av { inline-size: 32px; block-size: 32px; border-radius: 50%; overflow: hidden; }
+
+.iv-panel { background: var(--ink-1); border-radius: var(--r, 16px); padding: 20px; min-inline-size: 0; }
+.iv-h { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-block-end: 16px; }
+.iv-h h2 { margin: 0; font-family: var(--font-display); font-size: 1.3rem; color: var(--cream); }
+
+.iv-hero { display: grid; justify-items: center; gap: 6px; text-align: center; padding-block: 24px; }
+.iv-cap { font-size: 13px; color: var(--quiet); }
+.iv-big { font-family: var(--font-display); font-size: 56px; line-height: 1; font-weight: 600; font-variant-numeric: tabular-nums; }
+.iv-stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; margin-block-start: 8px; font-size: 13px; color: var(--muted); }
+.iv-link { margin-block-start: 6px; color: var(--muted); font-size: 13px; text-decoration: underline; text-underline-offset: 3px; }
+.iv-link:hover { color: var(--cream); }
+
+.iv-grid { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 16px; align-items: start; }
+.iv-holdings { display: grid; margin: 0; padding: 0; list-style: none; }
+.iv-holdings li { display: grid; grid-template-columns: 64px minmax(0, 1fr) 52px 64px; gap: 12px; align-items: center; padding: 10px 0; border-block-end: 1px solid var(--line); }
+.iv-holdings li:last-child { border-block-end: 0; }
+.iv-tk { font-weight: 600; color: var(--cream); text-decoration: none; }
+.iv-tk:hover { text-decoration: underline; text-underline-offset: 3px; }
+.iv-wt { display: block; block-size: 6px; border-radius: 99px; background: var(--ink-3); overflow: hidden; }
+.iv-wt i { display: block; block-size: 100%; border-radius: 99px; background: #7F9CC0; }
+.iv-wt-n, .iv-gain { font-size: 13px; text-align: end; font-variant-numeric: tabular-nums; }
+.iv-wt-n { color: var(--muted); }
+.iv-gain { font-weight: 600; }
+.iv-note { margin: 12px 0 0; font-size: 12px; color: var(--quiet); line-height: 1.6; }
+.iv-page .jr-hero { background: var(--ink-2); }
+.iv-page .jc { background: var(--ink-2); }
+
+@media (max-width: 900px) {
+  .iv-grid { grid-template-columns: minmax(0, 1fr); }
+  .iv-big { font-size: 48px; }
+}

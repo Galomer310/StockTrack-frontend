@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { addFollowup, CASH_KEY, Composition, CompositionEvent } from "../../api/portfolioDashboard";
+import { addFollowup, CASH_KEY, Composition, CompositionEvent, VsMarket } from "../../api/portfolioDashboard";
 import { money } from "../../api/social";
 import { CATEGORICAL, NEUTRAL } from "../../charts/chartTheme";
 import { fill } from "../../i18n/fill";
@@ -15,9 +15,9 @@ import { MessageKey } from "../../i18n/messages";
    written with it, quoted. The reasoning is never rewritten; its author
    adds dated follow-ups underneath.
 
-   The approved design also judges each decision against the market since
-   it was made ("vs S&P since"). That needs a metric the server does not
-   compute yet (open item), so the card leaves it out rather than guess.
+   Each decision is judged against the market since it was made ("vs S&P
+   since", src/performance/verdict.ts on the server); a trade from before
+   the stored price history has no verdict rather than a guessed one.
 
    JournalFlow is the second view: the composition after every action as a
    100% bar, the holding that changed outlined.
@@ -44,6 +44,21 @@ const KIND_PATH: Record<CompositionEvent["kind"], string> = {
 };
 
 const pct = (w: number | undefined) => Math.round((w ?? 0) * 1000) / 10;
+const signed = (v: number) => `${v > 0 ? "+" : v < 0 ? "−" : ""}${Math.abs(v).toFixed(1)}%`;
+
+/** How the decision has aged against the S&P 500 since it was made. */
+export const Verdict = ({ v, symbol, buy }: { v: VsMarket; symbol: string; buy: boolean }) => {
+  const { t } = useLanguage();
+  return (
+    <div className="jc-verdict" title={t(buy ? "act_verdict_buy_how" : "act_verdict_sell_how")}>
+      <small>{t("act_vs_market_since")}</small>
+      <bdi dir="ltr" className={`jc-verdict-v ${v.edge_pct >= 0 ? "is-up" : "is-down"}`}>{signed(v.edge_pct)}</bdi>
+      <bdi dir="ltr" className="jc-verdict-pair">
+        {symbol} {signed(v.stock_pct)} · S&amp;P {signed(v.market_pct)}
+      </bdi>
+    </div>
+  );
+};
 const dayKey = (at: string) => new Date(at).toDateString();
 
 export const JournalSummary = ({ data }: { data: Composition }) => {
@@ -52,12 +67,28 @@ export const JournalSummary = ({ data }: { data: Composition }) => {
   const buys = data.events.filter((e) => e.action === "buy").length;
   const last = data.events[0];
   const days = last ? Math.max(0, Math.floor((Date.now() - new Date(last.at).getTime()) / 86400000)) : 0;
+  const judged = data.events.filter((e) => e.vs_market);
+  const beat = judged.filter((e) => e.vs_market!.edge_pct > 0).length;
   return (
     <div className="jr-hero">
-      <div className="jr-big">
-        <bdi dir="ltr">{n(data.events.length)}</bdi>
-      </div>
-      <div className="jr-lbl">{t("act_decisions")}</div>
+      {judged.length > 0 ? (
+        <>
+          <div className="jr-big">
+            <bdi dir="ltr">
+              {n(beat)} <small>/ {n(judged.length)}</small>
+            </bdi>
+          </div>
+          <div className="jr-lbl">{t("act_beat_market")}</div>
+          <div className="jr-how-calc">{t("act_beat_how")}</div>
+        </>
+      ) : (
+        <>
+          <div className="jr-big">
+            <bdi dir="ltr">{n(data.events.length)}</bdi>
+          </div>
+          <div className="jr-lbl">{t("act_decisions")}</div>
+        </>
+      )}
       <div className="jr-stats">
         <span>{fill(t("act_n_buys"), { n: n(buys) })}</span>
         <span>{fill(t("act_n_sells"), { n: n(data.events.length - buys) })}</span>
@@ -110,6 +141,7 @@ const JournalCard = ({ e, onAdded, canWrite }: { e: CompositionEvent; onAdded: (
       <div className="jc-meta">
         <bdi dir="ltr">{time}</bdi> · {t(e.action === "buy" ? "act_buy_price" : "act_sell_price")} <bdi dir="ltr">{money(e.price)}</bdi>
       </div>
+      {e.vs_market && <Verdict v={e.vs_market} symbol={e.symbol} buy={e.action === "buy"} />}
       <div className="jc-wt">
         <div className="jc-bar" aria-hidden="true">
           <i style={{ inlineSize: `${lo}%` }} />

@@ -56,6 +56,16 @@ export interface CompositionEvent {
   note: string | null;
   /** The author's dated additions to the rationale, oldest first. */
   followups: Followup[];
+  /** How the decision has aged against the S&P 500 since (null without price history). */
+  vs_market?: VsMarket | null;
+}
+
+export interface VsMarket {
+  stock_pct: number;
+  market_pct: number;
+  /** Buy: stock minus market. Sell: market minus stock. Positive = beat the market. */
+  edge_pct: number;
+  through: string;
 }
 
 export interface Followup {

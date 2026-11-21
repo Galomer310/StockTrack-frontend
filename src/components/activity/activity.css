@@ -88,3 +88,22 @@
   .jr-big { font-size: 38px; }
   .flow-row { grid-template-columns: 96px minmax(0, 1fr); gap: 10px; }
 }
+
+/* "Vs market since" (approved design): beside the card's heading. */
+.jc { grid-template-columns: 46px minmax(0, 1fr) auto; }
+.jc-why, .jc-upd, .jc-add, .jc-write { grid-column: 2 / -1; }
+.jc-verdict {
+  grid-column: 3; grid-row: 1 / span 3; display: grid; justify-items: center; gap: 2px; min-inline-size: 120px;
+  padding: 10px 12px; border-radius: 12px; background: var(--ink-3); text-align: center;
+}
+.jc-verdict small { font-size: 12px; color: var(--quiet); }
+.jc-verdict-v { font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.jc-verdict-v.is-up { color: var(--gain-c); }
+.jc-verdict-v.is-down { color: var(--loss-c); }
+.jc-verdict-pair { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.jr-big small { font-size: 22px; color: var(--quiet); font-weight: 500; }
+.jr-how-calc { max-inline-size: 56ch; margin-block-start: 2px; font-size: 12px; color: var(--quiet); }
+@media (max-width: 760px) {
+  .jc { grid-template-columns: 40px minmax(0, 1fr); }
+  .jc-verdict { grid-column: 1 / -1; grid-row: auto; display: flex; justify-content: space-between; align-items: baseline; margin-block-start: 12px; min-inline-size: 0; }
+}

@@ -1,232 +1,185 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
-import TradeJournal from "../components/trades/TradeJournal";
-import { FollowButton } from "../components/social/FollowButton";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
+  fetchJournal,
   fetchPortfolio,
-  PortfolioResponse,
-  OwnHolding,
-  PublicHolding,
   isOwnHolding,
   money,
-  percent,
+  PortfolioResponse,
+  PublicJournalEntry,
 } from "../api/social";
+import PlayerAvatar from "../components/avatars/PlayerAvatar";
+import { FollowButton } from "../components/social/FollowButton";
+import { Verdict } from "../components/activity/ActivityJournal";
+import "../components/activity/activity.css";
+import { fill } from "../i18n/fill";
 import { useLanguage } from "../i18n/LanguageContext";
 import { MessageKey } from "../i18n/messages";
-import { fill, ltr } from "../i18n/fill";
-import PlayerAvatar from "../components/avatars/PlayerAvatar";
+import "./investor.css";
 
 /* ===========================================================================
-   Read-only view of one investor's portfolio, reached from the leaderboard.
+   One portfolio, as anyone sees it: the page the Arena, the boards and
+   Discover lead to (approved design, 2026-11).
    ---------------------------------------------------------------------------
-   Viewing someone else, you get one figure: total return, as a percentage.
-   No capital deployed, no current value, no profit or loss - the server does
-   not send them. Per position you get how it has done and how big a share of
-   the book it is, and below that the full log of buys and sells with the date
-   and time of each.
+   Its return since opening as the one big figure, its holdings by share of
+   the book and their move, and its decisions as a journal: what was done
+   and when, the reasoning written at the time, and how each decision has
+   aged against the S&P 500 since.
 
-   Opening your OWN id (the dashboard links here) still shows everything,
-   because at that point you are looking at your own numbers.
-
-   Translated: right to left in Hebrew; names keep their own direction, and
-   money and signed percentages stay left to right.
+   The server decides what is visible (src/controllers/leaderboardController):
+   percentages only for anyone but the owner. Who may see holdings and
+   decisions at all will follow the subscriptions decision (open item).
    =========================================================================== */
+
+const signed = (v: number | null | undefined) =>
+  v === null || v === undefined ? "—" : `${v > 0 ? "+" : v < 0 ? "−" : ""}${Math.abs(v).toFixed(1)}%`;
+const tone = (v: number | null | undefined) => (v === null || v === undefined ? "" : v > 0 ? "is-up" : v < 0 ? "is-down" : "");
+
 const InvestorPortfolio = () => {
   const { t, dir, lang, locale } = useLanguage();
-  // Inside Hebrew sentences, names keep their own direction.
-  const iso = (value: string) => (lang === "he" ? ltr(value) : value);
   const { id } = useParams();
   const navigate = useNavigate();
   const [data, setData] = useState<PortfolioResponse | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [journal, setJournal] = useState<PublicJournalEntry[] | null>(null);
   const [error, setError] = useState<MessageKey | null>(null);
 
   useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        setData(await fetchPortfolio(Number(id)));
-      } catch (err: any) {
-        // 403 is what the future paid-tier gate will return.
-        setError(err.response?.status === 403 ? "portfolio_no_access" : "inv_failed");
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
+    setData(null);
+    setJournal(null);
+    setError(null);
+    const pid = Number(id);
+    fetchPortfolio(pid)
+      .then(setData)
+      .catch((err) => setError(err.response?.status === 403 ? "portfolio_no_access" : "inv_failed"));
+    fetchJournal(pid)
+      .then((j) => setJournal(j.entries))
+      .catch(() => setJournal([]));
   }, [id]);
 
-  if (loading) return <div className="investor-page" dir={dir} lang={lang}><p>{t("inv_loading")}</p></div>;
-  if (error) return <div className="investor-page" dir={dir} lang={lang}><p className="error">{t(error)}</p></div>;
-  if (!data) return null;
+  const n = (v: number) => new Intl.NumberFormat(locale).format(v);
+  if (error) return <div className="iv-page" dir={dir} lang={lang}><p className="iv-error" role="alert">{t(error)}</p></div>;
+  if (!data) return <div className="iv-page" dir={dir} lang={lang}><p className="iv-muted iv-center" role="status">{t("inv_loading")}</p></div>;
 
   const { portfolio, owner, summary, holdings, is_self } = data;
+  const ownerName = owner.display_name;
+  const judged = (journal ?? []).filter((e) => e.vs_market);
+  const beat = judged.filter((e) => e.vs_market!.edge_pct > 0).length;
+  const sorted = [...holdings].sort((a, b) => b.weight_pct - a.weight_pct);
+
+  // The journal, newest first, grouped by day.
+  const days: { key: string; at: string; list: PublicJournalEntry[] }[] = [];
+  for (const e of journal ?? []) {
+    const key = new Date(e.occurred_at).toDateString();
+    const last = days[days.length - 1];
+    if (last && last.key === key) last.list.push(e);
+    else days.push({ key, at: e.occurred_at, list: [e] });
+  }
 
   return (
-    <div className="investor-page" dir={dir} lang={lang}>
-      <button className="back-btn" onClick={() => navigate("/arena")}>
-        {t("back_to_leaderboard")}
-      </button>
-
-      <h2>
-        <bdi>{portfolio.name}</bdi>
-        {is_self && <span className="lb-you">{t("you_badge")}</span>}
-      </h2>
-      <p className="investor-since">
-        <PlayerAvatar className="investor-avatar" name={owner.display_name} avatarId={owner.avatar_id} />
-        {fill(t("inv_owner_opened"), {
-          name: iso(owner.display_name),
-          date: new Date(portfolio.created_at).toLocaleDateString(locale),
-        })}
-      </p>
-      {/* Following is per player, not per portfolio. Hidden on your own. */}
-      {!is_self && <FollowButton playerId={owner.id} />}
-
-      <div className="summary-cards">
-        {/* Total return is the whole story for a visitor. */}
-        <div className="summary-card">
-          <span className="summary-label">{t("total_return")}</span>
-          <span
-            className={`summary-value ${summary.return_pct >= 0 ? "gain" : "loss"}`}
-          >
-            <bdi dir="ltr">{percent(summary.return_pct)}</bdi>
+    <div className="iv-page" dir={dir} lang={lang}>
+      <header className="iv-head">
+        <button type="button" className="iv-back" onClick={() => navigate(-1)}>
+          {t("back_to_leaderboard")}
+        </button>
+        <h1><bdi dir="auto">{portfolio.name}</bdi></h1>
+        <div className="iv-owner">
+          <PlayerAvatar className="iv-av" name={ownerName} avatarId={owner.avatar_id} />
+          <span>
+            {fill(t("inv_owner_opened"), {
+              name: ownerName,
+              date: new Date(portfolio.created_at).toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" }),
+            })}
           </span>
         </div>
-        <div className="summary-card">
-          <span className="summary-label">{t("col_holdings")}</span>
-          <span className="summary-value">{summary.holdings_count}</span>
-        </div>
-        {/* A ratio, so everyone sees it: how much of the book is uninvested
-            says as much about the strategy as the return does. */}
-        <div className="summary-card">
-          <span className="summary-label">{t("inv_in_cash")}</span>
-          <span className="summary-value"><bdi dir="ltr">{summary.cash_weight_pct.toFixed(1)}%</bdi></span>
-        </div>
+        {!is_self && <FollowButton playerId={owner.id} />}
+      </header>
 
-        {/* Your own figures, which nobody else receives. */}
-        {is_self && summary.equity !== undefined && (
-          <>
-            <div className="summary-card">
-              <span className="summary-label">{t("inv_equity")}</span>
-              <span className="summary-value"><bdi dir="ltr">{money(summary.equity)}</bdi></span>
-            </div>
-            <div className="summary-card">
-              <span className="summary-label">{t("inv_cash")}</span>
-              <span className="summary-value"><bdi dir="ltr">{money(summary.cash ?? 0)}</bdi></span>
-            </div>
-            <div className="summary-card">
-              <span className="summary-label">{t("inv_opened_with")}</span>
-              <span className="summary-value"><bdi dir="ltr">{money(summary.starting_balance ?? 0)}</bdi></span>
-            </div>
-            <div className="summary-card">
-              <span className="summary-label">{t("profit_loss")}</span>
-              <span
-                className={`summary-value ${(summary.profit ?? 0) >= 0 ? "gain" : "loss"}`}
-              >
-                <bdi dir="ltr">{money(summary.profit ?? 0)}</bdi>
-              </span>
-            </div>
-          </>
+      <section className="iv-panel iv-hero">
+        <span className="iv-cap">{t("total_return")} · {t("inv_since_open")}</span>
+        <div className={`iv-big ${tone(summary.return_pct)}`}><bdi dir="ltr">{signed(summary.return_pct)}</bdi></div>
+        <div className="iv-stats">
+          <span>{fill(t("inv_holdings_n"), { n: n(summary.holdings_count) })}</span>
+          <span>{t("inv_in_cash")} <bdi dir="ltr">{summary.cash_weight_pct.toFixed(1)}%</bdi></span>
+          {is_self && summary.equity !== undefined && <span>{t("inv_equity")} <bdi dir="ltr">{money(summary.equity)}</bdi></span>}
+        </div>
+        {!is_self && (
+          <Link className="iv-link" to={`/compare/${portfolio.id}`}>{t("inv_compare")}</Link>
         )}
+      </section>
+
+      <div className="iv-grid">
+        <section className="iv-panel" aria-labelledby="iv-h-holdings">
+          <div className="iv-h"><h2 id="iv-h-holdings">{t("col_holdings")}</h2></div>
+          {sorted.length === 0 ? (
+            <p className="iv-muted">{t("inv_no_holdings")}</p>
+          ) : (
+            <ul className="iv-holdings">
+              {sorted.map((h) => {
+                const gain = isOwnHolding(h) ? (h.price_at_time > 0 ? (h.latest_price / h.price_at_time - 1) * 100 : null) : h.gain_pct;
+                return (
+                  <li key={h.id}>
+                    <Link className="iv-tk" to={`/stock/${h.stock_symbol}`}><bdi dir="ltr">{h.stock_symbol}</bdi></Link>
+                    <span className="iv-wt" aria-hidden="true"><i style={{ inlineSize: `${Math.min(100, h.weight_pct)}%` }} /></span>
+                    <bdi dir="ltr" className="iv-wt-n">{h.weight_pct.toFixed(1)}%</bdi>
+                    <bdi dir="ltr" className={`iv-gain ${tone(gain)}`}>{signed(gain)}</bdi>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+          <p className="iv-note">{t("col_share")} · {t("col_return")}</p>
+        </section>
+
+        <section className="iv-panel" aria-labelledby="iv-h-journal">
+          <div className="iv-h"><h2 id="iv-h-journal">{t("inv_decisions")}</h2></div>
+          {judged.length > 0 && (
+            <div className="jr-hero">
+              <div className="jr-big"><bdi dir="ltr">{n(beat)} <small>/ {n(judged.length)}</small></bdi></div>
+              <div className="jr-lbl">{t("act_beat_market")}</div>
+              <div className="jr-how-calc">{t("act_beat_how")}</div>
+            </div>
+          )}
+          {journal === null ? (
+            <p className="iv-muted" role="status">{t("loading")}</p>
+          ) : days.length === 0 ? (
+            <p className="iv-muted">{t("inv_no_journal")}</p>
+          ) : (
+            <div className="jr">
+              {days.map((d) => (
+                <section className="jr-day" key={d.key}>
+                  <div className="jr-date">
+                    <b>{new Date(d.at).toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" })}</b>
+                    <span>{new Date(d.at).toLocaleDateString(locale, { weekday: "long" })}</span>
+                  </div>
+                  {d.list.map((e) => (
+                    <article className="jc" key={e.id}>
+                      <span className="jc-tk" aria-hidden="true">{e.stock_symbol}</span>
+                      <h3>
+                        <span className={`jc-act is-${e.action}`}>{t(e.action === "buy" ? "inv_bought" : "inv_sold")}</span>
+                        <span className="jc-sep">·</span>
+                        <bdi dir="ltr">{e.stock_symbol}</bdi>
+                      </h3>
+                      <div className="jc-meta">
+                        <bdi dir="ltr">{new Date(e.occurred_at).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })}</bdi>
+                        {" · "}
+                        {fill(t("inv_stock_since"), { symbol: e.stock_symbol })} <bdi dir="ltr">{signed(e.change_pct_since)}</bdi>
+                        {is_self && e.quantity !== undefined && e.price !== undefined && (
+                          <> · {fill(t("inv_qty_price"), { qty: n(e.quantity), price: money(e.price) })}</>
+                        )}
+                      </div>
+                      {e.vs_market && <Verdict v={e.vs_market} symbol={e.stock_symbol} buy={e.action === "buy"} />}
+                      {e.note ? <p className="jc-why" dir="auto">{e.note}</p> : <p className="jc-why is-empty">{t("act_no_reason")}</p>}
+                    </article>
+                  ))}
+                </section>
+              ))}
+            </div>
+          )}
+        </section>
       </div>
 
-      {!is_self && (
-        <>
-          <p className="privacy-note">{fill(t("inv_privacy"), { name: iso(owner.display_name) })}</p>
-          <button
-            className="compare-btn"
-            onClick={() => navigate(`/compare/${portfolio.id}`)}
-          >
-            {t("inv_compare")}
-          </button>
-        </>
-      )}
-
-      <h3>{t("inv_journal")}</h3>
-      <p className="compare-note">
-        {is_self ? t("inv_journal_self") : fill(t("inv_journal_other"), { name: iso(owner.display_name) })}
-      </p>
-      <TradeJournal portfolioId={portfolio.id} />
-
-      <h3>{t("col_holdings")}</h3>
-      {holdings.length === 0 ? (
-        <p>{t("inv_no_holdings")}</p>
-      ) : is_self ? (
-        /* Your own book, in full. */
-        <div className="table-wrap">
-          <table className="holdings-table">
-            <thead>
-              <tr>
-                <th>{t("col_ticker")}</th>
-                <th>{t("col_bought_at")}</th>
-                <th>{t("col_latest")}</th>
-                <th>{t("col_qty")}</th>
-                <th>{t("col_added")}</th>
-                <th>{t("profit_loss")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(holdings as OwnHolding[]).filter(isOwnHolding).map((h) => (
-                <tr key={h.id}>
-                  <td>
-                    <Link className="ticker-link" to={`/stock/${h.stock_symbol}`}>
-                      {h.stock_symbol}
-                    </Link>
-                  </td>
-                  <td><bdi dir="ltr">{money(h.price_at_time)}</bdi></td>
-                  <td><bdi dir="ltr">{money(h.latest_price)}</bdi></td>
-                  <td>{h.quantity}</td>
-                  <td>{new Date(h.added_at).toLocaleDateString(locale)}</td>
-                  <td className={h.profit_loss >= 0 ? "gain" : "loss"}>
-                    <bdi dir="ltr">{money(h.profit_loss)}</bdi>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        /* Someone else's book: which tickers, how each has done, and how much
-           of the portfolio each represents. Weight replaces quantity - it says
-           how committed they are without disclosing the size of the position. */
-        <div className="table-wrap">
-          <table className="holdings-table">
-            <thead>
-              <tr>
-                <th>{t("col_ticker")}</th>
-                <th>{t("col_held_since")}</th>
-                <th>{t("col_share")}</th>
-                <th>{t("col_return")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(holdings as PublicHolding[]).map((h) => (
-                <tr key={h.id}>
-                  <td>
-                    <Link className="ticker-link" to={`/stock/${h.stock_symbol}`}>
-                      {h.stock_symbol}
-                    </Link>
-                  </td>
-                  <td>{new Date(h.added_at).toLocaleDateString(locale)}</td>
-                  <td>
-                    <span className="weight-bar" aria-hidden="true">
-                      <span
-                        className="weight-bar-fill"
-                        style={{ width: `${Math.min(h.weight_pct, 100)}%` }}
-                      />
-                    </span>
-                    <bdi dir="ltr">{h.weight_pct.toFixed(1)}%</bdi>
-                  </td>
-                  <td className={h.gain_pct >= 0 ? "gain" : "loss"}>
-                    <bdi dir="ltr">{percent(h.gain_pct)}</bdi>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      {!is_self && <p className="iv-note iv-center">{fill(t("inv_privacy"), { name: ownerName })}</p>}
+      <p className="iv-note iv-center">{t("ar_disclaimer")}</p>
     </div>
   );
 };

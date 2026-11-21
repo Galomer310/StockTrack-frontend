@@ -25,3 +25,66 @@
 .act-write textarea { inline-size: 100%; min-block-size: 80px; padding: 8px 10px; font: inherit; resize: vertical; }
 .act-write-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 .act-hint { font-size: 0.76rem; color: var(--text-faint); }
+
+/* ===========================================================================
+   Decision journal, design B (ActivityJournal.tsx). Tokens: theme.css.
+   =========================================================================== */
+.al-dialog.act-dialog { inline-size: min(calc(100% - 32px), 900px); }
+.jr-hero { display: grid; justify-items: center; gap: 4px; margin: 4px 0 18px; padding: 20px; border-radius: 16px; background: var(--ink-2); text-align: center; }
+.jr-big { font-family: var(--font-display); font-size: 44px; line-height: 1.1; font-weight: 600; color: var(--cream); font-variant-numeric: tabular-nums; }
+.jr-lbl { font-size: 15px; color: var(--cream); }
+.jr-stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; inline-size: 100%; margin-block-start: 12px; padding-block-start: 12px; border-block-start: 1px solid var(--line); font-size: 13px; color: var(--quiet); }
+.jr { display: grid; gap: 26px; }
+.jr-day { display: grid; gap: 10px; }
+.jr-date { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--quiet); }
+.jr-date b { color: var(--cream); font-weight: 600; font-size: 15px; }
+.jr-date::after { content: ""; flex: 1; block-size: 1px; background: var(--line); }
+.jc { display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: 4px 16px; align-items: start; padding: 18px 20px; border-radius: 16px; background: var(--ink-2); }
+.jc-tk { grid-row: 1 / span 2; display: grid; place-items: center; inline-size: 46px; block-size: 46px; border-radius: 12px; background: var(--ink-3); color: var(--cream); font-size: 11px; font-weight: 700; direction: ltr; overflow: hidden; }
+.jc h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; font-family: var(--font-ui); font-size: 17px; font-weight: 600; color: var(--cream); }
+.jc-act { display: inline-flex; align-items: center; gap: 6px; }
+.jc-act svg { inline-size: 18px; block-size: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.jc-act.is-buy { color: var(--gain-c); }
+.jc-act.is-sell { color: var(--loss-c); }
+.jc-sep { color: var(--quiet); font-weight: 400; }
+.jc-meta { font-size: 13px; color: var(--quiet); }
+.jc-wt { grid-column: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-block-start: 10px; }
+.jc-bar { position: relative; inline-size: 240px; max-inline-size: 100%; block-size: 6px; border-radius: 99px; background: var(--ink-3); overflow: hidden; }
+.jc-bar i { position: absolute; inset-block: 0; inset-inline-start: 0; background: var(--muted); border-radius: 99px; }
+.jc-bar i.d { border-radius: 0; }
+.jc-bar i.d.up { background: var(--gain-c); }
+.jc-bar i.d.down { background: repeating-linear-gradient(135deg, var(--loss-c) 0 3px, transparent 3px 6px); }
+.jc-n { font-size: 14px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.jc-quiet { color: var(--quiet); }
+.jc-small { font-size: 12px; }
+.jc-why { grid-column: 2; margin: 14px 0 0; padding-inline-start: 14px; border-inline-start: 2px solid var(--ink-3); max-inline-size: 70ch; font-size: 15px; line-height: 1.65; color: var(--cream); white-space: pre-line; }
+.jc-why.is-empty { color: var(--quiet); font-size: 13px; }
+.jc-upd { grid-column: 2; display: flex; gap: 8px; align-items: flex-start; margin-block-start: 10px; font-size: 13px; color: var(--muted); }
+.jc-upd svg { flex: none; inline-size: 16px; block-size: 16px; margin-block-start: 2px; fill: none; stroke: var(--quiet); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.jc-upd b { color: var(--cream); font-weight: 600; }
+.jc-add, .jc-write { grid-column: 2; justify-self: start; margin-block-start: 8px; }
+.jc-write { justify-self: stretch; }
+
+.flow-wrap { padding: 4px 0; }
+.flow-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 16px; margin-block-end: 16px; font-size: 13px; color: var(--muted); }
+.flow-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.flow-legend i { inline-size: 10px; block-size: 10px; border-radius: 3px; }
+.flow { display: grid; gap: 12px; }
+.flow-row { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 16px; align-items: center; }
+.flow-lbl b { display: block; font-size: 14px; font-weight: 600; color: var(--cream); }
+.flow-lbl small { font-size: 12px; color: var(--quiet); }
+.flow-bar { display: flex; block-size: 34px; border-radius: 8px; overflow: hidden; gap: 2px; }
+.flow-bar span { display: grid; place-items: center; min-inline-size: 0; overflow: hidden; white-space: nowrap; font-size: 12px; font-weight: 600; color: #151518; opacity: 0.5; }
+.flow-bar span.is-changed { opacity: 1; box-shadow: inset 0 0 0 2px var(--cream); }
+.flow-bar span.is-cash { color: var(--cream); }
+.flow-bar.is-start span { opacity: 0.35; }
+.jr-how { margin: 16px 0 0; font-size: 13px; color: var(--quiet); text-align: center; }
+
+@media (max-width: 760px) {
+  .jc { grid-template-columns: 40px minmax(0, 1fr); padding: 16px; }
+  .jc-tk { inline-size: 40px; block-size: 40px; }
+  .jc-wt, .jc-why, .jc-upd, .jc-add, .jc-write { grid-column: 1 / -1; }
+  .jc-bar { flex: 1; inline-size: auto; }
+  .jr-big { font-size: 38px; }
+  .flow-row { grid-template-columns: 96px minmax(0, 1fr); gap: 10px; }
+}

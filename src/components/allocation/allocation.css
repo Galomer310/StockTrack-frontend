@@ -97,3 +97,7 @@
   .al-chart { block-size: 220px; }
   .al-dialog-frame { padding: 16px; }
 }
+
+/* Redesign 2026-11: centred (the global reset drops a modal's auto margin),
+   a surface tone rather than a gold frame. */
+.al-dialog { margin: auto; border: 0; background: var(--ink-1); }

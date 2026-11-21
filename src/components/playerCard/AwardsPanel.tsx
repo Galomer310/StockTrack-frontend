@@ -43,7 +43,10 @@ export const AwardsPanel = ({
   total,
   demo,
   onOpen,
+  readOnly = false,
 }: {
+  /** Another player's card: no links into the viewer's own collections. */
+  readOnly?: boolean;
   kind: AwardKind;
   awards: Award[];
   /** How many the player has in all; the panel shows at most four. */
@@ -76,7 +79,7 @@ export const AwardsPanel = ({
       ) : (
         <p className="pc-empty">{t(isMedal ? "medals_empty" : "achievements_empty")}</p>
       )}
-      {!isMedal ? (
+      {readOnly ? null : !isMedal ? (
         <div className="pc-awards-foot">
           <span>{fill(t("prg_unlocked_n"), { n: new Intl.NumberFormat(locale).format(total) })}</span>
           <Link className="pc-awards-link" to={`/player/achievements${demo != null ? `?demo=${demo}` : ""}`}>

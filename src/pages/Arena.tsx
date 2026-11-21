@@ -386,7 +386,7 @@ const Arena = () => {
                 <h3>
                   <Link to={`/investor/${d.portfolio_id}`}><bdi dir="auto">{d.name}</bdi></Link>
                 </h3>
-                <div className="ar-by"><bdi dir="auto">{handle(d.owner)}</bdi></div>
+                <Link className="ar-by" to={d.mine ? "/player" : `/players/${d.owner.id}`}><bdi dir="auto">{handle(d.owner)}</bdi></Link>
                 <div className="ar-dc-stats">
                   <span>
                     <b><bdi dir="ltr" className={tone(d.excess_pct)}>{signed(d.excess_pct)}</bdi></b>

@@ -92,6 +92,8 @@ const App = () => {
           <Route path="/test-tools" element={guarded(<TestToolsPage />)} />
           <Route path="/search" element={guarded(<StockSearch />)} />
           <Route path="/arena" element={guarded(<Arena />)} />
+          {/* Another player's card, read-only. */}
+          <Route path="/players/:id" element={guarded(<PlayerCard />)} />
           {/* The leaderboard became the Arena (monthly leagues). */}
           <Route path="/leaderboard" element={<Navigate to="/arena" replace />} />
           <Route path="/feed" element={guarded(<Feed />)} />

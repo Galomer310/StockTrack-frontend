@@ -1,5 +1,6 @@
 // frontend/src/pages/StockSearch.tsx
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
 import StockDetailPanel from "../components/stock/StockDetailPanel";
 import { useLanguage } from "../i18n/LanguageContext";
@@ -85,6 +86,8 @@ const StockSearch: React.FC = () => {
   return (
     <div className="stock-search" dir={dir} lang={lang}>
       <h2>{t("search_title")}</h2>
+      {/* The Market page lives under Search in the five-tab navigation. */}
+      <p><Link to="/market">{t("nav_market")} ←</Link></p>
       <p>{t("search_intro")}</p>
       <p>{t("search_examples")}</p>
 

@@ -85,7 +85,8 @@ export const PlayerHeader = ({
   canCheckNickname?: boolean;
   /** Saves the edit; rejects with ProfileSaveError when the server refuses it. */
   onSave: (update: ProfileUpdate) => Promise<void>;
-  onOpenTitles: () => void;
+  /** Omitted on another player's card: the collection is the owner's. */
+  onOpenTitles?: () => void;
 }) => {
   const { t, locale } = useLanguage();
   const [editing, setEditing] = useState(false);

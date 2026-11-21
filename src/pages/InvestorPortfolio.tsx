@@ -82,7 +82,7 @@ const InvestorPortfolio = () => {
           {t("back_to_leaderboard")}
         </button>
         <h1><bdi dir="auto">{portfolio.name}</bdi></h1>
-        <div className="iv-owner">
+        <Link className="iv-owner" to={is_self ? "/player" : `/players/${owner.id}`}>
           <PlayerAvatar className="iv-av" name={ownerName} avatarId={owner.avatar_id} />
           <span>
             {fill(t("inv_owner_opened"), {
@@ -90,7 +90,7 @@ const InvestorPortfolio = () => {
               date: new Date(portfolio.created_at).toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" }),
             })}
           </span>
-        </div>
+        </Link>
         {!is_self && <FollowButton playerId={owner.id} />}
       </header>
 

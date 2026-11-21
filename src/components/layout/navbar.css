@@ -1,0 +1,45 @@
+/* Navigation (approved design, 2026-11). Tokens: theme.css. */
+.topbar {
+  position: sticky; inset-block-start: 0; z-index: 50;
+  background: rgba(14, 14, 16, 0.92); backdrop-filter: blur(10px);
+  border-block-end: 1px solid var(--line);
+  padding-block-start: env(safe-area-inset-top, 0px);
+}
+.topbar-in {
+  display: flex; align-items: center; gap: 28px; max-inline-size: 1180px; block-size: 60px; margin: 0 auto;
+  padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px));
+}
+.tb-brand { font-family: var(--font-display); font-size: 19px; letter-spacing: 0.18em; color: var(--cream); text-decoration: none; direction: ltr; white-space: nowrap; }
+.tb-brand:hover { color: var(--cream); }
+.tb-tabs { display: flex; gap: 4px; margin-inline-start: auto; }
+.tb-tabs a { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 10px; color: var(--muted); font-weight: 500; text-decoration: none; transition: background-color 0.15s, color 0.15s; }
+.tb-tabs a:hover { background: var(--ink-1); color: var(--cream); }
+.tb-tabs a.is-on { background: var(--ink-1); color: var(--cream); }
+.tb-tabs svg { display: none; }
+.tb-tools { display: flex; align-items: center; gap: 6px; margin-inline-start: auto; }
+.tb-tabs + .tb-tools { margin-inline-start: 8px; }
+.tb-tools .tb-tool {
+  min-height: 34px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 99px; background: transparent;
+  color: var(--muted); font: inherit; font-size: 13px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center;
+}
+.tb-tools .tb-tool:hover { color: var(--cream); background: var(--ink-1); border-color: var(--line-2); }
+
+/* The tab bar: phones only. */
+.tabbar { display: none; }
+@media (max-width: 760px) {
+  .topbar-in { block-size: 54px; gap: 12px; }
+  .tb-tabs { display: none; }
+  .tabbar {
+    display: block; position: fixed; inset-inline: 0; inset-block-end: 0; z-index: 50;
+    background: rgba(14, 14, 16, 0.96); backdrop-filter: blur(10px); border-block-start: 1px solid var(--line);
+    padding-block-end: env(safe-area-inset-bottom, 0px);
+  }
+  .tabbar-in { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .tabbar-in a {
+    display: grid; justify-items: center; gap: 3px; padding: 8px 0 7px; color: var(--quiet);
+    font-size: 11px; font-weight: 500; text-decoration: none;
+  }
+  .tabbar-in a.is-on { color: var(--cream); }
+  .tabbar-in svg { inline-size: 22px; block-size: 22px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  body.has-tabbar { padding-block-end: calc(64px + env(safe-area-inset-bottom, 0px)); }
+}

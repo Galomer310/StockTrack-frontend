@@ -131,3 +131,6 @@
 /* A name is isolated (bdi) and becomes its own grid item, which would align it
    to its own direction; keep it on the page's side. */
 .ar-page[dir="rtl"] .ar-nm, .ar-page[dir="rtl"] .ar-nm-b { text-align: right; }
+
+.ar-by { text-decoration: none; }
+.ar-by:hover { color: var(--cream); text-decoration: underline; text-underline-offset: 3px; }

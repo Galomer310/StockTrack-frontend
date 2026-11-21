@@ -18,6 +18,12 @@ export type Lang = "he" | "en";
 const en = {
   // Navbar
   nav_home: "Home",
+  nav_tab_portfolios: "Portfolios",
+  nav_tab_search: "Search",
+  nav_tab_me: "Me",
+  pc_their_portfolios: "Their portfolios",
+  nav_main: "Main navigation",
+  nav_sign_in: "Sign in",
   nav_dashboard: "Dashboard",
   nav_player_card: "Player Card",
   nav_search: "Search Stocks",
@@ -1160,6 +1166,12 @@ export type Messages = Record<MessageKey, string>;
 
 const he: Messages = {
   nav_home: "בית",
+  nav_tab_portfolios: "תיקים",
+  nav_tab_search: "חיפוש",
+  nav_tab_me: "אני",
+  pc_their_portfolios: "התיקים של השחקן",
+  nav_main: "ניווט ראשי",
+  nav_sign_in: "התחברות",
   nav_dashboard: "לוח בקרה",
   nav_player_card: "כרטיס שחקן",
   nav_search: "חיפוש מניות",

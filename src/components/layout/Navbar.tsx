@@ -1,195 +1,114 @@
-// frontend/src/components/Navbar.tsx
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { clearUser } from "../../features/authSlice";
 import { clearActivePortfolio } from "../../features/portfolioSlice";
 import { useLanguage } from "../../i18n/LanguageContext";
+import { MessageKey } from "../../i18n/messages";
 import "../../style.css";
+import "./navbar.css";
+
+/* ===========================================================================
+   Navigation (approved design, 2026-11): five places, the same five on every
+   screen size. On a computer they sit in the top bar; on a phone they move
+   to a tab bar at the bottom, within thumb's reach, and the top bar keeps
+   only the brand, the language and signing out.
+
+     Portfolios (/user)   Arena (/arena)   Feed (/feed)   Search (/search)   Me (/player)
+
+   The Market page and stock pages count as Search; the Player Card's own
+   pages (achievements, medals, rewards) count as Me.
+
+   Dark only: the light variant is retired, so any stored preference for it
+   is cleared on load.
+   =========================================================================== */
+
+const TABS: { to: string; label: MessageKey; icon: string; also: string[] }[] = [
+  { to: "/user", label: "nav_tab_portfolios", icon: "M4 19V9M10 19V5M16 19v-7M22 19H2", also: ["/compare", "/performance"] },
+  { to: "/arena", label: "nav_leaderboard", icon: "M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM17 6h3v2a3 3 0 0 1-3 3M7 6H4v2a3 3 0 0 0 3 3", also: ["/investor"] },
+  { to: "/feed", label: "nav_feed", icon: "M4 6h16M4 12h16M4 18h10", also: [] },
+  { to: "/search", label: "nav_tab_search", icon: "M11 5a6 6 0 1 0 0 12 6 6 0 0 0 0-12zM20 20l-4.3-4.3", also: ["/market", "/stock"] },
+  { to: "/player", label: "nav_tab_me", icon: "M12 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM4 21a8 8 0 0 1 16 0", also: [] },
+];
 
 const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const location = useLocation();
-
-  // Current user from Redux; drives whether the Logout button is shown
+  const { pathname } = useLocation();
   const user = useSelector((state: RootState) => state.auth.user);
-
-  // Interface language. The navbar is translated and sets its own `dir`, so
-  // in Hebrew it reads right to left - and its drawer opens from the left -
-  // even while the pages below are not yet ported (see LanguageProvider).
   const { lang, dir, setLang, t } = useLanguage();
 
-  // State to track if the Search Stocks link is disabled
-  const [searchDisabled, setSearchDisabled] = useState(false);
-  // State to store the countdown (in seconds) for the Search Stocks button
-  const [countdown, setCountdown] = useState(60);
-
-  // Mobile menu. Below the tablet breakpoint the links collapse behind a
-  // hamburger; above it this state is irrelevant because the panel is static.
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  // The design is dark by default; this opts into the light variant instead.
-  // Restored from localStorage so the choice survives a reload.
-  const [lightMode, setLightMode] = useState(
-    () => localStorage.getItem("investments_theme") === "light"
-  );
-
-  // Apply the variant to <body> and remember the preference
+  // Dark only: undo any light-mode choice stored by the old toggle.
   useEffect(() => {
-    document.body.classList.toggle("light-mode", lightMode);
-    localStorage.setItem("investments_theme", lightMode ? "light" : "dark");
-  }, [lightMode]);
-
-  // Any navigation closes the menu, so tapping a link never leaves it hanging open
-  useEffect(() => {
-    setMenuOpen(false);
-  }, [location.pathname]);
-
-  // Escape closes the menu, and while it is open the page behind must not scroll
-  useEffect(() => {
-    if (!menuOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMenuOpen(false);
-    };
-    document.addEventListener("keydown", onKey);
-    document.body.classList.add("nav-locked");
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.classList.remove("nav-locked");
-    };
-  }, [menuOpen]);
-
-  // useEffect to handle Search Stocks button countdown
-  useEffect(() => {
-    let timer: ReturnType<typeof setInterval>;
-    if (searchDisabled) {
-      timer = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            setSearchDisabled(false);
-            return 10; // Reset countdown for next use
-          }
-          return prev - 1;
-        });
-      }, 1000);
+    document.body.classList.remove("light-mode");
+    try {
+      localStorage.removeItem("investments_theme");
+    } catch {
+      /* storage may be unavailable; nothing to undo then */
     }
-    return () => {
-      if (timer) clearInterval(timer);
-    };
-  }, [searchDisabled]);
+  }, []);
 
-  // Handler for the Search Stocks link click
-  const handleSearchClick = () => {
-    if (!searchDisabled) {
-      navigate("/search");
-      setSearchDisabled(true);
-      setCountdown(11);
-    }
-  };
+  // The tab bar needs room at the bottom of the page on phones.
+  useEffect(() => {
+    document.body.classList.toggle("has-tabbar", !!user);
+    return () => document.body.classList.remove("has-tabbar");
+  }, [user]);
 
-  // Handler for switching between the dark and light variants
-  const toggleDarkMode = () => {
-    setLightMode((prev) => !prev);
-  };
+  const isActive = (tab: (typeof TABS)[number]) =>
+    pathname === tab.to || pathname.startsWith(`${tab.to}/`) || tab.also.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 
-  // Handler for logging out: clear the session (which also removes the
-  // persisted copy in localStorage) and return to the landing page.
-  const handleLogout = () => {
+  const logout = () => {
     dispatch(clearUser());
-    // Forget which portfolio was open too: whoever signs in on this browser
-    // next must not start out pointing at someone else's book.
+    // Whoever signs in on this browser next must not start in someone else's book.
     dispatch(clearActivePortfolio());
     navigate("/");
   };
 
+  const tabs = (cls: string) => (
+    <nav className={cls} aria-label={t("nav_main")}>
+      {TABS.map((tab) => (
+        <NavLink key={tab.to} to={tab.to} className={isActive(tab) ? "is-on" : ""} aria-current={isActive(tab) ? "page" : undefined}>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d={tab.icon} />
+          </svg>
+          <span>{t(tab.label)}</span>
+        </NavLink>
+      ))}
+    </nav>
+  );
+
   return (
     <>
-      <nav className="navbar" dir={dir} lang={lang}>
-        <div className="navbar-brand">Investments</div>
-
-        {/* Hamburger, shown only below the tablet breakpoint. The three bars
-            morph into a cross while the panel is open. */}
-        <button
-          className={`nav-toggle${menuOpen ? " is-open" : ""}`}
-          onClick={() => setMenuOpen((prev) => !prev)}
-          aria-label={t(menuOpen ? "nav_close_menu" : "nav_open_menu")}
-          aria-expanded={menuOpen}
-          aria-controls="primary-navigation"
-        >
-          <span />
-          <span />
-          <span />
-        </button>
-
-        <ul
-          id="primary-navigation"
-          className={`navbar-links${menuOpen ? " is-open" : ""}`}
-        >
-          <li>
-            <Link to="/">{t("nav_home")}</Link>
-          </li>
-          <li>
-            <Link to="/user">{t("nav_dashboard")}</Link>
-          </li>
-          <li>
-            <Link to="/player">{t("nav_player_card")}</Link>
-          </li>
-          <li>
-            {searchDisabled ? (
-              <span className="nav-disabled">
-                {t("nav_search")} (<bdi>{countdown}</bdi>)
-              </span>
-            ) : (
-              <span className="nav-action" onClick={handleSearchClick}>
-                {t("nav_search")}
-              </span>
-            )}
-          </li>
-          {/* No Performance link: it lives on the dashboard now, under the
-              over-time chart, because it describes whichever portfolio you
-              have open rather than being a place of its own. */}
-          <li>
-            <Link to="/market">{t("nav_market")}</Link>
-          </li>
-          <li>
-            <Link to="/feed">{t("nav_feed")}</Link>
-          </li>
-          <li>
-            <Link to="/arena">{t("nav_leaderboard")}</Link>
-          </li>
-          <li className="nav-controls">
-            {/* Language toggle, labelled in the language it switches to */}
+      <header className="topbar" dir={dir} lang={lang}>
+        <div className="topbar-in">
+          <Link to={user ? "/user" : "/"} className="tb-brand">INVESTMENTS</Link>
+          {user && tabs("tb-tabs")}
+          <div className="tb-tools">
             <button
+              type="button"
               onClick={() => setLang(lang === "he" ? "en" : "he")}
-              className="toggle-lang"
+              className="tb-tool"
               lang={lang === "he" ? "en" : "he"}
               aria-label={t("nav_switch_language_label")}
             >
               {t("nav_switch_language")}
             </button>
-            {/* Theme toggle */}
-            <button onClick={toggleDarkMode} className="toggle-dark-mode">
-              {t(lightMode ? "nav_dark_mode" : "nav_light_mode")}
-            </button>
-            {user && (
-              /* Logout, only rendered while a session is active */
-              <button onClick={handleLogout} className="logout-btn">
+            {user ? (
+              <button type="button" onClick={logout} className="tb-tool">
                 {t("nav_logout")}
               </button>
+            ) : (
+              <Link to="/login" className="tb-tool">{t("nav_sign_in")}</Link>
             )}
-          </li>
-        </ul>
-      </nav>
-
-      {/* Tap-anywhere-to-close scrim behind the open mobile panel */}
-      <div
-        className={`nav-scrim${menuOpen ? " is-open" : ""}`}
-        onClick={() => setMenuOpen(false)}
-        aria-hidden="true"
-      />
+          </div>
+        </div>
+      </header>
+      {user && (
+        <div className="tabbar" dir={dir} lang={lang}>
+          {tabs("tabbar-in")}
+        </div>
+      )}
     </>
   );
 };

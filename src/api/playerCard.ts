@@ -179,6 +179,22 @@ export class ProfileSaveError extends Error {
 }
 
 // The signed-in player's card, or demo data when a scenario is given.
+/** What a visitor gets beside another player's card: their active portfolios. */
+export interface VisitorView {
+  playerId: number;
+  isSelf: boolean;
+  portfolios: { id: number; name: string; return_pct: number }[];
+}
+
+/** Another player's card, as anyone sees it (GET /players/:id/card): percentages only. */
+export const fetchPublicPlayerCard = async (id: number): Promise<PlayerCardResult & { visitor: VisitorView }> => {
+  const res = await axiosInstance.get<PlayerCardData & { player_id: number; is_self: boolean; portfolios: VisitorView["portfolios"] }>(
+    `${BASE}/${id}/card`
+  );
+  const { player_id, is_self, portfolios, ...data } = res.data;
+  return { data, demo: false, visitor: { playerId: player_id, isSelf: is_self, portfolios } };
+};
+
 export const fetchPlayerCard = async (demo?: DemoScenario): Promise<PlayerCardResult> => {
   if (demo) return { data: structuredClone(DEMO_PLAYER_CARDS[demo]), demo: true };
   const res = await axiosInstance.get<PlayerCardData>(`${BASE}/me/card`);

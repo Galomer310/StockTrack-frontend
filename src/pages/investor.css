@@ -43,3 +43,6 @@
   .iv-grid { grid-template-columns: minmax(0, 1fr); }
   .iv-big { font-size: 48px; }
 }
+
+.iv-owner { text-decoration: none; }
+.iv-owner:hover span { color: var(--cream); text-decoration: underline; text-underline-offset: 3px; }

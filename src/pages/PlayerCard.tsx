@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
-import { Award, fetchPlayerCard, PlayerCardResult, ProfileUpdate, saveProfile } from "../api/playerCard";
+import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Award, fetchPlayerCard, fetchPublicPlayerCard, PlayerCardResult, ProfileUpdate, saveProfile, VisitorView } from "../api/playerCard";
+import { FollowButton } from "../components/social/FollowButton";
 import { PROGRESSION_CHANGED, requestProgressionCheck, TitleCollection } from "../api/progression";
 import { ArtDefs, CornerChart, TitleOrnament } from "../components/playerCard/art";
 import { AwardDialog, AwardKind, AwardsPanel } from "../components/playerCard/AwardsPanel";
@@ -41,9 +42,13 @@ import "../components/progression/progression.css";
 const PlayerCard = () => {
   const { t, dir, lang } = useLanguage();
   const [params] = useSearchParams();
-  const demoParam = params.get("demo");
+  // /players/:id is another player's card, read-only (GET /players/:id/card).
+  const { id: playerParam } = useParams();
+  const otherId = playerParam ? Number(playerParam) : null;
+  const demoParam = otherId ? null : params.get("demo");
   const scenario = demoParam === null ? undefined : demoParam === "new" ? "newcomer" : "established";
 
+  const [visitor, setVisitor] = useState<VisitorView | null>(null);
   const [result, setResult] = useState<PlayerCardResult | null>(null);
   const [failed, setFailed] = useState(false);
   const [open, setOpen] = useState<{ award: Award; kind: AwardKind } | null>(null);
@@ -60,7 +65,20 @@ const PlayerCard = () => {
   useEffect(() => {
     let live = true;
     setResult(null);
+    setVisitor(null);
     setFailed(false);
+    if (otherId) {
+      fetchPublicPlayerCard(otherId)
+        .then((r) => {
+          if (!live) return;
+          setResult(r);
+          setVisitor(r.visitor);
+        })
+        .catch(() => live && setFailed(true));
+      return () => {
+        live = false;
+      };
+    }
     fetchPlayerCard(scenario)
       .then((r) => live && setResult(r))
       .catch(() => live && setFailed(true));
@@ -73,7 +91,10 @@ const PlayerCard = () => {
       live = false;
       window.removeEventListener(PROGRESSION_CHANGED, refresh);
     };
-  }, [scenario]);
+  }, [scenario, otherId]);
+
+  // Another player's card: read-only, with the way on to their portfolios.
+  const readOnly = !!visitor && !visitor.isSelf;
 
   // Saves, then shows the identity the server answers with, so the card
   // reflects what was stored (trimmed, cleared) rather than what was typed.
@@ -124,13 +145,30 @@ const PlayerCard = () => {
             <PlayerHeader
               player={result.data.player}
               progression={result.data.progression}
-              canEdit
-              canCheckNickname={!result.demo}
+              canEdit={!readOnly}
+              canCheckNickname={!result.demo && !readOnly}
               onSave={saveEdit}
-              onOpenTitles={() => setTitlesOpen(true)}
+              onOpenTitles={readOnly ? undefined : () => setTitlesOpen(true)}
             />
+            {readOnly && visitor && (
+              // A visitor's way on: this player's portfolios, and following them (free).
+              <section className="pc-card pc-panel pc-visit" aria-label={t("pc_their_portfolios")}>
+                <div className="pc-visit-list">
+                  {visitor.portfolios.map((p) => (
+                    <Link key={p.id} className="pc-visit-pf" to={`/investor/${p.id}`}>
+                      <bdi dir="auto">{p.name}</bdi>
+                      <bdi dir="ltr" className={p.return_pct >= 0 ? "pc-pos" : "pc-neg"}>
+                        {p.return_pct > 0 ? "+" : p.return_pct < 0 ? "−" : ""}
+                        {Math.abs(p.return_pct).toFixed(1)}%
+                      </bdi>
+                    </Link>
+                  ))}
+                </div>
+                <FollowButton playerId={visitor.playerId} />
+              </section>
+            )}
             {/* Who follows you is yours alone, and demo data has no real lists. */}
-            <StatsRow data={result.data} onOpenFollows={result.demo ? undefined : () => setFollowsOpen(true)} />
+            <StatsRow data={result.data} onOpenFollows={result.demo || readOnly ? undefined : () => setFollowsOpen(true)} />
             {/* Reading order of the approved design: medals, achievements,
                 competitions; then performance beside progress. */}
             <div className="pc-row3">
@@ -138,6 +176,7 @@ const PlayerCard = () => {
                 kind="medal"
                 awards={result.data.medals.top}
                 total={result.data.medals.total}
+                readOnly={readOnly}
                 onOpen={(award) => setOpen({ award, kind: "medal" })}
               />
               <AwardsPanel
@@ -145,6 +184,7 @@ const PlayerCard = () => {
                 awards={result.data.achievements.top}
                 total={result.data.achievements.total}
                 demo={demoParam}
+                readOnly={readOnly}
                 onOpen={(award) => setOpen({ award, kind: "achievement" })}
               />
               <CompetitionsPanel competitions={result.data.competitions} />
@@ -154,8 +194,8 @@ const PlayerCard = () => {
               <ProgressionPanel progression={result.data.progression} />
             </div>
             {/* Daily rewards are the signed-in player's own; demo data has none. */}
-            {!result.demo && <DailyRewardsPanel compact />}
-            {isTester && !result.demo && (
+            {!result.demo && !visitor && <DailyRewardsPanel compact />}
+            {isTester && !result.demo && !visitor && (
               <Link className="pc-btn pc-test-link" to="/test-tools">
                 {t("tt_open")}
               </Link>

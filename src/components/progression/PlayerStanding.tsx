@@ -19,7 +19,7 @@ export const PlayerStanding = ({
   onOpenCollection,
 }: {
   progression: PlayerCardData["progression"];
-  onOpenCollection: () => void;
+  onOpenCollection?: () => void;
 }) => {
   const { t, locale } = useLanguage();
   const p = progression.state === "available" ? progression.value : null;
@@ -36,9 +36,11 @@ export const PlayerStanding = ({
           <bdi dir="ltr">{title.name}</bdi>
         </span>
       )}
-      <button type="button" className="pc-chip-link" onClick={onOpenCollection}>
-        {t(title ? "prg_my_titles" : "prg_choose_title")}
-      </button>
+      {onOpenCollection && (
+        <button type="button" className="pc-chip-link" onClick={onOpenCollection}>
+          {t(title ? "prg_my_titles" : "prg_choose_title")}
+        </button>
+      )}
     </div>
   );
 };

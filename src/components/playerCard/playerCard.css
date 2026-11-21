@@ -539,3 +539,12 @@
 .pc-emblem { width: 104px; }
 @media (max-width: 1080px) { .pc-row2 { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 560px) { .pc-chips { justify-content: center; } }
+
+/* Another player's card: their portfolios and following them (visitor view). */
+.pc-visit { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; }
+.pc-visit-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.pc .pc-visit-pf {
+  display: inline-flex; align-items: center; gap: 10px; min-height: 40px; padding: 6px 14px; border-radius: 99px;
+  background: var(--ink-2); color: var(--cream); text-decoration: none; font-size: 14px; font-weight: 500;
+}
+.pc .pc-visit-pf:hover { background: var(--ink-3); }

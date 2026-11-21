@@ -128,7 +128,7 @@ const IndexComparison = () => {
 
   return (
     <div className="compare-page ix-page" dir={dir} lang={lang}>
-      <Link className="back-btn" to="/leaderboard">{t("back_to_leaderboard")}</Link>
+      <Link className="back-btn" to="/arena">{t("back_to_leaderboard")}</Link>
       <h2>{t("ix_title")}</h2>
       <p className="compare-note">{t("ix_intro")}</p>
 

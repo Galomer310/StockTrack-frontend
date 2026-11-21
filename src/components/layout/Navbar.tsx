@@ -158,7 +158,7 @@ const Navbar = () => {
             <Link to="/feed">{t("nav_feed")}</Link>
           </li>
           <li>
-            <Link to="/leaderboard">{t("nav_leaderboard")}</Link>
+            <Link to="/arena">{t("nav_leaderboard")}</Link>
           </li>
           <li className="nav-controls">
             {/* Language toggle, labelled in the language it switches to */}

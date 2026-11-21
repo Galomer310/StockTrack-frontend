@@ -65,7 +65,7 @@ const InvestorPortfolio = () => {
 
   return (
     <div className="investor-page" dir={dir} lang={lang}>
-      <button className="back-btn" onClick={() => navigate("/leaderboard")}>
+      <button className="back-btn" onClick={() => navigate("/arena")}>
         {t("back_to_leaderboard")}
       </button>
 

@@ -37,7 +37,7 @@ import Login from "./pages/Login";
 const Register = lazy(() => import("./pages/Register"));
 const UserPage = lazy(() => import("./pages/UserPage"));
 const StockSearch = lazy(() => import("./pages/StockSearch"));
-const Leaderboard = lazy(() => import("./pages/Leaderboard"));
+const Arena = lazy(() => import("./pages/Arena"));
 const Feed = lazy(() => import("./pages/Feed"));
 const Market = lazy(() => import("./pages/Market"));
 const InvestorPortfolio = lazy(() => import("./pages/InvestorPortfolio"));
@@ -91,7 +91,9 @@ const App = () => {
           <Route path="/player/rewards" element={guarded(<DailyRewardsPage />)} />
           <Route path="/test-tools" element={guarded(<TestToolsPage />)} />
           <Route path="/search" element={guarded(<StockSearch />)} />
-          <Route path="/leaderboard" element={guarded(<Leaderboard />)} />
+          <Route path="/arena" element={guarded(<Arena />)} />
+          {/* The leaderboard became the Arena (monthly leagues). */}
+          <Route path="/leaderboard" element={<Navigate to="/arena" replace />} />
           <Route path="/feed" element={guarded(<Feed />)} />
           <Route path="/market" element={guarded(<Market />)} />
           <Route path="/investor/:id" element={guarded(<InvestorPortfolio />)} />

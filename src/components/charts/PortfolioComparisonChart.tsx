@@ -165,7 +165,7 @@ const PortfolioComparisonChart: React.FC<Props> = ({ mine, theirs }) => {
   return (
     <div className="comparison-chart">
       <div className="chart-container chart-tall">
-        <Line data={data} options={options} />
+        <Line data={data} options={options} aria-label={t("chart_portfolio_comparison")} />
       </div>
 
       <p className="compare-note">{t("cmp_chart_note")}</p>

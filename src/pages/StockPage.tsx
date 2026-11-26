@@ -25,7 +25,7 @@ const StockPage = () => {
         <p className="quota-warning">{t("quota_busy")}</p>
       )}
 
-      <StockDetailPanel symbol={symbol} allowAdd onQuota={setQuotaLeft} />
+      <StockDetailPanel symbol={symbol} allowAdd onQuota={setQuotaLeft} headingLevel="h1" />
     </div>
   );
 };

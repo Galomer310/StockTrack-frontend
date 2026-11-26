@@ -236,7 +236,7 @@ body:not(.light-mode) :is(input[type="text"], input[type="email"], input[type="p
 .portfolio-cards { padding: 4px 2px 8px; margin-inline: 0; }
 
 /* Page titles that are h2: cream, like every other title. */
-body:not(.light-mode) :is(.feed-page, .market-page, .stock-search, .compare-page, .investor-page) > h2:first-of-type {
+body:not(.light-mode) :is(.feed-page, .market-page, .stock-search, .compare-page, .investor-page) > :is(h2:first-of-type, h1.page-h) {
   background: none;
   color: var(--cream);
 }
@@ -265,3 +265,48 @@ body:not(.light-mode) :is(.feed-page, .market-page, .stock-search, .compare-page
 
 /* Summary cards: no gold rule on top (tone, not ornament). */
 .summary-card::before { display: none; }
+
+/* ---------- Accessibility (IS 5568 / WCAG 2.1 AA) ---------- */
+/* Read by screen readers, never shown. */
+.visually-hidden {
+  position: absolute !important;
+  inline-size: 1px; block-size: 1px;
+  margin: -1px; padding: 0; border: 0;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Off-screen until a keyboard user Tabs onto it. */
+.skip-link {
+  position: absolute; z-index: 1000;
+  inset-block-start: 8px; inset-inline-start: 8px;
+  padding: 10px 16px; border-radius: 10px;
+  background: var(--champ); color: var(--ink-0);
+  font-weight: 700; text-decoration: none;
+  transform: translateY(-200%);
+}
+.skip-link:focus, .skip-link:focus-visible {
+  transform: none;
+  outline: 2px solid var(--cream); outline-offset: 2px;
+}
+
+/* <main> and page headings receive focus from the skip link and on route
+   changes. They are not controls, so no ring: the screen reader announces
+   them, and the page scrolls to them. */
+.site-main:focus, .site-main h1[tabindex="-1"]:focus { outline: none; }
+
+.site-footer {
+  border-block-start: 1px solid var(--line);
+  margin-block-start: 48px;
+  padding: 20px 16px;
+}
+.site-footer ul {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 24px;
+  margin: 0; padding: 0; list-style: none;
+}
+.site-footer a { color: var(--muted); font-size: 0.88rem; text-underline-offset: 3px; }
+.site-footer a:hover { color: var(--cream); }
+
+@media (prefers-reduced-motion: reduce) {
+  .skip-link { transition: none; }
+}

@@ -11,7 +11,7 @@
 }
 .prof-info:hover, .prof-info[aria-expanded="true"] { color: var(--gold-bright); text-shadow: 0 0 8px var(--gold-line); box-shadow: none; }
 .prof-result { margin-inline-start: auto; font-variant-numeric: tabular-nums; color: var(--text); text-align: end; }
-.prof-missing { color: var(--text-faint); font-size: 0.86rem; }
+.prof-missing { color: var(--muted); font-size: 0.86rem; } /* --text-faint is 3.4:1 here, under the 4.5:1 minimum */
 
 .prof-meter {
   position: relative; block-size: 8px; margin-block: 10px 4px; border-radius: 999px;

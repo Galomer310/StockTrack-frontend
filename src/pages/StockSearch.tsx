@@ -85,7 +85,7 @@ const StockSearch: React.FC = () => {
 
   return (
     <div className="stock-search" dir={dir} lang={lang}>
-      <h2>{t("search_title")}</h2>
+      <h1 className="page-h">{t("search_title")}</h1>
       {/* The Market page lives under Search in the five-tab navigation. */}
       <p><Link to="/market">{t("nav_market")} ←</Link></p>
       <p>{t("search_intro")}</p>

@@ -115,6 +115,8 @@ body.light-mode::before { opacity: 0.5; }
 h1, h2, h3, h4 { line-height: 1.25; letter-spacing: -0.015em; font-weight: 600; }
 h1 { font-size: clamp(2rem, 5vw, 3.25rem); }
 h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
+/* A page title promoted from h2 to h1 for screen readers keeps its old size. */
+h1.page-h { font-size: clamp(1.5rem, 3vw, 2rem); }
 h3 { font-size: 1.2rem; }
 
 a { color: var(--gold); text-decoration: none; }
@@ -407,24 +409,27 @@ body.light-mode .navbar { background: rgba(255, 255, 255, 0.82); }
 body.light-mode .login-container,
 body.light-mode .register-container { background: rgba(255, 255, 255, 0.92); }
 
-.login-container::before, .register-container::before {
+/* Two classes, so it beats the theme's plain h1 colour and stays gold. */
+:is(.login-container, .register-container) .auth-eyebrow {
   display: block;
+  margin-top: 0;
+  font-family: inherit;
+  line-height: 1.4;
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.3em;
   color: var(--gold);
   margin-bottom: 0.4rem;
 }
-/* The eyebrow text comes from data-eyebrow so it can be translated */
-.login-container::before, .register-container::before { content: attr(data-eyebrow); }
+/* The eyebrow is the page's <h1>: a real heading for screen readers and
+   the browser tab title, styled as the small label it always was. */
 
 /* Hebrew has no capitals, and wide letter-spacing breaks up its letterforms
    (as in the navbar). The address and password fields stay left to right but
    line up with the rest of the right-aligned form. */
 .hero-overlay:lang(he)::before,
 .hero-buttons:lang(he) .btn,
-.login-container:lang(he)::before,
-.register-container:lang(he)::before { letter-spacing: normal; }
+.auth-eyebrow:lang(he) { letter-spacing: normal; }
 .login-container:lang(he) input[dir="ltr"],
 .register-container:lang(he) input[dir="ltr"] { text-align: right; }
 
@@ -435,6 +440,11 @@ body.light-mode .register-container { background: rgba(255, 255, 255, 0.92); }
   margin: 1.25rem 0 0.9rem;
 }
 .login-container input, .register-container input { width: 100%; }
+/* Visible labels: a placeholder disappears as soon as typing starts. */
+.auth-field { display: grid; gap: 0.3rem; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); }
+.auth-consent { display: flex; align-items: flex-start; gap: 0.55rem; font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
+.login-container .auth-consent input, .register-container .auth-consent input { width: auto; flex: none; margin-block-start: 0.2rem; inline-size: 18px; block-size: 18px; accent-color: var(--champ); }
+.auth-consent a { color: var(--champ); text-decoration: underline; text-underline-offset: 3px; }
 .login-container button, .register-container button { width: 100%; }
 
 /* The secondary link-style button under each form */
@@ -594,8 +604,12 @@ tbody tr:hover { background: var(--gold-wash); }
   text-transform: uppercase;
   color: var(--text-muted);
 }
-.watchlist-header > div { cursor: pointer; transition: color 0.2s ease; }
-.watchlist-header > div:hover { color: var(--gold-bright); }
+.watchlist-header .sort-btn {
+  all: unset; cursor: pointer; transition: color 0.2s ease;
+  font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit;
+}
+.watchlist-header .sort-btn:hover { color: var(--gold-bright); }
+.watchlist-header .sort-btn:focus-visible { outline: 2px solid var(--champ); outline-offset: 2px; }
 
 .watchlist-row { transition: background-color 0.15s ease; }
 .watchlist-row:hover { background: var(--gold-wash); }
@@ -700,7 +714,7 @@ tbody tr:hover { background: var(--gold-wash); }
 }
 .back-btn:hover { color: var(--gold-bright); border-color: var(--gold-line); }
 
-.investor-page h2, .compare-page h2 { margin-bottom: 0.2rem; }
+.investor-page h2, .compare-page h2, .compare-page h1.page-h { margin-bottom: 0.2rem; }
 
 .compare-verdict {
   display: inline-block;
@@ -723,7 +737,7 @@ tbody tr:hover { background: var(--gold-wash); }
   border-radius: 999px;
   background: rgba(91, 140, 184, 0.18);
   border: 1px solid rgba(91, 140, 184, 0.4);
-  color: var(--steel);
+  color: #9DBFDE; /* --steel was 3.7:1 on the badge; this is above 4.5:1 */
   font-size: 0.6rem;
   font-weight: 700;
   letter-spacing: 0.08em;

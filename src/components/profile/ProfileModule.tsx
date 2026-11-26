@@ -75,13 +75,20 @@ const Row = ({
         </button>
         <span className="prof-result">{missing ? <span className="prof-missing">{missing}</span> : value}</span>
       </div>
+      {/* A meter with no value is not a meter: when the metric is not
+          available yet the empty track is decoration, and the "not
+          available" text above already says so. */}
       <div
         className="prof-meter"
-        role="meter"
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={meter === null ? undefined : Math.round(meter)}
-        aria-label={t(`prof_${metric}` as MessageKey)}
+        {...(meter === null
+          ? { "aria-hidden": true }
+          : {
+              role: "meter",
+              "aria-valuemin": 0,
+              "aria-valuemax": 100,
+              "aria-valuenow": Math.round(meter),
+              "aria-label": t(`prof_${metric}` as MessageKey),
+            })}
       >
         {meter !== null && <span className="prof-fill" style={{ inlineSize: `${Math.max(2, meter)}%` }} />}
         {meter !== null && <span className="prof-mark" style={{ insetInlineStart: `${meter}%` }} />}

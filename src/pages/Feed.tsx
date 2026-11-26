@@ -321,7 +321,7 @@ const Feed = () => {
 
   return (
     <div className="feed-page" dir={dir} lang={lang}>
-      <h2>{t("feed_title")}</h2>
+      <h1 className="page-h">{t("feed_title")}</h1>
       <p className="feed-subtitle">{t("feed_subtitle")}</p>
 
       {posts.length === 0 ? (

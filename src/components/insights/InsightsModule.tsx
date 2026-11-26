@@ -236,7 +236,7 @@ const Body = ({ data, meta }: { data: InsightsData; meta: Insights }) => {
       </div>
 
       <div className="ins-chart" role="img" aria-label={t("pi_chart_label")}>
-        <Line data={chart} options={options} />
+        <Line data={chart} options={options} aria-label={t("chart_insights")} />
       </div>
 
       <p className="ins-foot">

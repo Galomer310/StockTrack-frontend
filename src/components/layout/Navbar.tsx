@@ -89,10 +89,13 @@ const Navbar = () => {
               type="button"
               onClick={() => setLang(lang === "he" ? "en" : "he")}
               className="tb-tool"
-              lang={lang === "he" ? "en" : "he"}
-              aria-label={t("nav_switch_language_label")}
             >
-              {t("nav_switch_language")}
+              {/* The visible name is in the other language and is read in
+                  it; the hidden part says what the button does, in the
+                  current one. The accessible name contains the visible text,
+                  so voice control ("click English") still finds it. */}
+              <span lang={lang === "he" ? "en" : "he"}>{t("nav_switch_language")}</span>
+              <span className="visually-hidden"> ({t("nav_switch_language_label")})</span>
             </button>
             {user ? (
               <button type="button" onClick={logout} className="tb-tool">

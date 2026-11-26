@@ -118,7 +118,7 @@ const PortfolioPerformanceChart: FC<PortfolioPerformanceChartProps> = ({
     <div style={{ maxWidth: "800px", margin: "2rem auto" }}>
       {" "}
       {/* Container with max-width and centered margin */}
-      <Line data={chartData} options={chartOptions} />{" "}
+      <Line data={chartData} options={chartOptions} aria-label={t("chart_portfolio_value")} />{" "}
       {/* Render the Line chart with the prepared data and options */}
     </div>
   );

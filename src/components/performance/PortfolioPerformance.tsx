@@ -164,8 +164,9 @@ const PortfolioPerformance: React.FC<PortfolioPerformanceProps> = ({
                 <td>${item.latestPrice.toFixed(2)}</td>{" "}
                 {/* Formatted latest price */}
                 <td>{item.quantity}</td> {/* Quantity cell */}
-                <td style={{ color: item.profitLoss >= 0 ? "green" : "red" }}>
-                  ${item.profitLoss.toFixed(2)}{" "}
+                <td style={{ color: item.profitLoss >= 0 ? "var(--gain)" : "var(--loss)" }}>
+                  {/* The sign carries gain/loss too, not the colour alone (WCAG 1.4.1). */}
+                  {item.profitLoss >= 0 ? "+" : "−"}${Math.abs(item.profitLoss).toFixed(2)}{" "}
                   {/* Profit or loss value, colored green if positive and red if negative */}
                 </td>
               </tr>

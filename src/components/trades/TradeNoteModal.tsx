@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { fill, serverMessage } from "../../i18n/fill";
+import { useDialogFocus } from "../ui/useDialogFocus";
 
 /* ===========================================================================
    The note window shown for every buy and sell.
@@ -48,7 +49,11 @@ const TradeNoteModal: React.FC<Props> = ({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const noteRef = useRef<HTMLTextAreaElement>(null);
+  const boxRef = useRef<HTMLDivElement>(null);
   const { t, dir, lang } = useLanguage();
+  // Tab stays inside, and focus returns to the Buy/Sell button on close.
+  // Escape is handled below, where it can respect `submitting`.
+  useDialogFocus(boxRef, open);
 
   // Reset each time it opens, so a previous thesis never leaks into a new trade
   useEffect(() => {
@@ -116,6 +121,7 @@ const TradeNoteModal: React.FC<Props> = ({
       lang={lang}
     >
       <div
+        ref={boxRef}
         className="modal trade-modal"
         onClick={(e) => e.stopPropagation()}
         role="dialog"

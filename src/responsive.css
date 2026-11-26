@@ -423,7 +423,7 @@ body.nav-locked { overflow: hidden; }
   padding-bottom: 1.25rem;
   border-bottom: 1px solid var(--border);
 }
-.stock-headline h2 { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.stock-headline :is(h1, h2) { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
 
 .stock-ticker-chip {
   padding: 0.15rem 0.55rem;

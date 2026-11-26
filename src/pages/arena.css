@@ -1,7 +1,7 @@
 /* The Arena (approved design, 2026-11). Tokens: theme.css. */
 .ar-page { max-inline-size: 1180px; margin: 0 auto; padding: 24px 16px 64px; display: grid; gap: 16px; color: var(--cream); }
 .ar-muted { color: var(--muted); margin: 0; }
-.ar-quiet { color: var(--quiet); font-size: 12px; }
+.ar-quiet { color: var(--muted); font-size: 12px; } /* --quiet drops under 4.5:1 on the raised ladder rows */
 .ar-center { text-align: center; }
 .ar-error { color: var(--loss-c); text-align: center; }
 .is-up { color: var(--gain-c); }
@@ -62,7 +62,7 @@
 .ar-ladder > div { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; background: var(--ink-2); }
 .ar-ladder > div.is-cur { background: var(--champ-wash); box-shadow: inset 0 0 0 1px rgba(207, 174, 110, 0.45); }
 .ar-ladder > div.is-cur .ar-lg { color: var(--champ); }
-.ar-ladder-nm small { color: var(--quiet); font-size: 12px; }
+.ar-ladder-nm small { color: var(--muted); font-size: 12px; } /* --quiet is 4.1:1 on the current-league row */
 .ar-ladder-cnt { font-size: 13px; color: var(--muted); }
 .ar-rules { margin: 12px 0 0; font-size: 12px; line-height: 1.65; color: var(--quiet); }
 

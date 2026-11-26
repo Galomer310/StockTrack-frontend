@@ -12,6 +12,10 @@ import { ProgressionWatcher } from "./components/progression/ProgressionWatcher"
 import { DailyRewardsWatcher } from "./components/dailyRewards/DailyRewardsWatcher";
 import { IdleWatcher } from "./components/session/IdleWatcher";
 import { ProfessionalWatcher } from "./components/medals/ProfessionalWatcher";
+import { SkipLink, MAIN_ID } from "./components/layout/SkipLink";
+import { RouteFocus } from "./components/layout/RouteFocus";
+import SiteFooter from "./components/layout/SiteFooter";
+import { useLanguage } from "./i18n/LanguageContext";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 
@@ -49,6 +53,10 @@ const AchievementCollection = lazy(() => import("./pages/AchievementCollection")
 const DailyRewardsPage = lazy(() => import("./pages/DailyRewardsPage"));
 const TestToolsPage = lazy(() => import("./pages/TestToolsPage"));
 const ProfessionalPage = lazy(() => import("./pages/ProfessionalPage"));
+// The two statements are public: anyone must be able to read them before
+// registering, and a visitor with a disability before signing in at all.
+const AccessibilityStatement = lazy(() => import("./pages/AccessibilityStatement"));
+const PrivacyStatement = lazy(() => import("./pages/PrivacyStatement"));
 
 // Shown while a route chunk is in flight. Deliberately quiet: on a fast
 // connection the chunk arrives in a few frames, and a spinner that appears
@@ -61,6 +69,7 @@ const RouteFallback = () => (
 
 const App = () => {
   const user = useSelector((state: RootState) => state.auth.user);
+  const { dir, lang } = useLanguage();
 
   // Every authenticated route repeats the same "signed in, or go to login"
   // check. Writing it once keeps the table below readable and makes it
@@ -70,6 +79,10 @@ const App = () => {
 
   return (
     <Router>
+      {/* First thing a keyboard user reaches: straight past the navigation. */}
+      <SkipLink />
+      {/* Moves focus to the new page's heading and names the tab after it. */}
+      <RouteFocus />
       <Navbar />
       {/* Unlock notices and the title ceremony, for whoever is signed in. */}
       {user && <ProgressionWatcher />}
@@ -78,11 +91,16 @@ const App = () => {
       {user && <ProfessionalWatcher />}
       {/* Signs out after 15 minutes without activity. */}
       {user && <IdleWatcher />}
+      {/* The one main landmark. tabIndex -1 lets the skip link and the route
+          change move focus here without adding it to the Tab order. */}
+      <main id={MAIN_ID} tabIndex={-1} className="site-main" dir={dir} lang={lang}>
       <Suspense fallback={<RouteFallback />}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/accessibility" element={<AccessibilityStatement />} />
+          <Route path="/privacy" element={<PrivacyStatement />} />
 
           <Route path="/user" element={guarded(<UserPage />)} />
           <Route path="/player" element={guarded(<PlayerCard />)} />
@@ -113,6 +131,8 @@ const App = () => {
           <Route path="/manual-add" element={<Navigate to="/search" replace />} />
         </Routes>
       </Suspense>
+      </main>
+      <SiteFooter />
     </Router>
   );
 };

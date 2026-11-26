@@ -413,23 +413,28 @@ const Watchlist = ({ portfolio, onTraded }: Props) => {
         <div className="watchlist-header">
           {" "}
           {/* Header row for the watchlist table */}
-          <div className="ticker" onClick={() => handleSort("stock_symbol")}>
-            {t("col_ticker")}{" "}
-            {sortBy === "stock_symbol" && (sortOrder === "asc" ? "↑" : "↓")}{" "}
-            {/* Show sort arrow */}
-          </div>
-          <div className="price" onClick={() => handleSort("price")}>
-            {t("col_price")} {sortBy === "price" && (sortOrder === "asc" ? "↑" : "↓")}{" "}
-            {/* Show sort arrow */}
-          </div>
-          <div className="quantity" onClick={() => handleSort("quantity")}>
-            {t("col_qty")} {sortBy === "quantity" && (sortOrder === "asc" ? "↑" : "↓")}{" "}
-            {/* Show sort arrow */}
-          </div>
-          <div className="added" onClick={() => handleSort("added_at")}>
-            {t("col_added")} {sortBy === "added_at" && (sortOrder === "asc" ? "↑" : "↓")}{" "}
-            {/* Show sort arrow */}
-          </div>
+          {/* Real buttons, so the sort is reachable with Tab and Enter, and
+              the arrow is spoken as words rather than as a glyph. */}
+          {([
+            ["ticker", "stock_symbol", "col_ticker"],
+            ["price", "price", "col_price"],
+            ["quantity", "quantity", "col_qty"],
+            ["added", "added_at", "col_added"],
+          ] as const).map(([cls, field, label]) => (
+            <div className={cls} key={field}>
+              <button type="button" className="sort-btn" onClick={() => handleSort(field)}>
+                <span className="visually-hidden">{t("watchlist_sort_by")} </span>
+                {t(label)}
+                {sortBy === field && (
+                  <>
+                    {" "}
+                    <span aria-hidden="true">{sortOrder === "asc" ? "↑" : "↓"}</span>
+                    <span className="visually-hidden"> ({t(sortOrder === "asc" ? "watchlist_sorted_asc" : "watchlist_sorted_desc")})</span>
+                  </>
+                )}
+              </button>
+            </div>
+          ))}
           <div className="actions">{t("col_actions")}</div>{" "}
           {/* Column header for actions */}
         </div>

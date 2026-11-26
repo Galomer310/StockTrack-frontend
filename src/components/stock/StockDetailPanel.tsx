@@ -115,6 +115,8 @@ interface Props {
   allowAdd?: boolean;
   /** Called with the remaining daily request budget after each response */
   onQuota?: (remaining: number) => void;
+  /** h1 when the panel is the whole page (/stock/:ticker); h2 under the search page title */
+  headingLevel?: "h1" | "h2";
 }
 
 const money = (n: number) => `$${n.toFixed(2)}`;
@@ -140,7 +142,8 @@ const describeError = (
   return t(fallback);
 };
 
-const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }) => {
+const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota, headingLevel = "h2" }) => {
+  const Heading = headingLevel;
   const [quote, setQuote] = useState<Quote | null>(null);
   const [overview, setOverview] = useState<Overview | null>(null);
   const [news, setNews] = useState<Article[]>([]);
@@ -383,7 +386,18 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
   }
 
   if (error) {
-    return <p className="error">{error}</p>;
+    // On its own page the panel is the page: it keeps a title (the symbol)
+    // even when the quote could not be loaded, and the error is announced.
+    return (
+      <>
+        {headingLevel === "h1" && (
+          <h1 className="page-h">
+            <bdi>{symbol}</bdi>
+          </h1>
+        )}
+        <p className="error" role="alert">{error}</p>
+      </>
+    );
   }
 
   return (
@@ -447,12 +461,12 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
       {quote && (
         <div className="stock-headline">
           <div>
-            <h2>
+            <Heading className={headingLevel === "h1" ? "page-h" : undefined}>
               {/* Company names arrive in English; bdi keeps "Apple Inc." from
                   showing as ".Apple Inc" on a Hebrew page. */}
               <bdi>{overview?.name || quote.symbol}</bdi>
               <span className="stock-ticker-chip">{quote.symbol}</span>
-            </h2>
+            </Heading>
             <div className="stock-price-row">
               <span className="stock-price">{money(quote.price)}</span>
               <span className={quote.change >= 0 ? "gain" : "loss"} dir="ltr">
@@ -581,7 +595,7 @@ const StockDetailPanel: React.FC<Props> = ({ symbol, allowAdd = false, onQuota }
 
       {bars.length > 0 ? (
         <div className="chart-container chart-tall">
-          <Line data={chartData} options={chartOptions} />
+          <Line data={chartData} options={chartOptions} aria-label={t("chart_stock_price")} />
         </div>
       ) : (
         !barsLoading && <p className="stock-empty">{t("stock_no_history")}</p>

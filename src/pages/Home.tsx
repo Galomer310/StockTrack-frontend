@@ -6,6 +6,9 @@ const Home = () => {
   const { t, dir, lang } = useLanguage();
   return (
     <div className="home-container" dir={dir} lang={lang}>
+      {/* The landing page shows no title of its own; screen readers and the
+          browser tab still need one. */}
+      <h1 className="visually-hidden">Investments</h1>
       <div className="hero">
         {/* The eyebrow line above the buttons is drawn by CSS (::before),
             which reads its text from data-eyebrow so it can be translated. */}

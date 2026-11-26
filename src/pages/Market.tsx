@@ -88,7 +88,7 @@ const Market = () => {
 
   return (
     <div className="market-page" dir={dir} lang={lang}>
-      <h2>{t("market_title")}</h2>
+      <h1 className="page-h">{t("market_title")}</h1>
       <p className="leaderboard-subtitle">{t("market_subtitle")}</p>
 
       {/* Type a ticker once, then jump to it on any of the sites below. */}

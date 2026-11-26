@@ -121,7 +121,7 @@ export const AllocationModule = ({ portfolioId, reloadKey = 0 }: { portfolioId: 
 
       <div className="al-body">
         <div className="al-chart">
-          <Doughnut data={chartData} options={options} />
+          <Doughnut data={chartData} options={options} aria-label={t("chart_allocation")} />
         </div>
 
         <table className="al-table">

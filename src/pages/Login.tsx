@@ -81,29 +81,34 @@ const Login = () => {
   return (
     <>
       <div className="login-page" dir={dir} lang={lang}>
-        <div className="login-container" data-eyebrow={t("auth_eyebrow_login")}>
-          {" "}
-          {/* Container with CSS class for login */}
+        <div className="login-container">
+          <h1 className="auth-eyebrow">{t("auth_eyebrow_login")}</h1>
           <form onSubmit={handleLogin}>
-            {" "}
-            {/* Form submission triggers handleLogin */}
-            {/* An address and a password read left to right in either language */}
-            <input
-              type="email" // Input field for email
-              dir="ltr"
-              placeholder={t("auth_email")} // Placeholder text
-              value={email} // Bind value to email state
-              onChange={(e) => setEmail(e.target.value)} // Update email state on change
-              required // Mark input as required
-            />
-            <input
-              type="password" // Input field for password
-              dir="ltr"
-              placeholder={t("auth_password")} // Placeholder text
-              value={password} // Bind value to password state
-              onChange={(e) => setPassword(e.target.value)} // Update password state on change
-              required // Mark input as required
-            />
+            {/* An address and a password read left to right in either language.
+                Visible labels, and autocomplete so password managers and
+                assistive tech fill them (WCAG 1.3.5, 3.3.2). */}
+            <label className="auth-field">
+              {t("auth_email")}
+              <input
+                type="email"
+                dir="ltr"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </label>
+            <label className="auth-field">
+              {t("auth_password")}
+              <input
+                type="password"
+                dir="ltr"
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </label>
             <button type="submit">{t("auth_login")}</button> {/* Submit button */}
           </form>
           <button onClick={() => navigate("/")}>{t("auth_back_home")}</button>{" "}

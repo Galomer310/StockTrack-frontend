@@ -5,6 +5,7 @@ import { fill } from "../../i18n/fill";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { tierName } from "./format";
 import { Medal } from "./Medal";
+import { useDialogFocus } from "../ui/useDialogFocus";
 import "./professional.css";
 
 /* ===========================================================================
@@ -47,6 +48,10 @@ export const ProfessionalWatcher = () => {
     check();
   }, [location.pathname, check]);
 
+  const box = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<() => void>();
+  useDialogFocus(box, !!notice, () => closeRef.current?.());
+
   if (!notice) return null;
 
   const close = () => {
@@ -57,13 +62,14 @@ export const ProfessionalWatcher = () => {
         holding.current = false;
       });
   };
+  closeRef.current = close;
   const medal = notice.medals[0];
   const count = notice.achievements.length;
   const shown = notice.achievements.slice(0, 3);
 
   return (
     <div className="pro-notice-backdrop" dir={dir} lang={lang} onClick={(e) => e.target === e.currentTarget && close()}>
-      <div className="pro-notice" role="dialog" aria-modal="true" aria-labelledby="pro-notice-title">
+      <div ref={box} className="pro-notice" role="dialog" aria-modal="true" aria-labelledby="pro-notice-title" tabIndex={-1}>
         {medal && (
           <>
             <span className="pro-notice-kicker">{medal.is_upgrade ? t("pro_notice_upgrade") : t("pro_notice_medal")}</span>

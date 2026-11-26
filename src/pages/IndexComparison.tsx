@@ -129,7 +129,7 @@ const IndexComparison = () => {
   return (
     <div className="compare-page ix-page" dir={dir} lang={lang}>
       <Link className="back-btn" to="/arena">{t("back_to_leaderboard")}</Link>
-      <h2>{t("ix_title")}</h2>
+      <h1 className="page-h">{t("ix_title")}</h1>
       <p className="compare-note">{t("ix_intro")}</p>
 
       {portfolios && portfolios.length === 0 && <p className="stock-empty">{t("dash_open_portfolio")}</p>}
@@ -196,7 +196,7 @@ const IndexComparison = () => {
             </div>
           </div>
           <div className="ins-chart" role="img" aria-label={t("ix_chart_label")}>
-            <Line data={chart} options={options} />
+            <Line data={chart} options={options} aria-label={t("chart_index_comparison")} />
           </div>
           <p className="ins-foot">{fill(t("ix_proxy_note"), { symbol: ltr(data.index.symbol) })}</p>
           {data.estimated && <p className="ins-foot">{t("pi_estimated")}</p>}
